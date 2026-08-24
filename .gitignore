@@ -1,0 +1,6 @@
+# BMAD — cài lại được qua trình cài đặt (npx bmad-method install), không cần version control
+_bmad/
+.claude/skills/
+
+# van-dao là repo git riêng — không lồng repo con vào đây
+van-dao/

@@ -1,0 +1,81 @@
+<!-- bmad:context -->
+<!-- Verified 2026-08-24. Không phải git repo — chưa có SHA để đối chiếu; van-dao/ đối chiếu ở HEAD 040f2e8. Managed by bmad-project-context; sửa trong khối này sẽ bị ghi đè ở lần refresh sau. Nội dung ngoài marker được giữ nguyên. -->
+
+## van-dao
+
+Plugin `van-dao`: biến sách PDF/EPUB người dùng đã có thành lộ trình học có người kèm. Mã nguồn ở
+`van-dao/` (repo git riêng, **chỉ chứa mã nguồn** — không CLAUDE.md, không tài liệu). Toàn bộ tài liệu,
+đặc tả, và điều phối làm việc (kể cả sửa code trong `van-dao/`) đều thực hiện từ workspace BMAD này.
+
+Thiết kế: `docs/VAN-DAO-dac-ta-v1.0.md` — 2.112 dòng, mở theo mục, bắt đầu ở §0 (bảng tra từ vựng), đừng
+nạp cả file. Đang ở đâu, làm gì tiếp: `docs/VAN-DAO-trang-thai-du-an.md` §10.
+
+## Policy
+
+- **IMPORTANT: không bao giờ commit nội dung sách hoặc hồ sơ người học vào `van-dao/`.** Chúng ở
+  `~/.vandao/` trên máy người dùng; `van-dao/.gitignore` chặn `*.pdf` · `*.epub` · `.vandao/`. Đừng tạo
+  file mẫu vi phạm việc này.
+- Đặc tả (`docs/VAN-DAO-dac-ta-v1.0.md`) là nguồn sự thật. Mã lệch đặc tả thì sửa đặc tả trước, sửa mã
+  sau.
+- Không thêm thành phần ngoài §13 đặc tả mà chưa hỏi.
+- Không viết thêm design hay data contract trước khi có executable spec — viết just-in-time theo vòng.
+  Căn cứ: `docs/VAN-DAO-trang-thai-du-an.md` §4.2 — bốn lần soát tài liệu bắt 0/11 defect, walkthrough
+  chạy ca thật bắt 11/11.
+- Không làm việc trực tiếp bên trong `van-dao/` (không mở phiên riêng cd vào đó) — mọi thay đổi cho
+  `van-dao/` khởi tác từ workspace này.
+
+## Where things are
+
+- Mã nguồn plugin: `van-dao/` — repo git riêng, không có CLAUDE.md hay docs/ nội bộ
+- Đặc tả & trạng thái dự án: `docs/`
+- Data contract một bí kíp: `van-dao/tham-chieu/bi-kip.schema.md` — đi cặp với
+  `van-dao/bin/kiem-bi-kip.py` (§6 của schema là luật bằng lời của đúng những phép kiểm script thực thi,
+  §7 là phần script không làm — đổi một bên thì đổi bên kia trong cùng một thay đổi, kèm fixture và test)
+- Eval skill/agent: `van-dao/.claude/rules/eval.md` — tự nạp khi làm việc trong `van-dao/skills/` hoặc
+  `van-dao/agents/`
+- Artifact kế hoạch BMAD: `_bmad-output/planning-artifacts`, `_bmad-output/implementation-artifacts`
+
+## Running and verifying
+
+- `cd van-dao && pip install -r requirements-dev.txt && python -m pytest tests/ -v` — đúng lệnh CI chạy
+  (Python 3.11, cả `ubuntu-latest` và `windows-latest`)
+- `python van-dao/bin/kiem-bi-kip.py --kho van-dao/tests/fixtures` — thoát mã 1 là ĐÚNG, fixture
+  `sach-loi` cố ý chứa lỗi; `<quyển> --json` cho đầu ra máy đọc (0 đạt · 1 có lỗi · 2 không chạy được)
+- `claude plugin validate van-dao --strict` — chạy sau mỗi lần đụng `van-dao/.claude-plugin/` hay thêm
+  skill
+- Script BMAD ở đây (`_bmad/scripts/*.py` qua `uv run`) trên Windows phải kèm `PYTHONIOENCODING=utf-8`,
+  vd: `PYTHONIOENCODING=utf-8 uv run _bmad/scripts/resolve_config.py --project-root .` — thiếu biến này
+  sẽ crash `UnicodeEncodeError` vì stdout mặc định code page cp1252, không xử lý được Unicode trong output
+
+## Conventions that differ from defaults
+
+- Định danh trong mã, tên file, tên trường YAML dùng tiếng Việt **không dấu**; kebab-case cho file và
+  `id`, snake_case cho trường YAML.
+- Mọi script trong `van-dao/bin/` phải kèm luật tương đương bằng lời trong `van-dao/tham-chieu/`, và
+  **không được phụ thuộc code page của máy chạy**: mở file khai `encoding="utf-8"`, ép
+  `sys.stdout`/`sys.stderr` về UTF-8.
+- Mọi SKILL.md trong `van-dao/skills/` phải có "Xong khi", "Khi nào skill này không giúp được", trình
+  tự "Trình → xác nhận → ghi → kiểm", và (nếu có field trong `customize.toml`) bước nạp field đó trước
+  việc chính (§12.4 đặc tả).
+- Mọi ví dụ trong đặc tả và `van-dao/tham-chieu/` phải là ví dụ tổng hợp, không lấy từ bí kíp thật (R24).
+- Yêu cầu ở đặc tả §8 gồm **34 mục**: `R1`–`R31` cộng `R13b`, `R32`, `R33`. Sửa hành vi thì trỏ đúng R nào.
+- Tham chiếu tương đối từ file trong `van-dao/` sang `docs/` ở workspace này phụ thuộc độ sâu (`../docs/`
+  từ gốc `van-dao/`, `../../docs/` từ thư mục con cấp 1, `../../../docs/` từ `.claude/rules/`).
+
+## Known pitfalls
+
+- **Rỗng ≠ vắng** (R13). `chi_nhanh: []` hợp lệ; `sai_lam_pho_bien: []` chỉ là cảnh báo. Defect đầu tiên
+  của dự án, đã có regression test khoá lại.
+- Validator có ba mức — `L()` lỗi chặn nhập kho · `C()` cảnh báo · `G()` ghi chú — và chỉ `loi` quyết
+  định mã thoát. Chọn nhầm mức là cách âm thầm nhất làm hỏng luồng thu sách.
+- Bí kíp có hai hình dạng rẽ ở `kiem_mot()`: `loai: bi-kip` có `chuong/` và đồ thị phụ thuộc;
+  `loai: tan-quyen` không có `chuong/`, trường sư phạm nằm thẳng trong `manifest.yaml`.
+- Ba đường truyền tin định nghĩa thiết kế bằng thứ **không** mang theo (đặc tả §4.5): thư linh → nghiệm
+  công không mang giáo án; giám khảo → phúc khảo không mang tiêu chí; trưởng môn → trưởng lão không mang
+  `thu-linh/**`. Bốn vai chấm là subagent **tươi**, không bao giờ fork.
+- `.pham-vi.json` thiếu → **không vai nào** đọc được, không phải mọi vai đọc được (R26). Fail an toàn.
+- `van-dao/tests/test_kiem_bi_kip.py` gọi script qua `subprocess`, đọc `--json` — kiểm cả giao diện
+  lệnh. Thêm phép kiểm mới thì thêm ca lỗi vào fixture `sach-loi`, assert theo **mã lỗi** (`ma`), không
+  theo thông điệp.
+
+<!-- /bmad:context -->
