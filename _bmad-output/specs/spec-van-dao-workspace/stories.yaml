@@ -1,0 +1,320 @@
+- id: "1"
+  title: Thiết lập ban đầu — ngôn ngữ giao tiếp
+  description: >-
+    Khi plugin bật lần đầu, giúp người học chọn ngôn ngữ giao tiếp qua
+    userConfig (.claude-plugin/plugin.json); nếu chưa đặt, bước mở đầu
+    tự kiểm và hướng dẫn /plugin configure — phiên sau nạp lại, không
+    hỏi lại. Xem SPEC.md CAP-16.
+  spec_checkpoint: true
+  done_checkpoint: false
+  invoke_dev_with: >-
+    userConfig ĐÃ verify chạy thật 2026-08-26 (NFR8): field
+    communication_language thêm vào van-dao/.claude-plugin/plugin.json
+    (type=string, default=Vietnamese, có title bắt buộc — claude
+    plugin validate --strict từng FAIL vì thiếu title, tài liệu gốc
+    không nhắc field này); claude plugin install --config lưu đúng
+    vào ~/.claude/settings.json pluginConfigs["van-dao@van-dao"].options.
+    QUAN TRỌNG — claim đã sửa sau tự kiểm: cài qua CLI KHÔNG kèm
+    --config thì Claude Code KHÔNG tự chặn/hỏi — chỉ in cảnh báo "1
+    userConfig option not yet set" và cài xong với field trống. KHÔNG
+    được giả định Claude Code tự động hỏi khi bật plugin — nhap-mon
+    (hoặc bước mở đầu) phải tự đọc field này, và nếu trống thì chủ
+    động hướng dẫn người dùng chạy /plugin configure van-dao@van-dao.
+    Đường cài tương tác thật (người dùng, không qua CLI headless) vẫn
+    chưa verify được — có thể hành vi khác, cần kiểm khi có TTY thật.
+
+- id: "2"
+  title: Bái sư — đặt tên môn phái, khai vai/mạch, đặt tên 4 vai
+  description: >-
+    Đặt tên môn phái, ghi nhập môn ký, khai vai + mạch (hỏi VAI trước
+    nếu chưa biết muốn luyện gì, suy mạch từ vai kèm cờ nguồn gợi ý),
+    đặt tên riêng cho 4 vai nói-với-người-học (gợi ý sẵn, tự nhập
+    được), kích hoạt nghi thức bái sư khi có việc thật đứng sau. Xem
+    SPEC.md CAP-8 (phần bái sư), CAP-16, đặc tả §10.0.
+  spec_checkpoint: true
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Nhánh "chưa biết muốn luyện gì" hỏi VAI trước ("ngươi làm nghề
+    gì") — KHÔNG hỏi mạch trước, vì mạch là khái niệm của hệ, người
+    mới không trả lời được (đặc tả §10.0). "Ghi nhập môn ký" dùng
+    chung cơ chế tự-ghi/disable-model-invocation với đạo tâm (story 9)
+    — dựng song song cùng bước 7 §16, theo R32/FR22 KHÔNG được tự ghi
+    hộ. Cơ chế dùng chung nhưng CĂN CỨ khác: nhập môn ký đứng trên
+    Cialdini Commitment & Consistency (1984/2006), không phải Pierce
+    et al. 2003 của FR22 — đừng copy nguyên văn lý do của story 9.
+    Đặt tên 4 vai (FR35): chỉ 4 vai nói-với-người-học (Trưởng môn,
+    Tàng kinh trưởng lão, Thư linh, Giám khảo — đặc tả §3 bảng "Nói
+    với người học"), không đặt tên 4 vai âm thầm còn lại; gợi ý vài
+    tên kèm tự nhập, không ép chọn danh sách (khuôn agents.* của
+    BMAD). Đột phá cảnh giới (nghi thức thứ ba của FR23) hoãn tới
+    story 18 (CAP-6) — nếu người học hỏi ở MVP, trả lời rõ "chưa hỗ
+    trợ ở bản này".
+
+- id: "3"
+  title: Chỉ điểm — Trưởng môn gọi tên sách
+  description: >-
+    Sau khi khai vai/mạch, Trưởng môn chỉ điểm — gọi tên sách cụ thể
+    cho người học tự đi tìm, không chọn mạch hộ; mắt xích duy nhất
+    khởi động hệ khi tàng kinh các còn rỗng. Xem SPEC.md CAP-17, đặc
+    tả §10.0-10.3.
+  spec_checkpoint: true
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Luật chống bịa: mỗi chỉ điểm đủ 5 trường (tên/tác giả/năm-ấn
+    bản/công pháp-tâm pháp/vì sao) — ba dữ kiện đầu cụ thể khó bịa
+    hơn một cái tên trần; không chắc thì nói không chắc (đặc tả
+    §10.2). Ghi vào truong-mon/chi-diem.jsonl, 5 trạng thái: dang_treo
+    (còn hiệu lực, nhắc 1 câu phiên sau) / het_hieu_luc (bị thay) /
+    da_thu (đã vào kho) / ban_hong (kiếm thấy sách nhưng bản này
+    không rút được chữ — GIỮ trong chỉ điểm, khuyên tìm bản khác,
+    KHÁC khong_thay ở chỗ quyết định) / khong_thay (kiếm không ra,
+    ghi truong-mon/chi-diem-hong.jsonl, chỉ quyển khác). Chỉ điểm mới
+    thay HẲN chỉ điểm cũ (không cộng dồn) nhưng vẫn tra lại được nếu
+    người học hỏi tên cũ. Số chỉ điểm mặc định 3 công pháp + 2 tâm
+    pháp (đã biết muốn luyện gì) / 1+1 (chưa biết) — chỉnh qua
+    so_chi_diem trong customize.toml. Công pháp luôn kèm gợi ý tâm
+    pháp đỡ trần; mức chắc chắn (kèm số liệu thật / kèm nguồn khai
+    báo / chỉ suy đoán — bảng quyết định §10.3) PHẢI nói trước khi
+    đưa danh sách, không phải sau — dòng suy đoán là ca MẶC ĐỊNH ở
+    n=1 (kho rỗng nhiều tháng đầu), không phải ca dự phòng hiếm gặp.
+
+- id: "4"
+  title: Thu bí kíp
+  description: >-
+    Giải nghĩa PDF/EPUB thành lớp sư phạm dạy được khi người học mang
+    sách tìm được từ chỉ điểm về; tự đánh dấu đoạn tin cậy thấp
+    (bảng/công thức/code dày đặc); xử lý các kết quả tìm sách; người
+    dùng bắt buộc sửa-duyệt pha 2 trước khi sinh cấp chương; dừng
+    ngay khi không rút được chữ; bí kíp có hai mức hợp lệ (đủ dùng/đủ
+    chuẩn); kích hoạt nghi thức thu bí kíp khi bí kíp vào kho. Xem
+    SPEC.md CAP-1, CAP-8 (phần thu bí kíp).
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Dùng book-to-skill (virgiliojr94) đã verify chạy thật — không tự
+    viết lại engine phân giải. Tham khảo companion đặc tả §6 cho 3
+    pha (giám định / trích xuất / thiết kế sư phạm). Xử lý nhánh kết
+    quả thỉnh sách (đặc tả §10.0 flow): "kiếm được" → chạy story này;
+    "không thấy SÁCH" → ghi chi-diem-hong.jsonl, quay lại story 3 chỉ
+    điểm quyển khác; "bản hỏng" (thấy sách, bản không rút được chữ)
+    → GIỮ nguyên trong chỉ điểm, khuyên tìm bản khác, KHÔNG gạch khỏi
+    chỉ điểm; "chưa đụng tới" → nhắc một câu phiên sau, không nài.
+    Nghi thức thu bí kíp kích hoạt khi bí kíp vào kho (chi-diem:
+    da_thu) — cùng cơ chế disable-model-invocation với story 2 (bái
+    sư)/story 9 (đạo tâm), khác thời điểm kích hoạt. FR37: pha 2
+    (thiết kế sư phạm) máy CHỈ ĐỀ XUẤT kèm lý do — không tự quyết
+    xương sống/tiêu chí đạt/điểm hạ sơn; bắt buộc dừng chờ người dùng
+    sửa-và-duyệt trước khi sinh cấp chương (đặc tả §6.2, sơ đồ). FR38:
+    không rút được chữ (ExtractionError) → dừng ngay, báo "tìm bản
+    khác", KHÔNG OCR, KHÔNG tạo bí kíp rỗng (đặc tả §6.1/§6.2). FR39:
+    hai mức hợp lệ — đủ dùng (mục tiêu/giả định nền/tiêu chí đạt
+    thô/≥1 câu vận dụng, vào kho ngay) và đủ chuẩn (thêm tiêu chí chi
+    tiết/sai lầm phổ biến/worked example, bồi SAU KHI học chương đó,
+    không theo lịch); Thư linh dạy ở mức đủ dùng phải nói rõ đang
+    chấm theo mục tiêu, chưa có tiêu chí chi tiết (đặc tả §6.5). Ở
+    n=1, người học luôn dùng bản chưa bồi — hạn chế cấu trúc, không
+    phải thiếu sót cài đặt.
+
+- id: "5"
+  title: Lộ đồ trình duyệt trước khi dạy
+  description: >-
+    Sinh và trình lộ đồ cả quyển duyệt trước khi dạy; nháp chưa duyệt
+    sống sót qua gián đoạn phiên. Xem SPEC.md CAP-2, ARCHITECTURE-SPINE.md
+    AD-6/AD-9.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    AD-9 bắt buộc ghi nháp NGAY lúc sinh xong (append, đúng AD-2), không
+    chờ đóng máy. AD-6: sửa lộ đồ sau duyệt bắt buộc duyệt lại — mỗi lần
+    duyệt là bản ghi mới, không sửa tại chỗ.
+
+- id: "6"
+  title: "Dạy: tóm lược mở đầu, giáo án, hỏi ngược, đối chất quan niệm cũ"
+  description: >-
+    Trình tóm lược/mô hình tổng quan chương (FR1a — 4C/ID Supportive
+    Information, van Merriënboer & Kirschner 2018) trước khi hỏi ngược
+    từng ý; giáo án ra file trước mỗi chương; hỏi ngược mỗi ý (không
+    đáp câu trùng nghiệm công đang treo); đối chất quan niệm cũ trước
+    nội dung trái ngược (thừa nhận bằng lời không tự coi là đã gỡ).
+    Xem SPEC.md CAP-3.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Tóm lược dựa trên lớp giải nghĩa FR1 đã có, không để model tự bịa
+    tại chỗ; đây là bước chuẩn bị nhận thức đứng trước, không thay thế
+    hỏi ngược. Tóm lược là Loại 3 (AD-5) — dẫn xuất/cache từ FR1, KHÔNG
+    phải nguồn lưu trữ chính; không tạo cơ chế đồng bộ riêng cho nó, vì
+    story 16 (Epic 10, nhắc lại) sẽ tự tái sinh từ FR1 chứ không đọc
+    cache của story này. Giáo án chỉ ghi SỰ KIỆN mỗi nước đi (AD-5 Loại
+    2 — không ghi nội dung lời giảng; lưu lại là có hại, không chỉ
+    thừa). FR2a (R5, đặc tả §7.0): khi một câu nghiệm công đang treo
+    (chưa chấm xong ở story 8), Thư linh KHÔNG được đáp câu hỏi trùng
+    câu đó — hỏi ngược lại; giảng lại (nếu cần) bằng ví dụ KHÁC, không
+    dùng đúng ca đang được nghiệm công; ghi nhật ký các câu đã né.
+    FR3a (R18, đặc tả §5.12): Thư linh KHÔNG tự tuyên bố tâm ma đã
+    gỡ — thừa nhận bằng lời chỉ đưa `chua_go`→`dang_go`; chuyển sang
+    `da_go` đòi bằng chứng trong bài (nghiệm công/khảo thí, làm khác
+    đi thật); dấu hiệu cũ quay lại sau `da_go` thì sang `tai_phat`
+    (trạng thái RIÊNG, không gộp về `chua_go` — người học từng vượt
+    qua được, câu nói khác với người mới). Người học bảo cách cũ vẫn
+    đúng trong hoàn cảnh họ thì đóng nhánh, không ép (không gác cổng).
+
+- id: "7"
+  title: "Dạy: giàn giáo co giãn, chẩn đoán và giảng lại"
+  description: >-
+    Mức gợi ý co giãn theo vấp/vững; sai lần hai đổi cách trình bày, sai
+    lần ba báo lên thay vì giảng lại. Xem SPEC.md CAP-3.
+  spec_checkpoint: true
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Phụ thuộc kỹ thuật vào story 6 (cùng CAP-3, khác pha build — đặc tả
+    bước 11 so với bước 5).
+
+- id: "8"
+  title: Soát độc lập, tách vai
+  description: >-
+    Chấm bởi vai tách biệt vai dạy (subagent tươi, không fork), có căn
+    cứ trích dẫn; khảo thí có soát thứ hai độc lập, cờ bất đồng khi
+    không khớp. Xem SPEC.md CAP-4, ARCHITECTURE-SPINE.md AD-1.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Bốn cạnh không-mang-theo của AD-1 phải đúng tuyệt đối: Thư linh →
+    Nghiệm Công Sứ không mang giáo án/ghi chép; Giám khảo → Phúc Khảo Sứ
+    không mang tiêu chí. Đây là ranh giới quyết định "độc lập" có thật
+    hay chỉ hình thức.
+
+- id: "9"
+  title: Đạo tâm tự ghi
+  description: >-
+    Sổ đạo tâm do người học tự ghi; không vai nào ghi hộ. Xem SPEC.md
+    CAP-7.
+  spec_checkpoint: true
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Bắt buộc disable-model-invocation ở tầng skill/tool, không chỉ quy
+    ước lời nói trong prompt — đây là một ràng buộc kiểm được, không
+    phải gợi ý. Cơ chế này được story 2 (bái sư, "ghi nhập môn ký")
+    tái dùng — dựng song song ở cùng bước 7 §16, không phải story này
+    xong trước mới làm story 2.
+
+- id: "10"
+  title: Trả lời rõ khi chưa hỗ trợ
+  description: >-
+    Ý định ngoài phạm vi đã dựng trả lời "chưa hỗ trợ ở bản này", không
+    im lặng không đoán liều. Xem SPEC.md CAP-14.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Áp cho mọi ý định của /vd:chi-duong — cross-cutting, không riêng
+    một vai.
+
+- id: "11"
+  title: Không khen sáo rỗng
+  description: >-
+    Không khen xã giao/nịnh bợ ở mọi phản hồi (Dạy, Soát, Nền). Xem
+    SPEC.md CAP-15.
+  spec_checkpoint: false
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Kiểm bằng behavioral eval — ca thử "đưa câu trả lời tầm thường",
+    xác nhận hệ không khen sáo rỗng. Đây là story cuối MVP — sau story
+    này nên chạy lại toàn bộ eval suite trước khi coi MVP xong.
+
+- id: "12"
+  title: Định hướng có lối tự nhập
+  description: >-
+    Gợi ý học gì tiếp kèm lối tự nhập, nói rõ nguồn thật hay suy đoán.
+    Xem SPEC.md CAP-5.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Suy đoán cần xác nhận thêm một bước mới coi là chấp nhận — không
+    dừng ở một nhãn thụ động. Khác story 3 (chỉ điểm, cold-start, kho
+    rỗng) — story này giả định kho đã có nội dung để gợi ý dựa vào.
+
+- id: "13"
+  title: Quét kho gợi sách
+  description: >-
+    Công cụ quét kho trả tối đa 3 lựa chọn kèm lý do. Xem SPEC.md
+    CAP-12.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: >-
+    tra-tang-kinh-cac — công cụ, không phải vai; không sở hữu quyết
+    định nào (đặc tả §4.2). Khác story 3 (chỉ điểm) — công cụ này quét
+    kho ĐÃ có sách, chỉ điểm là khi kho còn rỗng.
+
+- id: "14"
+  title: Hạ sơn và phục mệnh
+  description: >-
+    Nhánh mang kiến thức ra việc thật rồi báo lại nhận cả báo cáo thất
+    bại. Xem SPEC.md CAP-9.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Trưởng môn dẫn đệ tử qua dao-tam để TỰ ghi dòng đạo tâm (không ghi
+    hộ — cùng ràng buộc story 9).
+
+- id: "15"
+  title: Bản đồ trực quan tiến độ
+  description: >-
+    Tiến độ nhiều quyển/mạch xem dạng bản đồ, dựng lại được từ artifact
+    gốc. Xem SPEC.md CAP-13.
+  spec_checkpoint: false
+  done_checkpoint: true
+  invoke_dev_with: >-
+    ban-do.py + Artifact — Loại 3 (dẫn xuất/cache theo AD-5), không phải
+    nguồn lưu trữ chính. Đúng bước §16 (bước 17), dựng trước Liền mạch
+    (bước 18).
+
+- id: "16"
+  title: Nhắc lại và hệ thống hoá cuối quyển
+  description: >-
+    Nhắc lại nội dung liên quan trước chương phụ thuộc; hệ thống hoá
+    toàn quyển trước khảo thí. Xem SPEC.md CAP-10.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: >-
+    F6 (nhắc lại) và F7 (hệ thống hoá) trong thu-linh — chặn bởi story 6
+    đã xong. F6 KHÔNG đọc cache tóm lược của story 6 (Loại 3, không phải
+    nguồn lưu trữ chính) — tự tái sinh nội dung liên quan từ lớp giải
+    nghĩa FR1 (Loại 1), cắt khớp nối cứng với runtime artifact của Epic
+    3.
+
+- id: "17"
+  title: Nối lại mạch cũ và xuất quan
+  description: >-
+    Quay lại chương dở hỏi lại một hai câu để tự quyết đi tiếp hay ôn
+    lại; xuất quan là tạm dừng hợp lệ, giữ nguyên lộ đồ/giáo án. Xem
+    SPEC.md CAP-10. Đây là story cuối Vòng 3.
+  spec_checkpoint: true
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Không tính theo số ngày đã qua — quyết định dựa trên câu trả lời
+    thật, không phải thời gian trôi qua.
+
+- id: "18"
+  title: Đo cảnh giới có hiệu chuẩn
+  description: >-
+    Tuyên bố cảnh giới cần ≥2 nguồn độc lập, đa mẫu đo độ tản mát, chỉ
+    công bố khi κ đạt ngưỡng. Xem SPEC.md CAP-6.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    κ<0,6 thì KHÔNG công bố nhãn — chỉ nêu dấu hiệu. Gọi đúng tên "đa
+    mẫu, đo độ tản mát", không gọi "self-consistency" (mượn uy tín một
+    kỹ thuật cho việc nó chưa từng được kiểm chứng).
+
+- id: "19"
+  title: Chú Giải Sứ bồi sai lầm phổ biến
+  description: >-
+    Sai lầm lặp lại cùng chỗ thì bồi ghi chú vào lớp chú giải riêng,
+    không sửa gốc, không mang chi tiết tình huống thật ra ngoài. Xem
+    SPEC.md CAP-11.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    AD-1: Chú Giải Sứ cấm đọc ban-giao/tinh-huong/ — vai duy nhất đầu ra
+    có thể rời máy người dùng khi bí kíp đạt mức chia sẻ được, nên tuyệt
+    đối không được thấy dữ liệu riêng tư.

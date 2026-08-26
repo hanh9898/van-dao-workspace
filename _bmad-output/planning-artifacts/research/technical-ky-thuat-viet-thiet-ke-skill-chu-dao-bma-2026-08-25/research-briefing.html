@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kỹ thuật viết skill BMAD — Báo cáo</title>
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#f6f7f9; --card:#ffffff; --text:#1a1d23; --text-dim:#5b6270;
+    --border:#e3e6eb; --accent:#3b5bdb; --accent-dim:#eef1fd;
+    --ok:#1c7c3c; --ok-bg:#e6f6ea; --med:#a8710a; --med-bg:#fdf2df;
+    --low:#b0330f; --low-bg:#fde9e2; --unv:#8a1f9c; --unv-bg:#f6e6f9;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#14161a; --bg-alt:#1b1e24; --card:#1b1e24; --text:#e7e9ee; --text-dim:#9aa1b0;
+      --border:#2b2f38; --accent:#7d95f5; --accent-dim:#232a45;
+      --ok:#4fd07a; --ok-bg:#0f2b1a; --med:#e0ab4c; --med-bg:#2f2410;
+      --low:#f0806a; --low-bg:#341410; --unv:#d68ae0; --unv-bg:#2c1730;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+  a{color:var(--accent)}
+  header{padding:2rem 1.5rem 1.5rem;border-bottom:1px solid var(--border);background:var(--bg-alt)}
+  header h1{margin:0 0 .5rem;font-size:1.5rem}
+  .meta{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;color:var(--text-dim);font-size:.9rem}
+  .meta strong{color:var(--text)}
+  .wrap{max-width:920px;margin:0 auto;padding:0 1.5rem}
+  .summary-card{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:1.5rem 0}
+  nav.toc{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--border);padding:.6rem 1.5rem;z-index:10;overflow-x:auto;white-space:nowrap}
+  nav.toc a{margin-right:1.1rem;font-size:.85rem;text-decoration:none;color:var(--text-dim)}
+  nav.toc a:hover{color:var(--accent)}
+  section{margin:2rem 0}
+  h2{font-size:1.2rem;border-bottom:1px solid var(--border);padding-bottom:.4rem}
+  h3{font-size:1.02rem;color:var(--accent)}
+  .warn-box{background:var(--med-bg);border:1px solid var(--med);border-radius:6px;padding:.9rem 1.1rem;margin:1rem 0;font-size:.93rem}
+  .badge{display:inline-block;font-size:.72rem;font-weight:600;padding:.12rem .5rem;border-radius:99px;margin-left:.3rem;vertical-align:middle}
+  .badge-ok{background:var(--ok-bg);color:var(--ok)}
+  .badge-med{background:var(--med-bg);color:var(--med)}
+  .badge-low{background:var(--low-bg);color:var(--low)}
+  .badge-unv{background:var(--unv-bg);color:var(--unv)}
+  .rec{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin:.9rem 0}
+  .rec .feed{color:var(--text-dim);font-size:.85rem;margin-top:.5rem}
+  ol.oq li{margin-bottom:.5rem}
+  table.sources{width:100%;border-collapse:collapse;font-size:.85rem}
+  table.sources td{border-bottom:1px solid var(--border);padding:.5rem .6rem;vertical-align:top}
+  table.sources td:first-child{width:2.5rem;color:var(--text-dim)}
+  details{background:var(--bg-alt);border:1px solid var(--border);border-radius:8px;padding:.8rem 1rem}
+  summary{cursor:pointer;font-weight:600}
+  .note{font-size:.85rem;color:var(--text-dim)}
+  code{background:var(--bg-alt);padding:.1rem .3rem;border-radius:4px;font-size:.88em}
+  footer{max-width:920px;margin:2rem auto;padding:1rem 1.5rem 3rem;color:var(--text-dim);font-size:.8rem}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap" style="padding:0">
+    <h1>Kỹ thuật viết, thiết kế skill chủ đạo của BMAD-METHOD</h1>
+    <div class="meta">
+      <span><strong>Loại:</strong> Technical (nguồn cục bộ)</span>
+      <span><strong>Ngày:</strong> 2026-08-25</span>
+      <span><strong>Preset:</strong> standard · 5 chiều breadth-first</span>
+      <span><strong>Xác minh:</strong> 7/7 claim verified <span class="badge badge-ok">verified</span></span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#summary">Tóm tắt</a>
+  <a href="#d1">2.1 Cấu trúc</a>
+  <a href="#d2">2.2 Trạng thái</a>
+  <a href="#d3">2.3 Điều phối</a>
+  <a href="#d4">2.4 HITL/gate</a>
+  <a href="#d5">2.5 Văn phong</a>
+  <a href="#cross">Xuyên chiều</a>
+  <a href="#rec">Khuyến nghị</a>
+  <a href="#oq">Câu hỏi mở</a>
+  <a href="#src">Nguồn</a>
+  <a href="#stale">Độ mới</a>
+</nav>
+
+<div class="wrap">
+
+<section id="summary">
+  <div class="summary-card">
+    <strong>Quyết định phục vụ:</strong> Vấn Đạo sắp viết SKILL.md/agents/hooks/customize.toml thật cho 8 vai của mình — nghiên cứu này đọc trực tiếp mã nguồn 7 skill BMAD-METHOD tiêu biểu để rút kỹ thuật thiết kế đã chứng minh, thay vì phát minh khuôn riêng.
+    <ul>
+      <li><strong>Bước 1 activation giống hệt nhau</strong> ở 5/5 skill: <code>resolve_customization.py</code> rồi fallback <code>customize.toml</code>.</li>
+      <li><strong>"Extract, don't ingest"</strong> lặp lại xuyên nhiều skill dưới nhiều tên (research firewall, lens isolation) — parent không bao giờ giữ full text.</li>
+      <li><strong>Memlog không phải cơ chế phổ quát</strong> — bmad-prfaq dùng hẳn cơ chế khác (frontmatter <code>stage</code>).</li>
+      <li><strong>Reviewer Gate ≠ Plan Gate</strong> — hai triết lý HITL khác nhau, chỉ có ở các skill khác nhau.</li>
+    </ul>
+    <div class="warn-box">⚠ <strong>Cảnh báo xuyên suốt:</strong> BMAD-METHOD không đồng nhất — mọi khái quát hoá "BMAD luôn làm X" đã bị kiểm tra chéo và phần lớn <strong>sai</strong> khi soi vào bmad-review, bmad-prfaq, hoặc bmad-brainstorming. Đọc nhãn "chỉ thấy ở n/5" trước khi copy sang Vấn Đạo.</div>
+  </div>
+</section>
+
+<section id="d1">
+  <h2>2.1 Cấu trúc &amp; giao thức skill</h2>
+  <p>Mọi SKILL.md mở đầu bằng frontmatter tối giản rồi một H1 <a href="#src-1">[1]</a><a href="#src-2">[2]</a><a href="#src-3">[3]</a><a href="#src-4">[4]</a><a href="#src-5">[5]</a>. Section quy ước path tên không thống nhất (<code>## Conventions</code> vs <code>## Resolution rules</code>) nhưng nội dung tương đương: <code>{skill-root}</code>, <code>{project-root}</code>, <code>{workflow.&lt;name&gt;}</code>.</p>
+  <p><code>{doc_workspace}</code> chỉ khai tường minh ở 3/5 file <span class="badge badge-med">medium</span>.</p>
+  <p>Cơ chế merge <code>customize.toml</code> thật (đọc <code>config_utils.py</code> <a href="#src-12">[12]</a>): ba lớp base→team→user, mảng bảng có field khoá <code>code</code>/<code>id</code> thì merge-theo-khoá (khoá trùng thay thế, khoá mới append), ngược lại nối đuôi thuần tuý.</p>
+  <p><strong>Lệch mẫu:</strong> bmad-prd đọc thẳng <code>_bmad/bmm/config.yaml</code> thay vì gọi <code>resolve_config.py</code> như 3 skill kia — lý do chưa xác nhận được <a href="#src-1">[1]</a>. bmad-review lệch mẫu rõ nhất: <code>## Execution</code>, không chào người dùng, không memlog/run-folder.</p>
+</section>
+
+<section id="d2">
+  <h2>2.2 Giữ trạng thái xuyên phiên</h2>
+  <p>Memlog là "LLM-optimal working memory" <a href="#src-10">[10]</a>: log phẳng, chronological, append-only. Ba bất biến: (1) không sửa/xoá — không có subcommand edit/delete; (2) write-only/blind — ghi atomic, echo JSON, không đọc lại giữa phiên; (3) không có field "status" — trạng thái là một <code>event</code>.</p>
+  <p><code>{doc_workspace}</code> = <code>{output_path}/{run_folder_pattern}/</code> ở cả 3 skill có memlog. bmad-deep-recon dùng <code>recon_kit.py slug</code> để tên folder deterministic theo topic <a href="#src-13">[13]</a>.</p>
+  <div class="warn-box">⚠ <strong>Không phải cơ chế phổ quát:</strong> bmad-prfaq hoàn toàn không dùng <code>memlog.py</code> — resume bằng frontmatter <code>stage</code> (chỉ đọc 20 dòng đầu) + comment HTML nhúng trong tài liệu <a href="#src-6">[6]</a>.</div>
+</section>
+
+<section id="d3">
+  <h2>2.3 Điều phối subagent</h2>
+  <p>"Research firewall" — định nghĩa chính xác nhất — chỉ có ở bmad-deep-recon <a href="#src-3">[3]</a><a href="#src-8">[8]</a>. Các skill khác dùng cơ chế tương đương nhưng <strong>không cùng contract</strong>: deep-recon <code>{claim, source, publisher, pub_date, accessed, confidence, class}</code>; prd/architecture reviewer <code>verdict + top 2-5 findings + file path</code>; review <code>{lens, location, trigger_condition, guard_snippet, potential_consequence}</code>.</p>
+  <p>Quy tắc bất biến: <strong>ghi file trước khi làm gì khác với kết quả</strong> — kể cả fallback tuần tự vẫn "write the file first, then flush it from context" <a href="#src-1">[1]</a><a href="#src-9">[9]</a>.</p>
+  <div class="warn-box">⚠ <strong>Không tìm thấy cơ chế kỹ thuật (sandbox/permission)</strong> nào thực thi firewall — toàn bộ là kỷ luật văn xuôi. Xem Khuyến nghị #4.</div>
+</section>
+
+<section id="d4">
+  <h2>2.4 Human-in-the-loop / gate</h2>
+  <p><strong>Plan Gate</strong> (deep-recon): "the one hard stop, kept light" — một điểm dừng cứng TRƯỚC khi chạy, sau đó liền mạch <a href="#src-8">[8]</a>.</p>
+  <p><strong>Reviewer Gate</strong> (prd, architecture): lint deterministic → rubric walker + reviewer cấu hình, dispatch song song, trình bày tiered (verdict một câu, critical+high, medium/low gộp đuôi) — KHÔNG tồn tại trong bmad-deep-recon <a href="#src-1">[1]</a><a href="#src-9">[9]</a>.</p>
+  <p>Coaching path mặc định ở prd/architecture: "elicit, don't quiz" — mở câu hỏi thắng menu trắc nghiệm. bmad-architecture: quyết định trọng yếu phải "shown, not silently made" <a href="#src-2">[2]</a>.</p>
+  <p>"Never ask what a scan could answer" — tường minh nhất ở bmad-project-context, coi là <strong>defect</strong> <a href="#src-7">[7]</a>.</p>
+</section>
+
+<section id="d5">
+  <h2>2.5 Văn phong hướng dẫn model</h2>
+  <p>Ngôi thứ hai xuyên suốt; 4/5 mở đầu bằng persona "You are.../Act as..." — bmad-review là ngoại lệ, không gán persona.</p>
+  <p>"One test decides what belongs" — chỉ đúng nghĩa đen ở bmad-architecture <a href="#src-2">[2]</a>, nhưng biến thể "một tiêu chí thay liệt kê" lặp lại ở 4/5 file khác.</p>
+  <p>Đẩy chi tiết ra <code>references/*.md</code>, nạp just-in-time — không tìm thấy quy tắc số-dòng-tối-đa bằng lời cho SKILL.md ở bất kỳ file nào.</p>
+</section>
+
+<section id="cross">
+  <h2>3. Phát hiện xuyên chiều</h2>
+  <ol>
+    <li><strong>Ba lớp kỷ luật khác nhau</strong> dưới cùng triết lý "đừng để context/tài liệu trôi": memlog · "extract, don't ingest" · "distill at the end" — ba bài toán khác nhau, dễ nhầm là một (xem Khuyến nghị #6).</li>
+    <li><strong>Plan Gate vs Reviewer Gate</strong> là hai triết lý HITL khác nhau theo bản chất quyết định (dừng-trước vs soát-sau) — xem Khuyến nghị #3.</li>
+    <li><strong>Sự không đồng nhất giữa các skill BMAD</strong> tự nó là bài học: chọn cơ chế theo hình dạng công việc, không copy khuôn nặng nhất — xem Khuyến nghị #2.</li>
+  </ol>
+</section>
+
+<section id="rec">
+  <h2>5. Khuyến nghị</h2>
+  <div class="rec"><strong>1.</strong> Áp nguyên văn khuôn "bước 1 activation" cho mọi skill mới của Vấn Đạo. <span class="badge badge-ok">verified</span><div class="feed">Feed vào: <code>thu-linh/SKILL.md</code>, <code>truong-mon/SKILL.md</code></div></div>
+  <div class="rec"><strong>2.</strong> Không copy <code>memlog.py</code> máy móc — chọn theo hình dạng công việc (<code>thu-linh</code> nặng, <code>khao-thi</code> nhẹ). <span class="badge badge-med">medium</span><div class="feed">Feed vào: architecture spine (đã đúng hướng AD-2)</div></div>
+  <div class="rec"><strong>3.</strong> Đặt tên tường minh Plan Gate (F-1 lộ đồ) vs Reviewer Gate (Nghiệm Công Sứ/Phúc Khảo Sứ). <span class="badge badge-ok">verified</span><div class="feed">Feed vào: bmad-spec/epics cho FR6, FR12a-b</div></div>
+  <div class="rec"><strong>4.</strong> Giữ nguyên ranh giới file-system thật của Vấn Đạo — mạnh hơn kỷ luật văn xuôi của BMAD. <span class="badge badge-ok">verified</span><div class="feed">Feed vào: đã đúng hướng, không cần hành động</div></div>
+  <div class="rec"><strong>5.</strong> Dùng khuôn "one test decides" cho luật phức tạp trong SKILL.md, thay liệt kê dài. <span class="badge badge-med">medium</span><div class="feed">Feed vào: cách viết SKILL.md mọi vai</div></div>
+  <div class="rec"><strong>6.</strong> Đặt tên tường minh cho "distill at the end" — Vấn Đạo đã làm đúng (giáo án chỉ ghi sự kiện) nhưng chưa gọi tên. <span class="badge badge-med">medium</span><div class="feed">Feed vào: SKILL.md cho thu-linh, truong-mon</div></div>
+</section>
+
+<section id="oq">
+  <h2>6. Câu hỏi còn mở</h2>
+  <ol class="oq">
+    <li>Vì sao bmad-prd đọc thẳng <code>config.yaml</code> thay vì gọi <code>resolve_config.py</code>.</li>
+    <li>Cơ chế Refresh/Deepen xử lý conflict thế nào — trong <code>references/lifecycle.md</code>, chưa đọc.</li>
+    <li>Hình dạng thật của "compact checklist" ở Plan Gate — chưa có mẫu văn bản cụ thể.</li>
+    <li>"One test decides" có lặp lại ở SKILL.md khác (bmad-spec, bmad-build)?</li>
+    <li><code>references/headless.md</code>/<code>validate.md</code>/<code>verification.md</code> — chưa đọc trong lượt này.</li>
+  </ol>
+</section>
+
+<section id="src">
+  <h2>7. Phụ lục nguồn</h2>
+  <p class="note">Mọi nguồn: publisher "BMAD-METHOD skill source (local)" · ngày xuất bản N/A (mã nguồn cục bộ) · truy cập 2026-08-25 · độ tin Cao.</p>
+  <details open>
+    <summary>18 nguồn (bấm để thu gọn)</summary>
+    <table class="sources"><tbody><tr id="src-1"><td>[1]</td><td>`.claude/skills/bmad-prd/SKILL.md`</td><td>Cấu trúc activation, extract-don&#x27;t-ingest, Reviewer Gate, Coaching/Fast path, văn phong</td></tr><tr id="src-2"><td>[2]</td><td>`.claude/skills/bmad-architecture/SKILL.md`</td><td>One-test-decides, Coaching path mặc định, shown-not-silently-made, cấu trúc activation</td></tr><tr id="src-3"><td>[3]</td><td>`.claude/skills/bmad-deep-recon/SKILL.md`</td><td>Research firewall, extract-don&#x27;t-ingest, epistemics, &quot;nothing exists until it is a file&quot;</td></tr><tr id="src-4"><td>[4]</td><td>`.claude/skills/bmad-review/SKILL.md`</td><td>Lệch mẫu (Execution/không persona/không memlog), lens isolation, digest contract riêng</td></tr><tr id="src-5"><td>[5]</td><td>`.claude/skills/bmad-brainstorming/SKILL.md`</td><td>Cấu trúc activation, resume-scan trước khi tạo workspace mới</td></tr><tr id="src-6"><td>[6]</td><td>`.claude/skills/bmad-prfaq/SKILL.md`</td><td>Cơ chế state khác hẳn (frontmatter stage + comment nhúng), bảng Stages, persona &quot;hardcore mode&quot;</td></tr><tr id="src-7"><td>[7]</td><td>`.claude/skills/bmad-project-context/SKILL.md`</td><td>&quot;Never ask what a scan could answer&quot; tường minh nhất, Interview-the-gaps</td></tr><tr id="src-8"><td>[8]</td><td>`.claude/skills/bmad-deep-recon/references/run.md`</td><td>Plan Gate, fan-out, digest contract, stop-and-write valve</td></tr><tr id="src-9"><td>[9]</td><td>`.claude/skills/bmad-architecture/references/reviewer-gate.md`</td><td>Lint deterministic trước, subfolder reviews/, lý do &quot;independent context is the point&quot;</td></tr><tr id="src-10"><td>[10]</td><td>`_bmad/scripts/memlog.py`</td><td>Ba bất biến (append-only, write-only, no-lifecycle-status), atomic write, format file</td></tr><tr id="src-11"><td>[11]</td><td>`_bmad/scripts/resolve_customization.py`</td><td>`--key` dotted-path, exit code 1 khi lỗi (kích hoạt fallback), tìm project-root ngược cây</td></tr><tr id="src-12"><td>[12]</td><td>`_bmad/scripts/config_utils.py`</td><td>Cơ chế merge thật ba lớp, `structural_merge()`, `_merge_arrays()` theo khoá `code`/`id`</td></tr><tr id="src-13"><td>[13]</td><td>`.claude/skills/bmad-deep-recon/scripts/recon_kit.py`</td><td>`slug` sinh tên folder deterministic, `tally` đếm claim theo last-status-wins</td></tr><tr id="src-14"><td>[14]</td><td>`.claude/skills/bmad-prd/customize.toml`</td><td>Field lặp lại (activation_steps, persistent_facts, doc_standards...), cảnh báo DO NOT EDIT</td></tr><tr id="src-15"><td>[15]</td><td>`.claude/skills/bmad-architecture/customize.toml`</td><td>Cùng khuôn field với bmad-prd, `spine_output_path`, `run_folder_pattern`</td></tr><tr id="src-16"><td>[16]</td><td>`.claude/skills/bmad-deep-recon/customize.toml`</td><td>`persistent_facts = []` có chủ đích (research firewall), 6 bảng `[[workflow.research_types]]` khoá `code`</td></tr><tr id="src-17"><td>[17]</td><td>`.claude/skills/bmad-review/customize.toml`</td><td>5 bảng `[[workflow.lenses]]` khoá `code` — ví dụ thật của merge-theo-khoá</td></tr><tr id="src-18"><td>[18]</td><td>`.claude/skills/bmad-brainstorming/customize.toml`</td><td>Field `persistent_facts` mặc định giống bmad-prd/bmad-architecture</td></tr></tbody></table>
+  </details>
+</section>
+
+<section id="stale">
+  <h2>8. Bản đồ độ mới</h2>
+  <p>Mọi nguồn là mã nguồn cục bộ của workspace này, đọc trực tiếp 2026-08-25 — không phải xuất bản phẩm có ngày công bố riêng, nên <code>recon_kit.py staleness</code> không áp dụng có ý nghĩa. "Độ mới" thật: các file BMAD-METHOD này có thể tự đổi khi framework cập nhật (tự cảnh báo "DO NOT EDIT -- overwritten on every update").</p>
+  <p><strong>Mốc tái xác minh:</strong> trước khi Vấn Đạo bắt đầu viết SKILL.md thật (<code>bmad-create-epics-and-stories</code>/<code>bmad-build</code>) — xác nhận lại bước 1 activation và cơ chế merge <code>customize.toml</code>, hai điểm dự định copy gần nguyên văn.</p>
+</section>
+
+</div>
+<footer>Vấn Đạo workspace · deep-recon technical research · nguồn cục bộ, không web fan-out · <a href="#summary">↑ về đầu</a></footer>
+</body>
+</html>

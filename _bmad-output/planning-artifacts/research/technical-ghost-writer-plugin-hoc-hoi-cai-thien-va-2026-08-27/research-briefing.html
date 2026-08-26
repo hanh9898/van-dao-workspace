@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Deep recon: plugin ghost-writer — học hỏi cho van-dao</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#faf9f7; --surface:#ffffff; --border:#e4e0d8; --text:#1f1c17; --text-dim:#5a564c;
+    --accent:#8a5a2b; --accent-soft:#f1e6d6;
+    --verified-bg:#e4f3e6; --verified-fg:#1e6b2f; --verified-bd:#a9d9b2;
+    --medium-bg:#fdf1da; --medium-fg:#8a5a00; --medium-bd:#f0cf8f;
+    --low-bg:#fbe6e0; --low-fg:#a13b1f; --low-bd:#eeb39f;
+    --unverified-bg:#fde8e8; --unverified-fg:#b3261e; --unverified-bd:#f2a6a3;
+    --disputed-bg:#3a1f1f; --disputed-fg:#ffb4a9; --disputed-bd:#c94f3f;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#171512; --surface:#211e19; --border:#3a352c; --text:#efe9dd; --text-dim:#b8b0a0;
+      --accent:#e0a869; --accent-soft:#3a2c17;
+      --verified-bg:#193a22; --verified-fg:#8fd89c; --verified-bd:#2f6b3d;
+      --medium-bg:#3a2f10; --medium-fg:#f0cf8f; --medium-bd:#7a5f1e;
+      --low-bg:#3a1f16; --low-fg:#f2a488; --low-bd:#7a3d28;
+      --unverified-bg:#3a1414; --unverified-fg:#ff9d96; --unverified-bd:#8a2e28;
+      --disputed-bg:#4a1f1a; --disputed-fg:#ffb4a9; --disputed-bd:#c94f3f;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+  a{color:var(--accent)}
+  code{background:var(--accent-soft);padding:.1em .35em;border-radius:4px;font-size:.92em}
+  .layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:0;max-width:1180px;margin:0 auto}
+  header.hero{padding:2.2rem 1.5rem 1.4rem;border-bottom:1px solid var(--border)}
+  header.hero h1{margin:.2rem 0 .5rem;font-size:1.5rem;text-wrap:balance}
+  .meta{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;font-size:.86rem;color:var(--text-dim)}
+  .meta b{color:var(--text)}
+  nav.toc{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:1.4rem 1rem;border-right:1px solid var(--border);font-size:.88rem}
+  nav.toc a{display:block;padding:.32rem .5rem;border-radius:6px;color:var(--text-dim);text-decoration:none}
+  nav.toc a:hover{background:var(--accent-soft);color:var(--text)}
+  main{padding:1.6rem 1.6rem 4rem;min-width:0}
+  section{margin:0 0 2.4rem}
+  h2{font-size:1.18rem;border-bottom:2px solid var(--accent-soft);padding-bottom:.4rem;margin-top:0}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.3rem 1.5rem;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .exec{font-size:1.02rem}
+  .badge{display:inline-flex;align-items:center;gap:.35em;font-size:.74rem;font-weight:600;padding:.16em .55em;border-radius:999px;border:1px solid;white-space:nowrap;letter-spacing:.01em}
+  .badge.verified{background:var(--verified-bg);color:var(--verified-fg);border-color:var(--verified-bd)}
+  .badge.medium{background:var(--medium-bg);color:var(--medium-fg);border-color:var(--medium-bd)}
+  .badge.low{background:var(--low-bg);color:var(--low-fg);border-color:var(--low-bd)}
+  .badge.unverified{background:var(--unverified-bg);color:var(--unverified-fg);border-color:var(--unverified-bd);font-weight:700}
+  .badge.disputed{background:var(--disputed-bg);color:var(--disputed-fg);border-color:var(--disputed-bd);font-weight:700}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}
+  th,td{text-align:left;padding:.55rem .6rem;border-bottom:1px solid var(--border);vertical-align:top}
+  th{color:var(--text-dim);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.03em}
+  .tablewrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:.4rem 1rem;font-size:.9rem}
+  .kv dt{color:var(--text-dim)}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:.9rem 1.1rem;border-radius:0 8px 8px 0;margin:1rem 0}
+  .callout.warn{border-left-color:var(--unverified-fg)}
+  details.appendix{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0}
+  details.appendix summary{cursor:pointer;padding:1rem 1.3rem;font-weight:600;list-style:none}
+  details.appendix summary::-webkit-details-marker{display:none}
+  details.appendix summary::before{content:"▸ ";color:var(--accent)}
+  details.appendix[open] summary::before{content:"▾ "}
+  details.appendix .tablewrap{border:none;border-top:1px solid var(--border);border-radius:0}
+  table.sources td:first-child{white-space:nowrap;color:var(--text-dim)}
+  ol.reco li{margin-bottom:.7rem}
+  .tag-code{display:inline-block;font-weight:700;background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:.05em .5em;margin-right:.4em}
+  footer{padding:1.5rem;text-align:center;color:var(--text-dim);font-size:.8rem;border-top:1px solid var(--border)}
+  @media (max-width:820px){
+    .layout{grid-template-columns:1fr}
+    nav.toc{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border)}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc" aria-label="Mục lục">
+    <a href="#exec">Tóm tắt điều hành</a>
+    <a href="#dim1">1 · Cơ chế vận hành</a>
+    <a href="#dim2">2 · Đối chiếu van-dao</a>
+    <a href="#dim3">3 · Ecosystem thật</a>
+    <a href="#reco">Khuyến nghị</a>
+    <a href="#open">Câu hỏi mở</a>
+    <a href="#citcheck">Citation check</a>
+    <a href="#sources">Nguồn</a>
+    <a href="#staleness">Độ cũ</a>
+  </nav>
+  <main>
+    <header class="hero">
+      <span class="badge medium">TECHNICAL · EXPLORE</span>
+      <h1>Deep recon: plugin ghost-writer — học hỏi cải thiện van-dao</h1>
+      <div class="meta">
+        <span><b>Quyết định:</b> tìm điểm thiết kế đáng mang vào van-dao</span>
+        <span><b>Nguồn gốc:</b> <a href="https://github.com/simonediroma/claude-ghost-writer" target="_blank" rel="noopener">simonediroma/claude-ghost-writer</a></span>
+        <span><b>Ngày:</b> 2026-08-27</span>
+        <span><b>Độ sâu:</b> standard (2 vòng tối đa)</span>
+        <span><b>Kiểm chứng:</b> normal + citation check ngữ nghĩa</span>
+        <span><b>Claim:</b> 16 verified · 0 unverified · 2 overturned</span>
+      </div>
+    </header>
+
+    <section id="exec">
+      <h2>Tóm tắt điều hành</h2>
+      <div class="card exec">
+        <p>Ghost-writer là plugin Claude Code 27-skill của một tác giả duy nhất, đặc tả cơ chế rất chỉn chu ở ba điểm:
+        <b>(1)</b> thang leo thang 4 bước có từ vựng trạng thái tường minh khi tác giả "bí" trong phê bình,
+        <b>(2)</b> một skill nâng cấp cấu trúc tường minh, có ngưỡng, cần xác nhận khi dự án lớn dần,
+        <b>(3)</b> một lệnh "resume" tối giản luôn trả đúng 1 khuyến nghị. Cả ba đều đáng đối chiếu với van-dao.</p>
+        <div class="callout warn">
+          <b>Nhưng:</b> nhánh ecosystem xác nhận plugin này — và cả dự án gốc "quantum_fatalism" mà phương pháp dựa trên —
+          có <b>0 sao, 0 fork, 0 issue/PR từ người ngoài, 0 tín hiệu cộng đồng công khai nào</b>
+          <a href="#src-11">[11]</a><a href="#src-12">[12]</a><a href="#src-14">[14]</a>, và việc lọt vào marketplace
+          <code>anthropics/claude-plugins-community</code> chỉ qua kiểm tra an toàn tự động, không phải biên tập chất lượng
+          <a href="#src-15">[15]</a>.
+        </div>
+        <p><b>Kết luận:</b> đây là các ý tưởng thiết kế được đặc tả tốt trên giấy, chưa có bằng chứng đã qua thử lửa thực tế
+        ngoài tác giả tự dùng một lần. Nên học <i>cách đặc tả</i> (cấu trúc quy tắc, từ vựng trạng thái), không nên học như
+        một "pattern đã kiểm chứng".</p>
+        <p><b>Cập nhật sau khi đối chiếu trực tiếp với <code>docs/VAN-DAO-dac-ta-v1.0.md</code> thật</b> (mục 2, bảng cập
+        nhật): <b>0/3 ứng viên là gap thật</b> — 2/3 (mã A, C) van-dao đã có cơ chế tương đương, kiến trúc chặt hơn
+        ghost-writer ở một số điểm; mã B tiền đề không khớp hình dạng vấn đề của van-dao. <code>van-dao/skills/</code> và
+        <code>van-dao/agents/</code> hiện còn rỗng (<code>.gitkeep</code>) — dự án ở giai đoạn tiền-triển khai, chỉ đặc tả
+        đã tồn tại.</p>
+      </div>
+    </section>
+
+    <section id="dim1">
+      <h2>1 · Cơ chế vận hành thật của ghost-writer</h2>
+      <div class="card">
+        <p>27 skill (khớp CHANGELOG), một tác giả, MIT — đúng với <b>bản đã pin cục bộ</b> (v1.0.0, 2026-05-10)
+        <span class="badge verified">verified</span> <a href="#src-1">[1]</a>. GitHub HEAD thật đã tiến xa hơn: sau v1.0.0
+        còn ít nhất 1 đợt "Sprint tối ưu token" và 1 commit cập nhật tài liệu cho v1.1.0 — nhưng bản trên
+        <b>marketplace</b> (nơi người dùng cài từ) vẫn trỏ đúng sha v1.0.0, chưa đồng bộ <a href="#src-13">[13]</a>.</p>
+
+        <table>
+          <thead><tr><th>Skill</th><th>Cơ chế</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><code>resume</code></td><td>"Lệnh duy nhất cần nhớ": quét đúng 5 nguồn cố định, tường minh cấm đọc sâu, luôn xuất đúng 3 khối (LAST TIME/WAITING/NEXT), đúng 1 khuyến nghị theo bảng if/else 8 nhánh — không bao giờ liệt kê menu.</td><td><span class="badge verified">verified</span> <a href="#src-2">[2]</a></td></tr>
+            <tr><td><code>demolish</code></td><td>Máy trạng thái phê bình một-lỗi-một-lúc; khi tác giả bí có chuỗi leo thang 4 bước (diễn đạt lại → thu hẹp về 1 claim → hỏi trực giác → 3 lối thoát có cấu trúc: Modify/Narrow/Accept) trước khi park chính thức vào trạng thái <code>deferred</code>.</td><td><span class="badge verified">verified</span> <a href="#src-3">[3]</a></td></tr>
+            <tr><td><code>longform-upgrade</code></td><td>Tự đề xuất ở ngưỡng 10 chương, hỏi xác nhận cách chia trước khi đổi, tuyên bố rõ "không đổi nội dung, chỉ đổi cách quản lý context". Sau nâng cấp chỉ 2/27 skill còn full-read.</td><td><span class="badge verified">verified</span> <a href="#src-5">[5]</a></td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <b>Phản-mẫu phát hiện được:</b> <code>integrate</code> (Phase 5, bước 4) âm thầm ghi đè <code>voice-sample.md</code>
+          khi ≥3 đoạn bị viết lại, "không nói cho tác giả biết" — mâu thuẫn trực tiếp với nguyên tắc chính README tuyên bố
+          ("Memory is explicit"). <span class="badge verified">verified</span> <a href="#src-4">[4]</a>
+        </div>
+
+        <p>Nghi vấn ban đầu về dữ liệu mẫu (<code>book-memory.md</code>, <code>chapters/</code>, <code>outline.md</code>...
+        trông như dữ liệu thật) đã <b>giải quyết dứt điểm</b>: đọc trực tiếp xác nhận toàn bộ là template rỗng cú pháp
+        placeholder ngoặc vuông (<code>[term]</code>, <code>[date]</code>, "Your Book Title"...) — không phải rò rỉ dữ liệu.
+        <span class="badge verified">verified</span> <a href="#src-6">[6]</a></p>
+      </div>
+    </section>
+
+    <section id="dim2">
+      <h2>2 · Đối chiếu với van-dao</h2>
+      <div class="card">
+        <p style="color:var(--text-dim);font-size:.88rem">Đối chiếu trực tiếp với <code>docs/VAN-DAO-dac-ta-v1.0.md</code>
+        (2.136 dòng) và cây thư mục <code>van-dao/</code> thật. Xác nhận: <code>van-dao/skills/</code>,
+        <code>van-dao/agents/</code>, <code>van-dao/hooks/</code> hiện chỉ có <code>.gitkeep</code> — dự án tiền-triển khai,
+        chỉ <code>bin/kiem-bi-kip.py</code> và <code>tham-chieu/bi-kip.schema.md</code> là mã đã tồn tại. Đối chiếu dưới
+        đây là với <b>đặc tả</b>, không phải code đang chạy.</p>
+        <div class="tablewrap">
+        <table>
+          <thead><tr><th>Mã</th><th>Mẫu ghost-writer</th><th>Đối chiếu với đặc tả van-dao thật</th><th>Kết luận</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="tag-code">A</span></td>
+              <td>Thang leo thang 4 bước + trạng thái <code>deferred</code>/<code>accepted-limitation</code> khi bế tắc
+                <a href="#src-3">[3]</a></td>
+              <td><b>Đã có, cấu trúc hơn.</b> §7.0: F4 chẩn đoán → F5 đổi biểu diễn → F5′ báo Trưởng Môn "có thể thiếu
+                nền" (3 bước leo thang lúc dạy). §9.4–9.5: đúng vai chấm candidate nêu — <code>khong_ro</code> là trạng
+                thái thứ ba chính thức của Phúc Khảo Sứ, bảng quyết định 6 nhánh, mỗi bất đồng ghi taxonomy loại + lý do
+                nguyên văn + đề xuất tiêu chí thay thế — giàu hơn 2-status vocab của ghost-writer
+                <span class="badge verified">verified</span> <a href="#src-16">[16]</a></td>
+              <td><b>Không phải gap</b> — không cần cấy gì (đánh giá ban đầu ở <a href="#src-7">[7]</a>, nay lật lại)</td>
+            </tr>
+            <tr>
+              <td><span class="tag-code">B</span></td>
+              <td>Skill nâng cấp cấu trúc tường minh, có ngưỡng, cần xác nhận <a href="#src-5">[5]</a><a href="#src-8">[8]</a></td>
+              <td><b>Tiền đề không khớp.</b> "Bậc" (§13.1) là trục thứ tự dựng plugin (dev-time), vô hình với người dùng
+                sau khi ship đủ (§15). Bí kíp van-dao nhập <b>toàn bộ một lần</b> từ PDF/EPUB có sẵn — không phình dần
+                qua nhiều tuần như sách ghost-writer, nên "ngưỡng phình cần nâng cấp" không có đối tượng tương ứng ở cấp
+                một bí kíp <span class="badge verified">verified</span> <a href="#src-17">[17]</a></td>
+              <td><b>Không áp dụng</b> — analogy yếu hơn nhìn ban đầu; câu hỏi thật còn treo về log hành trình học dài hạn</td>
+            </tr>
+            <tr>
+              <td><span class="tag-code">C</span></td>
+              <td><code>resume</code>: quét nhanh, cấm đọc sâu, luôn 1 khuyến nghị, giọng "welcome back"
+                <a href="#src-2">[2]</a></td>
+              <td><b>Đã có, kiến trúc chặt hơn.</b> §14 xác nhận: <code>/vd:be-quan [bí kíp]</code> không tham số =
+                "liệt kê bí kíp và chỗ đang dở" — thay thế cho lệnh <code>/vd:tiep</code> từng bị cắt. <code>/vd:chi-duong</code>
+                ý định 3 trả Bản đồ vấn đạo (Artifact). Trạng thái <b>luôn suy lại từ artifact thật trên đĩa</b> (§5.7) —
+                chặt hơn cách <code>resume</code> của ghost-writer đọc <code>book-memory.md</code> do LLM tự duy trì thủ công
+                <span class="badge verified">verified</span> <a href="#src-18">[18]</a></td>
+              <td><b>Không phải gap</b> — đã có, state-derivation chặt hơn (câu hỏi ban đầu ở <a href="#src-9">[9]</a>, nay xác nhận)</td>
+            </tr>
+            <tr>
+              <td><span class="tag-code">D</span></td>
+              <td>Phản-mẫu: silent-overwrite mâu thuẫn tuyên bố "Memory is explicit" <a href="#src-4">[4]</a></td>
+              <td>NFR2 append-only đã có thật ở van-dao (<code>epics.md</code>) <span class="badge verified">verified</span>
+                <a href="#src-10">[10]</a></td>
+              <td>Không cần hành động — dùng làm bằng chứng củng cố quy ước hiện có</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+        <p style="margin-top:1rem">Không đáng học nguyên xi: mô hình co-authoring qua Git nhánh riêng (đối tượng khác hẳn);
+        field <code>language</code> đa dạng ở đầu mọi skill (van-dao nhắm người học tiếng Việt là chính). Giá trị biên thấp:
+        macro-command gói skill atomic.</p>
+        <div class="callout">Một điểm nhỏ còn đáng giữ lại (không phải gap, chỉ mức độ chi tiết): khi <code>be-quan</code>/
+        <code>chi-duong</code> được viết SKILL.md thật (chưa tồn tại), có thể mượn <b>phong cách đặc tả chính xác</b> của
+        <code>resume</code> — đúng N nguồn cố định, cấm đọc sâu, luôn đúng 1 khuyến nghị — làm tham khảo hành văn, không
+        phải tính năng mới.</div>
+      </div>
+    </section>
+
+    <section id="dim3">
+      <h2>3 · Độ trưởng thành / tín hiệu cộng đồng thật</h2>
+      <div class="card">
+        <dl class="kv">
+          <dt>Repo hoạt động</dt><dd>tạo 2026-04-18, push cuối 2026-06-07 (~7 tuần rồi im lặng ~11 tuần tính tới hôm nay)</dd>
+          <dt>Tín hiệu cộng đồng</dt><dd><b>0</b> sao, fork, watcher, open-issue; không Release object nào; 4 "issue" thực chất
+            là PR tự-merge bởi chính chủ repo <span class="badge verified">verified</span> <a href="#src-11">[11]</a></dd>
+          <dt>Contributor</dt><dd>16 commit, chỉ 2 "tác giả" (chủ repo + bot Claude Code) <span class="badge verified">verified</span>
+            <a href="#src-12">[12]</a></dd>
+          <dt>Marketplace</dt><dd>entry trỏ sha cũ hơn 3 commit sprint cuối — bản người dùng cài có thể lệch bản mới nhất
+            <span class="badge verified">verified</span> <a href="#src-13">[13]</a></dd>
+          <dt>Dự án gốc phương pháp</dt><dd><code>quantum_fatalism</code> — tạo và viết xong trong 1 ngày (~9.5 giờ), có essay
+            hoàn chỉnh thật (đã đọc trực tiếp, 45–46KB) theo đúng chu trình quảng cáo, nhưng tự-xuất bản, chưa qua biên tập
+            độc lập nào, claim "8 phiên bản" chỉ có nguồn là tự-thuật, cũng 0 sao/fork/issue
+            <span class="badge verified">verified</span> <a href="#src-14">[14]</a></dd>
+          <dt>Ý nghĩa marketplace</dt><dd>chỉ qua kiểm tra an toàn tự động khi nộp — không phải biên tập chất lượng thủ công
+            <span class="badge verified">verified</span> <a href="#src-15">[15]</a></dd>
+        </dl>
+      </div>
+    </section>
+
+    <section id="reco">
+      <h2>Khuyến nghị</h2>
+      <div class="card">
+        <p>Ghép cơ chế (mục 1) với ecosystem (mục 3): không quy tắc nào trong đó từng được ai ngoài tác giả thử qua, kể cả
+        tác giả cũng chỉ dùng thật đúng 1 lần. "Có mặt trên marketplace Anthropic" chỉ là qua lọc an toàn tự động, không
+        phải tín hiệu chất lượng. Đối chiếu trực tiếp với đặc tả thật (mục 2) xác nhận điều đó đúng theo hướng cụ thể nhất:
+        <b>0/3 ứng viên là gap</b> — van-dao không cần copy pattern nào của ghost-writer để cải thiện.</p>
+        <ol class="reco">
+          <li><b>Không hành động cho mã A, B, C, D.</b> A và C đã có cơ chế tương đương trong đặc tả (kiến trúc chặt hơn
+            ở một số điểm); B tiền đề không khớp hình dạng vấn đề của van-dao; D chỉ là bằng chứng củng cố NFR2 sẵn có.</li>
+          <li><b>Câu hỏi thật duy nhất còn treo</b> (từ việc kiểm B, không phải một ứng viên ghost-writer): log cấp hành
+            trình học (<code>lo-trinh.jsonl</code>, <code>so-tay.jsonl</code>, đạo tâm) tích luỹ không giới hạn qua nhiều
+            năm — đặc tả chưa thấy cơ chế nén/tái cấu trúc. Đáng hỏi kiến trúc sư khi có dịp, không phải nhập từ ghost-writer.</li>
+          <li><b>Ghi chú hành văn cho tương lai</b> (không phải hành động bây giờ): khi viết <code>be-quan</code>/
+            <code>chi-duong</code> SKILL.md thật, độ chính xác đặc tả của <code>resume</code> là tham khảo hành văn tốt —
+            <code>van-dao/skills/</code> hiện còn rỗng nên chưa tới lúc.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="open">
+      <h2>Câu hỏi còn mở</h2>
+      <div class="card">
+        <ul>
+          <li>Log cấp hành trình học (<code>lo-trinh.jsonl</code>, <code>so-tay.jsonl</code>, đạo tâm) tích luỹ không giới
+            hạn qua nhiều năm/nhiều bí kíp — đặc tả chưa thấy cơ chế nén/tái cấu trúc. Câu hỏi thật của van-dao, phát hiện
+            phụ khi kiểm mã B.</li>
+          <li><code>ships_log.md</code>/<code>diario_di_bordo.md</code> của quantum_fatalism chưa đọc sâu — nơi duy nhất
+            có thể xác minh độc lập claim "8 phiên bản".</li>
+          <li>Có người dùng thật nào cài ghost-writer qua marketplace không — không có kênh đo lượt cài công khai.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="citcheck">
+      <h2>Citation check (ngữ nghĩa, fresh-context) + polish (structure/prose)</h2>
+      <div class="card">
+        <p>12/15 nguồn <span class="badge verified">MATCH</span> ngay lần kiểm đầu. 1 nguồn (<a href="#src-10">[10]</a>)
+        bị chấm <span class="badge unverified">MISMATCH</span> vì bảng nguồn ghi nhầm "AGENTS.md" — tự tra lại
+        <code>epics.md</code>, xác nhận claim vẫn <b>đúng</b> (NFR2, dòng 69), chỉ trích dẫn sai chỗ, đã sửa trong bảng
+        Nguồn bên dưới. 2 ghi chú nhỏ khác ([1] phạm vi bản pin, [4] thiếu nguồn phụ README) đã được làm rõ trong văn bản
+        — không đổi kết luận nào. Sau đó chạy thêm lens <b>structure</b> (gộp 3 chỗ trùng lặp, bỏ 1 heading thừa, ~10%
+        gọn hơn) và <b>prose</b> (thống nhất thuật ngữ, thêm từ nối bị thiếu) — chỉ đổi cách trình bày, không đổi số liệu
+        hay kết luận nào. <b>Deepen sau đó:</b> đối chiếu trực tiếp mã A/B/C với <code>docs/VAN-DAO-dac-ta-v1.0.md</code>
+        thật — lật lại 2 claim ([7], [8]) từng đánh giá "đáng học" khi chỉ có AGENTS.md, xác nhận 1 claim ([9]). Xem mục 2.</p>
+      </div>
+    </section>
+
+    <section id="sources">
+      <h2>Nguồn</h2>
+      <details class="appendix" open>
+        <summary>18 nguồn — bấm để thu gọn</summary>
+        <div class="tablewrap">
+          <table class="sources">
+            <thead><tr><th>#</th><th>Claim/phát hiện</th><th>Nguồn</th><th>Ngày</th><th>Truy cập</th><th>Độ tin cậy</th></tr></thead>
+            <tbody id="sources-tbody"></tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <section id="staleness">
+      <h2>Bản đồ độ cũ (staleness)</h2>
+      <div class="card">
+        <p>16/18 claim verified, 0/18 unverified, 2/18 overturned (mã A và B — lật lại bằng đối chiếu đặc tả thật, [16][17]).
+        Không claim nào đã stale tại thời điểm viết.</p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Nhóm claim</th><th>Cửa sổ</th><th>Tái kiểm</th><th>Lý do</th></tr></thead>
+            <tbody>
+              <tr><td>community / provenance / metadata</td><td>6 tháng</td><td><b>2027-02-01</b> (sớm nhất)</td><td>Số liệu GitHub sống — có thể đổi bất cứ lúc nào</td></tr>
+              <tr><td>comparison</td><td>12 tháng</td><td>2027-08-01</td><td>Phụ thuộc cả hai dự án tiến hoá</td></tr>
+              <tr><td>mechanism / data-provenance</td><td>24 tháng</td><td>2028-05-01</td><td>Chỉ đổi nếu ghost-writer ra bản mới — hiện chưa có dấu hiệu</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <footer>research.md là nguồn sự thật đầy đủ — trang này chỉ là bản trình bày lại, không phải nguồn thứ hai.</footer>
+  </main>
+</div>
+<script id="sources-data" type="application/json"><tr id="src-1"><td>[1]</td><td>27 skill, 1 tác giả, MIT, v1.0.0 một lần</td><td><a href="https://github.com/simonediroma/claude-ghost-writer" target="_blank" rel="noopener">plugin.json / CHANGELOG.md</a> (đọc cục bộ, bản clone git thật)</td><td>2026-05-10</td><td>2026-08-27</td><td>Cao (sơ cấp)</td></tr><tr id="src-2"><td>[2]</td><td>Cơ chế `resume`</td><td><a href="https://github.com/simonediroma/claude-ghost-writer/blob/main/skills/resume/SKILL.md" target="_blank" rel="noopener">skills/resume/SKILL.md</a></td><td>2026-05</td><td>2026-08-27</td><td>Cao (sơ cấp)</td></tr><tr id="src-3"><td>[3]</td><td>Cơ chế `demolish` + thang leo thang</td><td><a href="https://github.com/simonediroma/claude-ghost-writer/blob/main/skills/demolish/SKILL.md" target="_blank" rel="noopener">skills/demolish/SKILL.md</a></td><td>2026-05</td><td>2026-08-27</td><td>Cao (sơ cấp)</td></tr><tr id="src-4"><td>[4]</td><td>`integrate` silent-overwrite + nguyên tắc &quot;Memory is explicit&quot; (README § Core Principles) bị mâu thuẫn</td><td><a href="https://github.com/simonediroma/claude-ghost-writer/blob/main/skills/integrate/SKILL.md" target="_blank" rel="noopener">skills/integrate/SKILL.md</a></td><td>2026-05</td><td>2026-08-27</td><td>Cao (sơ cấp, đã đối chiếu cả `integrate/SKILL.md` lẫn `README.md`)</td></tr><tr id="src-5"><td>[5]</td><td>Cơ chế `longform-upgrade`</td><td><a href="https://github.com/simonediroma/claude-ghost-writer/blob/main/skills/longform-upgrade/SKILL.md" target="_blank" rel="noopener">skills/longform-upgrade/SKILL.md</a></td><td>2026-05</td><td>2026-08-27</td><td>Cao (sơ cấp)</td></tr><tr id="src-6"><td>[6]</td><td>Template rỗng, không rò rỉ dữ liệu</td><td>book.config.json / book-memory.md / outline.md (đọc cục bộ)</td><td>2026-05</td><td>2026-08-27</td><td>Cao (sơ cấp)</td></tr><tr id="src-7"><td>[7]</td><td>Đối chiếu ban đầu (mã A &quot;đáng học nhất&quot;) — **bị lật lại bởi [16]** sau khi đọc đặc tả thật</td><td>Tổng hợp bởi người điều phối từ [3] + `AGENTS.md` van-dao (bản tóm tắt, chưa đủ)</td><td>2026-08-27</td><td>2026-08-27</td><td>Overturned — xem [16]</td></tr><tr id="src-8"><td>[8]</td><td>Đối chiếu ban đầu (mã B &quot;đáng cân nhắc&quot;) — **bị lật lại bởi [17]**, tiền đề không khớp</td><td>Tổng hợp bởi người điều phối từ [5] + `AGENTS.md` van-dao (bản tóm tắt, chưa đủ)</td><td>2026-08-27</td><td>2026-08-27</td><td>Overturned — xem [17]</td></tr><tr id="src-9"><td>[9]</td><td>Đối chiếu: van-dao đã có skill resume-cho-đệ tử — xác nhận bởi [18]</td><td>Tổng hợp bởi người điều phối từ [2] + `AGENTS.md` van-dao</td><td>2026-08-27</td><td>2026-08-27</td><td>Cao (verified — xem [18])</td></tr><tr id="src-10"><td>[10]</td><td>Đối chiếu: phản-mẫu silent-overwrite củng cố NFR append-only</td><td>Tổng hợp bởi người điều phối từ [4] + **NFR2** (`epics.md`, mục NonFunctional Requirements)</td><td>2026-08-27</td><td>2026-08-27</td><td>Cao (verified)</td></tr><tr id="src-11"><td>[11]</td><td>0 sao/fork/issue thật; PR tự-merge</td><td><a href="https://github.com/simonediroma/claude-ghost-writer" target="_blank" rel="noopener">api.github.com/repos/simonediroma/claude-ghost-writer</a></td><td>2026-08-27 (live)</td><td>2026-08-27</td><td>Cao (sơ cấp)</td></tr><tr id="src-12"><td>[12]</td><td>16 commit, 2 tác giả, cửa sổ hoạt động</td><td>GitHub API `/commits`</td><td>2026-08-27 (live)</td><td>2026-08-27</td><td>Cao (sơ cấp)</td></tr><tr id="src-13"><td>[13]</td><td>Marketplace sha lệch bản mới nhất</td><td><a href="https://github.com/anthropics/claude-plugins-community/blob/main/.claude-plugin/marketplace.json" target="_blank" rel="noopener">marketplace.json</a></td><td>2026-08-27 (live)</td><td>2026-08-27</td><td>Cao (sơ cấp)</td></tr><tr id="src-14"><td>[14]</td><td>`quantum_fatalism` — essay hoàn chỉnh, tự-xuất bản, 0 tín hiệu</td><td><a href="https://github.com/simonediroma/quantum_fatalism" target="_blank" rel="noopener">github.com/simonediroma/quantum_fatalism</a></td><td>2026-04-16</td><td>2026-08-27</td><td>Cao (tồn tại) / Trung bình (claim &quot;8 phiên bản&quot;)</td></tr><tr id="src-15"><td>[15]</td><td>Marketplace community = chỉ automated screening</td><td><a href="https://code.claude.com/docs/en/discover-plugins" target="_blank" rel="noopener">code.claude.com/docs/en/discover-plugins</a></td><td>—</td><td>2026-08-27</td><td>Cao (sơ cấp)</td></tr><tr id="src-16"><td>[16]</td><td>Mã A không phải gap — §7.0 (F4→F5→F5′) + §9.4–9.5 (`khong_ro`, taxonomy bất đồng) đã giải quyết</td><td>`docs/VAN-DAO-dac-ta-v1.0.md` §7.0, §9.4, §9.5 (đọc trực tiếp)</td><td>2026-08-27</td><td>2026-08-27</td><td>Cao (sơ cấp, đọc trực tiếp đặc tả)</td></tr><tr id="src-17"><td>[17]</td><td>Mã B tiền đề không khớp — &quot;Bậc&quot; là dev-roadmap, bí kíp nhập toàn bộ một lần</td><td>`docs/VAN-DAO-dac-ta-v1.0.md` §13.1, §15, §6.2 (đọc trực tiếp)</td><td>2026-08-27</td><td>2026-08-27</td><td>Cao (sơ cấp, đọc trực tiếp đặc tả)</td></tr><tr id="src-18"><td>[18]</td><td>Mã C đã có — `/vd:be-quan` không tham số, `/vd:chi-duong` ý định 3, state luôn suy từ artifact</td><td>`docs/VAN-DAO-dac-ta-v1.0.md` §5.7, §14, §14.1, §14.2 (đọc trực tiếp)</td><td>2026-08-27</td><td>2026-08-27</td><td>Cao (sơ cấp, đọc trực tiếp đặc tả)</td></tr></script>
+<script>
+  document.getElementById('sources-tbody').innerHTML = document.getElementById('sources-data').textContent;
+</script>
+</body>
+</html>

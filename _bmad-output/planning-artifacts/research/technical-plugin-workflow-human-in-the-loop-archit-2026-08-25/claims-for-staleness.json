@@ -1,0 +1,20 @@
+[
+  {"claim": "MCP de facto standard, ceded to Agentic AI Foundation", "class": "landscape", "pub_date": "2025-12"},
+  {"claim": "A2A protocol 150+ orgs, production use", "class": "landscape", "pub_date": "2026-04"},
+  {"claim": "LangGraph interrupt() checkpointer requirement", "class": "version", "pub_date": "2026-01"},
+  {"claim": "Temporal Signal-based HITL, durable execution", "class": "mechanism", "pub_date": "2026-01"},
+  {"claim": "Anthropic orchestrator-worker multi-agent system", "class": "landscape", "pub_date": "2025-06"},
+  {"claim": "Anthropic human involvement at edge-case testing", "class": "landscape", "pub_date": "2025-06"},
+  {"claim": "LangGraph resume re-executes node from start", "class": "mechanism", "pub_date": "2026-01"},
+  {"claim": "Temporal Signal + durable Timer, 4-systems-collapsed framing", "class": "mechanism", "pub_date": "2026-01"},
+  {"claim": "3 failure modes at approval checkpoint (fear-based, rubber-stamp, sync-only)", "class": "failure-claim", "pub_date": "2026-07"},
+  {"claim": "Academic grounding: automation bias, Ironies of Automation", "class": "failure-claim", "pub_date": "2026-01"},
+  {"claim": "4 practitioners on good HITL design (IT Brew)", "class": "success-factor", "pub_date": "2026-03"},
+  {"claim": "LangGraph resume re-execution, idempotency requirement", "class": "pain-point", "pub_date": "2025-12"},
+  {"claim": "LangChain 2026 report: >60% incidents are state-management failures", "class": "implementation-reality", "pub_date": "2026-04"},
+  {"claim": "Approval fatigue degradation curve", "class": "pain-point", "pub_date": "2026-03"},
+  {"claim": "Claude Code permission modes + Hooks (PreToolUse etc.)", "class": "mechanism", "pub_date": "2026-08"},
+  {"claim": "GitHub Copilot SDK onPreToolUse/onPostToolUse convergence", "class": "mechanism", "pub_date": "2026-08"},
+  {"claim": "Cline checkpoints (shadow git repo)", "class": "plugin-pattern", "pub_date": "2026-08"},
+  {"claim": "block/buzz#3871: approval staleness on state change (3 commenters)", "class": "failure-claim", "pub_date": "2026-08"}
+]

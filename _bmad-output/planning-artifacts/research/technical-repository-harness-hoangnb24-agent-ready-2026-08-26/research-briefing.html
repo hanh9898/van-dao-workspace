@@ -1,0 +1,492 @@
+<title>Repository Harness Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f2f1ec;
+    --paper-raised: #ffffff;
+    --ink: #191d21;
+    --ink-soft: #4a5157;
+    --ink-faint: #7c8388;
+    --line: #d8d5cc;
+    --accent: #2a6f77;
+    --accent-soft: #e3eef0;
+    --accent-ink: #16454b;
+    --ok: #2f7d4a;
+    --ok-bg: #e6f2e9;
+    --warn: #a8720b;
+    --warn-bg: #faf0da;
+    --bad: #b8460e;
+    --bad-bg: #fbe9e0;
+    --unv: #6b5a99;
+    --unv-bg: #eee9f7;
+    --shadow: 0 1px 2px rgba(25,29,33,0.06), 0 6px 20px rgba(25,29,33,0.05);
+    --radius: 10px;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --paper: #14171a;
+      --paper-raised: #1c2024;
+      --ink: #ecebe6;
+      --ink-soft: #b8bcc0;
+      --ink-faint: #82898e;
+      --line: #2e3338;
+      --accent: #52a3ab;
+      --accent-soft: #1c3236;
+      --accent-ink: #bfe6ea;
+      --ok: #6fbf85;
+      --ok-bg: #1a2e20;
+      --warn: #d9a441;
+      --warn-bg: #332a15;
+      --bad: #e07b52;
+      --bad-bg: #3a1f14;
+      --unv: #b0a0e0;
+      --unv-bg: #241f38;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #14171a;
+    --paper-raised: #1c2024;
+    --ink: #ecebe6;
+    --ink-soft: #b8bcc0;
+    --ink-faint: #82898e;
+    --line: #2e3338;
+    --accent: #52a3ab;
+    --accent-soft: #1c3236;
+    --accent-ink: #bfe6ea;
+    --ok: #6fbf85;
+    --ok-bg: #1a2e20;
+    --warn: #d9a441;
+    --warn-bg: #332a15;
+    --bad: #e07b52;
+    --bad-bg: #3a1f14;
+    --unv: #b0a0e0;
+    --unv-bg: #241f38;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Literata', Georgia, 'Times New Roman', serif;
+    font-size: 17px;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation: none !important; transition: none !important; }
+  }
+
+  code, .mono, .badge, .toc a::before, .src-table, .src-table * , .meta-row .v {
+    font-family: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+  }
+
+  a { color: var(--accent-ink); text-decoration-color: var(--accent); text-underline-offset: 3px; }
+  a:hover { text-decoration-thickness: 2px; }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px 96px; }
+
+  header.head {
+    padding: 56px 0 32px;
+    border-bottom: 1px solid var(--line);
+  }
+  .kicker {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700;
+    line-height: 1.15;
+    margin: 0 0 14px;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  .decision-line {
+    font-size: 17px;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0 0 28px;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 14px;
+    font-size: 13.5px;
+  }
+  .meta-row .k {
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 11.5px;
+    margin-bottom: 3px;
+  }
+  .meta-row .v { color: var(--ink); font-weight: 500; font-size: 13.5px; }
+
+  .summary-card {
+    margin: 36px 0 44px;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px 30px;
+    box-shadow: var(--shadow);
+  }
+  .summary-card h2 {
+    margin-top: 0;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent-ink);
+  }
+  .summary-card p { margin: 0 0 14px; }
+  .summary-card p:last-child { margin-bottom: 0; }
+  .caveat {
+    border-left: 3px solid var(--warn);
+    background: var(--warn-bg);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    font-size: 15.5px;
+    margin-top: 18px;
+  }
+  .caveat strong { color: var(--warn); }
+
+  nav.toc {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: color-mix(in srgb, var(--paper) 92%, transparent);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+    margin: 0 -24px 40px;
+    padding: 12px 24px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  nav.toc a {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 6px 11px;
+    border-radius: 6px;
+  }
+  nav.toc a:hover { background: var(--accent-soft); color: var(--accent-ink); }
+
+  section { margin: 52px 0; }
+  section > h2 {
+    font-size: 22px;
+    letter-spacing: -0.005em;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 18px;
+    scroll-margin-top: 64px;
+  }
+  section > h2 .num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--ink-faint);
+    font-weight: 500;
+  }
+  h3 { font-size: 18px; margin: 28px 0 10px; }
+
+  blockquote {
+    margin: 16px 0;
+    padding: 10px 18px;
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+  blockquote p { margin: 6px 0; }
+
+  .cite {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78em;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    padding: 1px 5px;
+    border-radius: 4px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  table.compare {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    margin: 18px 0;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  table.compare th, table.compare td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  table.compare th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+    background: var(--paper);
+  }
+  table.compare tr:last-child td { border-bottom: none; }
+  .yes { color: var(--ok); font-weight: 600; }
+  .no { color: var(--ink-faint); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 3px 9px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+  }
+  .badge.verified { color: var(--ok); background: var(--ok-bg); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+  .badge.medium   { color: var(--warn); background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+  .badge.low      { color: var(--bad); background: var(--bad-bg); border-color: color-mix(in srgb, var(--bad) 35%, transparent); }
+  .badge.unverified {
+    color: var(--unv); background: var(--unv-bg); border: 1.5px solid var(--unv);
+    font-weight: 700;
+  }
+  .badge.disputed { color: var(--bad); background: var(--bad-bg); border: 1.5px solid var(--bad); font-weight: 700; }
+
+  .rec-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  .rec {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+  .rec .rec-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
+  .rec .num-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--accent); color: white;
+    width: 24px; height: 24px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 13px; flex: none;
+  }
+  .rec-body { margin-left: 34px; }
+  .rec-body p { margin: 6px 0 0; }
+
+  details.appendix {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 4px 20px;
+  }
+  details.appendix summary {
+    cursor: pointer;
+    padding: 14px 0;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  details.appendix summary::-webkit-details-marker { display: none; }
+  details.appendix summary::before {
+    content: '▸';
+    color: var(--accent);
+    transition: transform 0.15s ease;
+    display: inline-block;
+  }
+  details.appendix[open] summary::before { transform: rotate(90deg); }
+  .src-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 18px; }
+  .src-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .src-table td:first-child { color: var(--accent-ink); font-weight: 600; white-space: nowrap; }
+  .src-table tr:target { background: var(--accent-soft); }
+
+  .stale-box {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    font-size: 15.5px;
+  }
+  .stale-box .earliest {
+    display: inline-block;
+    margin-top: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    background: var(--warn-bg);
+    color: var(--warn);
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--ink-faint);
+  }
+
+  ::selection { background: var(--accent); color: white; }
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <span class="kicker">Technical Research · Deep Recon</span>
+    <h1>repository-harness (hoangnb24) — tư duy áp dụng harness cho agent</h1>
+    <p class="decision-line">Quyết định phục vụ: hiểu tư duy/phương pháp thiết kế harness cho repo, soi lại thực hành <code>AGENTS.md</code> của Vấn Đạo/BMAD.</p>
+    <div class="meta-grid">
+      <div class="meta-row"><div class="k">Nguồn</div><div class="v"><a href="https://github.com/hoangnb24/repository-harness" target="_blank" rel="noopener">github.com/hoangnb24/repository-harness</a></div></div>
+      <div class="meta-row"><div class="k">Ngày</div><div class="v">2026-08-26 → 27</div></div>
+      <div class="meta-row"><div class="k">Preset</div><div class="v">standard · depth-first</div></div>
+      <div class="meta-row"><div class="k">Verification</div><div class="v">normal + spot-check</div></div>
+      <div class="meta-row"><div class="k">Claims</div><div class="v"><span class="badge verified">✓ 8 verified</span></div></div>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="Mục lục">
+    <a href="#summary">Tóm tắt</a>
+    <a href="#d1">1 · Kiến trúc</a>
+    <a href="#d2">2 · Cơ chế</a>
+    <a href="#d3">3 · Đối chiếu</a>
+    <a href="#cross">Cross-dimension</a>
+    <a href="#rec">Khuyến nghị</a>
+    <a href="#sources">Nguồn</a>
+    <a href="#stale">Độ tươi</a>
+  </nav>
+
+  <section id="summary">
+    <div class="summary-card">
+      <h2>Tóm tắt điều hành</h2>
+      <p><strong>repository-harness</strong> là một Rust binary thật (1198 sao, pre-1.0, gần như một người vận hành) sinh và bảo trì <code>AGENTS.md</code>/<code>CLAUDE.md</code>/cấu trúc tài liệu cho repo bất kỳ, có installer/updater ba chiều (three-way merge). Bảy nguyên tắc thiết kế của nó đều xoay quanh một trục: <strong>repo là nguồn sự thật, <code>AGENTS.md</code> chỉ là entrypoint gọn dẫn tới đó — không phải nơi nhồi nội dung, và mọi tuyên bố "xong" phải có bằng chứng chạy được, không phải tự báo cáo.</strong></p>
+      <p>Đối chiếu trực tiếp với <code>AGENTS.md</code> hiện tại của Vấn Đạo, phần lớn khác biệt là <strong>khác triết lý phù hợp quy mô riêng</strong> — không phải chỗ trống cần lấp. Có <strong>đúng một điểm đáng học thật</strong>: Vấn Đạo đã có tinh thần "luật bằng lời ⇄ check tự động" ở một cặp cụ thể (<code>bi-kip.schema.md</code> §6 ↔ <code>kiem-bi-kip.py</code>) nhưng chưa phát biểu thành quy ước chung, tái dùng được cho luật mới.</p>
+      <div class="caveat">
+        <strong>Caveat lớn nhất:</strong> repo pre-1.0, đang đổi kiến trúc mạnh (vừa khai tử một dòng sản phẩm — SQLite <code>harness-cli</code>/protocol v1 — ngày 2026-08-10 <a class="cite" href="#src-11">[11]</a>), và có một PR audit ngoài (chưa merge) tự báo phát hiện lỗ hổng path traversal thật <span class="badge unverified">unverified</span>. Không ảnh hưởng việc học nguyên tắc thiết kế — chỉ liên quan nếu ai định <em>dùng thật</em> công cụ này.
+      </div>
+    </div>
+  </section>
+
+  <section id="d1">
+    <h2><span class="num">1</span> Kiến trúc &amp; tư duy thiết kế</h2>
+    <p><strong><code>.agents/</code>, <code>AGENTS.md</code>, <code>CLAUDE.md</code> — ba vai trò tách biệt rõ.</strong> <code>AGENTS.md</code> (gốc, 1613 byte) là payload nội dung thật, bọc marker <code>&lt;!-- HARNESS:BEGIN --&gt;...END --&gt;</code> cho phép updater merge ba chiều mà không mất chỉnh sửa cục bộ — là "entry map và authority boundary" <a class="cite" href="#src-1">[1]</a>. <code>CLAUDE.md</code> (258 byte) hoàn toàn không có nội dung riêng:</p>
+    <blockquote><p>"Claude Code does not auto-load AGENTS.md. Import that single canonical project instruction source... <code>@AGENTS.md</code>"</p></blockquote>
+    <p><code>.agents/skills/</code> chứa 5 skill, kích hoạt qua slash-command tường minh — tách hẳn khỏi <code>AGENTS.md</code> (luôn nạp):</p>
+    <blockquote><p>"No skill runs during installation. Onboarding and Harness improvement remain explicit-only." <a class="cite" href="#src-2">[2]</a></p></blockquote>
+    <p><strong><code>crates/</code> chỉ có 1 crate</strong> (<code>crates/harness</code>) <a class="cite" href="#src-3">[3]</a>, kiến trúc hexagonal: domain ← application ← infrastructure ← interface; "Architecture tests reject outward dependencies from inner layers" — kiểm bằng test tự động <a class="cite" href="#src-4">[4]</a>.</p>
+
+    <h3>Bảy nguyên tắc thiết kế</h3>
+    <p><em>docs/HARNESS.md, mục "Principles" — trích nguyên văn, đã spot-check khớp <span class="badge verified">✓ MATCH</span> <a class="cite" href="#src-5">[5]</a></em></p>
+    <table class="compare">
+      <tr><th>#</th><th>Nguyên tắc</th></tr>
+      <tr><td>1</td><td><strong>Repository truth wins.</strong> Tài liệu sản phẩm, quyết định, kế hoạch, code, test, CI, bằng chứng runtime, và Git history là nguồn sự thật.</td></tr>
+      <tr><td>2</td><td><strong>Load the smallest useful context.</strong> AGENTS.md là entrypoint, không phải bách khoa toàn thư.</td></tr>
+      <tr><td>3</td><td><strong>Process follows work shape.</strong> Việc nhỏ giữ nhỏ; việc phối hợp/nhiều-phiên mới cần 1 kế hoạch bền.</td></tr>
+      <tr><td>4</td><td><strong>Material choices stay human-owned.</strong> Thiếu chính sách sản phẩm thì dừng, không tự quyết.</td></tr>
+      <tr><td>5</td><td><strong>Behavior proves completion.</strong> Ghi chép quy trình và tự báo cáo không thay được bằng chứng chạy được/quan sát được.</td></tr>
+      <tr><td>6</td><td><strong>Consumer applications own application operation.</strong></td></tr>
+      <tr><td>7</td><td><strong>Harness maintains only its core.</strong> Chỉ cài/cập nhật hướng dẫn được quản lý, không biến thành task control plane.</td></tr>
+    </table>
+    <blockquote><p>"The repository remains the system of record... It is not a task database, story tracker, agent orchestrator, or application runtime." · "A typo does not need a plan. A migration spanning sessions does." <a class="cite" href="#src-6">[6]</a></p></blockquote>
+  </section>
+
+  <section id="d2">
+    <h2><span class="num">2</span> Cơ chế vận hành thật</h2>
+    <p>Không phải "quét code rồi tự sinh AGENTS.md" — payload cài đặt <strong>khai báo tường minh</strong> trong <code>scripts/harness-install-files.txt</code> <a class="cite" href="#src-8">[8]</a>. Cơ chế "block" chèn vào file đích thay vì ghi đè toàn bộ (cờ <code>--merge</code>/<code>--override</code>/<code>--dry-run</code>). Lệnh bảo trì thật: <code>harness status</code>, <code>harness doctor</code>, <code>harness update</code> — three-way merge, backup, transactional <a class="cite" href="#src-9">[9]</a>.</p>
+
+    <table class="compare">
+      <tr><th>Chỉ số</th><th>Giá trị thật</th></tr>
+      <tr><td>Sao / Fork</td><td>1198 / 429</td></tr>
+      <tr><td>License</td><td>MIT</td></tr>
+      <tr><td>Tạo repo → push cuối</td><td>2026-05-05 → 2026-08-13</td></tr>
+      <tr><td>Version nội bộ</td><td>harness-v0.1.10 <span class="badge medium">pre-1.0</span></td></tr>
+      <tr><td>Dòng sản phẩm cũ</td><td>SQLite harness-cli / protocol v1 — <strong>end-of-life 2026-08-10</strong> <span class="badge verified">✓ verified</span> <a class="cite" href="#src-11">[11]</a></td></tr>
+    </table>
+
+    <h3>Người dùng thật nói gì</h3>
+    <p>Gần như một người vận hành (quét ~35 PR gần nhất, đại đa số tác giả <code>hoangnb24</code>). Duy nhất 1 issue từ người ngoài (<code>lxbachit03</code>) với phản hồi tích cực — <strong>hai phát biểu riêng, cùng tác giả, cách nhau ~8 giờ</strong> (đã sửa sau spot-check, ban đầu bị ghép nhầm thành một câu):</p>
+    <blockquote>
+      <p>07:45 UTC (issue body): "Based on my experience, this harness repo was so powerful for most projects, tasks,..."</p>
+      <p>15:29 UTC (comment, cùng ngày): "...after exploring all features, workflows, and the harness CLI; I was falling in love with this repo." <a class="cite" href="#src-12">[12]</a></p>
+    </blockquote>
+    <p>Một PR draft (chưa merge, <code>#63</code>) từ contributor ngoài tự báo audit tìm 3 bug critical + 8 systemic, gồm path traversal trong <code>HARNESS_RUN_ID</code> — <span class="badge unverified">unverified</span>, chỉ tự báo cáo trong PR chưa merge <a class="cite" href="#src-13">[13]</a>.</p>
+  </section>
+
+  <section id="d3">
+    <h2><span class="num">3</span> Đối chiếu với AGENTS.md của Vấn Đạo</h2>
+    <table class="compare">
+      <tr><th>#</th><th>Khác biệt</th><th>Đáng học?</th></tr>
+      <tr><td>1</td><td><code>CLAUDE.md</code> tách riêng (harness) vs khối trong chính AGENTS.md (Vấn Đạo)</td><td class="no">Đã kiểm filesystem: <code>van-dao/</code> không có CLAUDE.md — khớp tự khai</td></tr>
+      <tr><td>2</td><td>Vòng đời <code>docs/plans/active→completed/</code> vs 1 status doc theo §</td><td class="no">Không — hai triết lý khác nhau, đã hợp lý cho quy mô</td></tr>
+      <tr><td>3</td><td>Skill phân tầng mặc-định vs explicit-only</td><td class="no">Chưa áp dụng được — <code>van-dao/skills/</code> hiện <strong>rỗng</strong></td></tr>
+      <tr><td>4</td><td>Quy trình có tên <code>$encode-invariant</code> (5 bước, tái dùng) vs 1 cặp cụ thể</td><td class="yes">✓ Đáng học một phần</td></tr>
+      <tr><td>5</td><td>CHANGELOG riêng cho tài liệu-agent vs 1 dòng "Verified {ngày}"</td><td class="no">Thấp/trung bình — git log đã cho lịch sử thô</td></tr>
+      <tr><td>6</td><td>Installer/updater độc lập vs skill BMAD ghi đè marker</td><td class="no">Không — sẽ xung đột hệ sinh thái BMAD</td></tr>
+    </table>
+    <p><strong>Điểm đáng học thật (#4):</strong> Vấn Đạo đã thực hành đúng tinh thần "luật bằng lời ⇄ check tự động" ở đúng một chỗ — <code>bi-kip.schema.md</code> §6 ↔ <code>kiem-bi-kip.py</code>, "đổi một bên thì đổi bên kia trong cùng một thay đổi, kèm fixture và test". Đây chính là nguyên tắc <code>$encode-invariant</code> của harness, chưa được phát biểu thành quy ước CHUNG. Không cần cả bộ máy 5-cổng — chỉ cần một dòng quy ước ngắn.</p>
+  </section>
+
+  <section id="cross">
+    <h2>Cross-dimension insight</h2>
+    <p>"Harness" ở đây được thiết kế RÕ RÀNG cho bối cảnh nhiều-repo/nhiều-agent/nhiều-phiên cần một lớp cài đặt-cập-nhật độc lập — đúng như nguyên tắc #6/#7 tự thừa nhận. Vấn Đạo đã giải quyết đúng vấn đề đó bằng cách khác phù hợp bối cảnh hơn (BMAD skill trong cùng workspace). Phần lớn khác biệt ở mục 3 là <strong>kết quả tất yếu của bối cảnh khác nhau</strong>, không phải thiếu sót. Điều đáng mang về nằm ở tầng "nguyên tắc" (không phụ thuộc quy mô) chứ không phải tầng "cơ chế" (installer, changelog, thư mục plans — phụ thuộc quy mô).</p>
+  </section>
+
+  <section id="rec">
+    <h2>Khuyến nghị</h2>
+    <ul class="rec-list">
+      <li class="rec">
+        <div class="rec-head"><span class="num-badge">1</span> <span class="badge verified">Độ tin cao</span></div>
+        <div class="rec-body"><strong>Thêm 1 dòng quy ước vào AGENTS.md</strong> (mục "Conventions that differ from defaults"): tổng quát hoá pattern <code>bi-kip.schema.md</code>↔<code>kiem-bi-kip.py</code> — "luật mới cần kiểm bằng script phải đi cặp: luật bằng lời + test dương/âm trong cùng một thay đổi, và nêu rõ luật bắt nguồn từ R-nào của đặc tả."
+        <p>Dựa trên pattern Vấn Đạo đã thực hành thật, chỉ thiếu phát biểu tường minh.</p></div>
+      </li>
+      <li class="rec">
+        <div class="rec-head"><span class="num-badge">2</span></div>
+        <div class="rec-body"><strong>Không</strong> áp dụng vòng đời plans active/completed, installer riêng, hay CHANGELOG riêng cho AGENTS.md — giải quyết vấn đề Vấn Đạo không có ở quy mô hiện tại, hoặc đã có giải pháp khác qua BMAD.</div>
+      </li>
+      <li class="rec">
+        <div class="rec-head"><span class="num-badge">3</span> <span class="badge medium">Độ tin trung bình</span></div>
+        <div class="rec-body"><strong>Theo dõi, không hành động ngay:</strong> nếu sau này cân nhắc phụ thuộc trực tiếp vào <code>repository-harness</code>, PR #63 (chưa merge) và tình trạng pre-1.0/đổi kiến trúc mạnh là lý do để không vội.</div>
+      </li>
+    </ul>
+  </section>
+
+  <section id="sources">
+    <h2>Nguồn</h2>
+    <details class="appendix">
+      <summary>13 nguồn — bấm để mở bảng đầy đủ</summary>
+      <table class="src-table"><tbody><tr id="src-1"><td>[1]</td><td>Vai trò AGENTS.md (entrypoint, marker 3-way) vs CLAUDE.md (shim import)</td><td><a href="https://raw.githubusercontent.com/hoangnb24/repository-harness/main/AGENTS.md" target="_blank" rel="noopener">raw AGENTS.md/CLAUDE.md, hoangnb24/repository-harness</a></td><td>2026 (repo hiện hành)</td><td>2026-08-26</td><td>Cao — đọc trực tiếp file gốc</td></tr><tr id="src-2"><td>[2]</td><td>`.agents/skills/` — 5 skill, 3 explicit-only</td><td><a href="https://api.github.com/repos/hoangnb24/repository-harness/contents/.agents/skills" target="_blank" rel="noopener">GitHub API listing `.agents/skills`</a></td><td>2026</td><td>2026-08-26</td><td>Cao</td></tr><tr id="src-3"><td>[3]</td><td>`crates/` chỉ 1 crate `harness`</td><td><a href="https://raw.githubusercontent.com/hoangnb24/repository-harness/main/Cargo.toml" target="_blank" rel="noopener">raw Cargo.toml</a></td><td>2026</td><td>2026-08-26</td><td>Cao</td></tr><tr id="src-4"><td>[4]</td><td>Kiến trúc hexagonal, architecture test chặn dependency ngược</td><td><a href="https://raw.githubusercontent.com/hoangnb24/repository-harness/main/docs/ARCHITECTURE.md" target="_blank" rel="noopener">raw docs/ARCHITECTURE.md</a></td><td>2026</td><td>2026-08-26</td><td>Cao</td></tr><tr id="src-5"><td>[5]</td><td>7 nguyên tắc thiết kế</td><td><a href="https://raw.githubusercontent.com/hoangnb24/repository-harness/main/docs/HARNESS.md" target="_blank" rel="noopener">raw docs/HARNESS.md</a></td><td>2026</td><td>2026-08-26</td><td>Cao</td></tr><tr id="src-6"><td>[6]</td><td>&quot;Repository remains system of record&quot;, &quot;typo does not need a plan&quot;</td><td><a href="https://raw.githubusercontent.com/hoangnb24/repository-harness/main/README.md" target="_blank" rel="noopener">raw README.md</a></td><td>2026</td><td>2026-08-26</td><td>Cao</td></tr><tr id="src-7"><td>[7]</td><td>Ví dụ &quot;material ambiguity → dừng&quot; (rate limiting)</td><td><a href="https://raw.githubusercontent.com/hoangnb24/repository-harness/main/docs/WORKFLOW.md" target="_blank" rel="noopener">raw docs/WORKFLOW.md</a></td><td>2026</td><td>2026-08-26</td><td>Cao</td></tr><tr id="src-8"><td>[8]</td><td>Payload cài đặt khai báo tường minh, cơ chế block-merge</td><td>README.md; <a href="https://api.github.com/repos/hoangnb24/repository-harness/contents/scripts" target="_blank" rel="noopener">GitHub API `scripts/`</a></td><td>2026</td><td>2026-08-26</td><td>Cao</td></tr><tr id="src-9"><td>[9]</td><td>Lệnh bảo trì (`status`/`doctor`/`update`), gate CI `validate-premerge.sh`</td><td>README.md, mục &quot;Maintain An Installation&quot;/&quot;Development&quot;</td><td>2026</td><td>2026-08-26</td><td>Cao</td></tr><tr id="src-10"><td>[10]</td><td>Metadata repo: 1198 sao, 429 fork, MIT, ngày tạo/push</td><td><a href="https://api.github.com/repos/hoangnb24/repository-harness" target="_blank" rel="noopener">GitHub API repo metadata</a></td><td>2026-08-13 (pushed_at)</td><td>2026-08-26</td><td>Cao — số liệu trực tiếp từ API</td></tr><tr id="src-11"><td>[11]</td><td>Protocol v1/SQLite CLI end-of-life 2026-08-10</td><td>README &quot;Protocol V1 End Of Life&quot;; CHANGELOG PR #64</td><td>2026-08-10</td><td>2026-08-26</td><td>Cao — xác nhận chéo 2 nguồn</td></tr><tr id="src-12"><td>[12]</td><td>Testimonial người dùng thật (issue #38) — 2 phát biểu riêng cùng tác giả, cùng ngày, cách ~8h (issue body + comment), không phải 1 câu liên tục</td><td><a href="https://api.github.com/repos/hoangnb24/repository-harness/issues/38" target="_blank" rel="noopener">GitHub Issue #38 + comments</a></td><td>2026-07-07 (issue body 07:45 UTC, comment 15:29 UTC)</td><td>2026-08-26; spot-check độc lập 2026-08-27</td><td>Cao — nội dung xác nhận thật qua spot-check, đã sửa cách trích cho đúng 2 nguồn tách biệt</td></tr><tr id="src-13"><td>[13]</td><td>PR #63 (draft) tự báo audit 3 critical + 8 systemic bug</td><td><a href="https://api.github.com/repos/hoangnb24/repository-harness/issues?state=open" target="_blank" rel="noopener">GitHub Issues API, PR #63 body</a></td><td>2026 (chưa merge)</td><td>2026-08-26</td><td>**Thấp — chưa xác nhận độc lập, tự báo cáo trong PR chưa merge**</td></tr></tbody></table>
+    </details>
+  </section>
+
+  <section id="stale">
+    <h2>Độ tươi (Staleness)</h2>
+    <div class="stale-box">
+      <p>Lớp claim dễ lỗi thời nhất: <strong>metrics/số liệu repo</strong> (sao, fork, version, PR count) — pack "technical" đặt cửa sổ tươi ≤1 tháng cho version/compatibility, ≤6 tháng cho tín hiệu ecosystem. Repo pre-1.0, đang đổi kiến trúc mạnh — số liệu ở đây lỗi thời nhanh hơn trung bình. Claim <a class="cite" href="#src-10">[10]</a>/<a class="cite" href="#src-11">[11]</a>/<a class="cite" href="#src-13">[13]</a> nên re-check trước; nguyên tắc thiết kế/kiến trúc code (<a class="cite" href="#src-1">[1]</a>–<a class="cite" href="#src-9">[9]</a>) bền hơn (cửa sổ ≤2 năm).</p>
+      <span class="earliest">Re-check sớm nhất: ~2026-09 (metrics/version)</span>
+    </div>
+  </section>
+
+  <footer>
+    Technical Research · bmad-deep-recon · preset standard, depth-first, validation normal + spot-check độc lập · 8 claim verified, 1 unverified · Nguồn đầy đủ &amp; memlog: <code>research.md</code> cùng thư mục.
+  </footer>
+</div>
