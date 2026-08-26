@@ -1,5 +1,5 @@
 <!-- bmad:context -->
-<!-- Verified 2026-08-24. Không phải git repo — chưa có SHA để đối chiếu; van-dao/ đối chiếu ở HEAD 040f2e8. Managed by bmad-project-context; sửa trong khối này sẽ bị ghi đè ở lần refresh sau. Nội dung ngoài marker được giữ nguyên. -->
+<!-- Verified 2026-08-27. Workspace root ở HEAD 3073cd3; van-dao/ đối chiếu ở HEAD b69d801. Managed by bmad-project-context; sửa trong khối này sẽ bị ghi đè ở lần refresh sau. Nội dung ngoài marker được giữ nguyên. -->
 
 ## van-dao
 
@@ -34,6 +34,8 @@ nạp cả file. Đang ở đâu, làm gì tiếp: `docs/VAN-DAO-trang-thai-du-a
 - Eval skill/agent: `van-dao/.claude/rules/eval.md` — tự nạp khi làm việc trong `van-dao/skills/` hoặc
   `van-dao/agents/`
 - Artifact kế hoạch BMAD: `_bmad-output/planning-artifacts`, `_bmad-output/implementation-artifacts`
+- Kiến trúc ràng buộc mọi epic/story: `_bmad-output/planning-artifacts/architecture/architecture-van-dao-workspace-2026-08-25/ARCHITECTURE-SPINE.md`
+  — 9 invariant (AD-1..AD-9)
 
 ## Running and verifying
 
@@ -61,6 +63,13 @@ nạp cả file. Đang ở đâu, làm gì tiếp: `docs/VAN-DAO-trang-thai-du-a
 - Yêu cầu ở đặc tả §8 gồm **34 mục**: `R1`–`R31` cộng `R13b`, `R32`, `R33`. Sửa hành vi thì trỏ đúng R nào.
 - Tham chiếu tương đối từ file trong `van-dao/` sang `docs/` ở workspace này phụ thuộc độ sâu (`../docs/`
   từ gốc `van-dao/`, `../../docs/` từ thư mục con cấp 1, `../../../docs/` từ `.claude/rules/`).
+- Tên vai hiển thị (Trưởng môn, Nghiệm Công Sứ, Phúc Khảo Sứ, Sơn phong trưởng lão...) và định danh kỹ
+  thuật kebab-case (`truong-mon`, `nghiem-cong`, `phuc-khao`, `truong-lao`...) là hai lớp tách biệt — đổi
+  tên vai trong văn xuôi/tài liệu không kéo theo đổi file, `id`, hay identifier kỹ thuật.
+- Luật mới cần kiểm bằng script (không riêng `bi-kip.schema.md`↔`kiem-bi-kip.py`) phải đi cặp: đoạn luật
+  bằng lời trong tài liệu tham chiếu + test dương/test âm trong cùng một thay đổi, và luật đó bắt nguồn
+  từ đâu (R-nào của đặc tả, hay quyết định nào) phải nêu rõ — không âm thầm thêm luật không truy được
+  nguồn.
 
 ## Known pitfalls
 
@@ -70,12 +79,20 @@ nạp cả file. Đang ở đâu, làm gì tiếp: `docs/VAN-DAO-trang-thai-du-a
   định mã thoát. Chọn nhầm mức là cách âm thầm nhất làm hỏng luồng thu sách.
 - Bí kíp có hai hình dạng rẽ ở `kiem_mot()`: `loai: bi-kip` có `chuong/` và đồ thị phụ thuộc;
   `loai: tan-quyen` không có `chuong/`, trường sư phạm nằm thẳng trong `manifest.yaml`.
-- Ba đường truyền tin định nghĩa thiết kế bằng thứ **không** mang theo (đặc tả §4.5): thư linh → nghiệm
-  công không mang giáo án; giám khảo → phúc khảo không mang tiêu chí; trưởng môn → trưởng lão không mang
-  `thu-linh/**`. Bốn vai chấm là subagent **tươi**, không bao giờ fork.
+- Ba đường truyền tin định nghĩa thiết kế bằng thứ **không** mang theo (đặc tả §4.1): thư linh → Nghiệm
+  Công Sứ không mang giáo án; giám khảo → Phúc Khảo Sứ không mang tiêu chí; trưởng môn → trưởng lão không
+  mang `thu-linh/**`. Bốn vai chấm là subagent **tươi**, không bao giờ fork.
 - `.pham-vi.json` thiếu → **không vai nào** đọc được, không phải mọi vai đọc được (R26). Fail an toàn.
 - `van-dao/tests/test_kiem_bi_kip.py` gọi script qua `subprocess`, đọc `--json` — kiểm cả giao diện
   lệnh. Thêm phép kiểm mới thì thêm ca lỗi vào fixture `sach-loi`, assert theo **mã lỗi** (`ma`), không
   theo thông điệp.
+- "Bậc" (đặc tả §13.1 — độ hoàn thiện tính năng) và "Vòng" (đặc tả §16 — thứ tự phụ thuộc dựng thật) là
+  hai trục khác nhau, từng lệch nhau thật (`phuc-khao` bị gắn Bậc 3 dù đã cần dùng ở Vòng 2). Hỏi "cái gì
+  dựng trước" hay "MVP dừng ở đâu" thì dùng Vòng, không dùng Bậc.
+- Mermaid `stateDiagram-v2` không cho nối chuỗi `A --> B --> C` trên một dòng như `flowchart` cho phép —
+  parse-fail thật đã gặp ở `ARCHITECTURE-SPINE.md` (2026-08-27); viết mỗi cạnh một dòng riêng.
+- Edit nối tiếp theo mục đánh số (Epic N, Story N.M...) vào file lớn với anchor text lặp lại đã từng ghi
+  nhầm vị trí thật (`epics.md`: thứ tự Epic Details xáo trộn, AC lạc sang story khác, phải Write lại cả
+  file để sửa) — đảm bảo anchor đủ duy nhất, hoặc đọc lại file sau mỗi lần nối.
 
 <!-- /bmad:context -->
