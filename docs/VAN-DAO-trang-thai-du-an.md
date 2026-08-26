@@ -1,6 +1,6 @@
 # Vấn Đạo — Trạng thái dự án và kế hoạch triển khai
 
-**Ngày:** 2026-08-21 · **Tác giả:** hanhnt2 (hanhnt2@hblab.vn)
+**Ngày:** 2026-08-21, cập nhật 2026-08-24 · **Tác giả:** hanhnt2 (hanhnt2@hblab.vn)
 **Đi kèm:** `VAN-DAO-dac-ta-v1.0.md` (đặc tả) · `bi-kip.schema.md` (data contract) · `VAN-DAO-setup-du-an.md` (dựng môi trường)
 
 Tài liệu này nói **đang ở đâu** và **làm gì tiếp**. Không nhắc lại thiết kế.
@@ -14,8 +14,8 @@ Tài liệu này nói **đang ở đâu** và **làm gì tiếp**. Không nhắc
 | Requirements | **Đóng** | 34 requirement — `R1`–`R31` cộng `R13b`·`R32`·`R33`, không open issue |
 | Architecture | **Đóng** | 8 role, 28 component, 13 model, ranh giới đọc/ghi đã khai |
 | Detailed design | **1/8** | Một data contract đã đặc tả; bảy cái còn lại mới có tên |
-| Implementation | **Chưa bắt đầu** | Một script tồn tại nhưng nằm ngoài repo |
-| Verification | **Manual only** | Chưa có test suite |
+| Implementation | **Nền kỹ thuật xong, vertical slice chưa bắt đầu** | `kiem-bi-kip.py` + test + CI đã trong repo (§6 Ưu tiên 1); `giam-dinh.py`/skill `thu-bi-kip`/`thu-linh` chưa viết |
+| Verification | **9 regression test (script), còn lại manual** | `pytest` xanh, CI chạy cả `ubuntu-latest` và `windows-latest` |
 
 **Pha đặc tả đóng được.** Không còn câu hỏi chặn việc dựng.
 
@@ -101,14 +101,11 @@ Bốn cơ chế còn lại ở §17.1 đặc tả **không mô phỏng được*
 
 # 5 · NỢ KỸ THUẬT
 
-| Nợ | Rủi ro |
-|---|---|
-| `kiem-bi-kip.py` không nằm trong repo, không VCS | Mất, hoặc trôi khỏi schema |
-| Không có test suite | Ba defect đã sửa **không có regression test** — sửa lần nữa là có thể tái phát |
-| Test data nằm rải trong phiên làm việc | Không tái tạo được |
-| Chưa có CI | Không biết khi nào script vỡ |
+**Bốn nợ trước đó đã trả** — `kiem-bi-kip.py` vào `bin/`, test suite (`tests/` + fixture, 9/9 pass), CI (`.github/workflows/kiem.yml`, ubuntu+windows). Ba defect cần regression test đã có test khoá lại: **mảng rỗng bị coi là vắng mặt** (`test_mang_rong_khong_phai_thieu_truong`) · **bộ tham số thiếu khoá** (`test_bo_tham_so_thieu_khoa_la_loi`) · **enum sai giá trị** (`test_canh_gioi_ngoai_enum_la_loi`).
 
-Ba defect cần regression test ngay: **mảng rỗng bị coi là vắng mặt** · **bộ tham số thiếu khoá** · **enum sai giá trị**.
+| Nợ còn lại | Rủi ro |
+|---|---|
+| Chưa có remote — cả `van-dao` và workspace chỉ tồn tại local | Máy hỏng là mất hết, kể cả lịch sử git |
 
 ---
 
@@ -118,17 +115,17 @@ Ba defect cần regression test ngay: **mảng rỗng bị coi là vắng mặt*
 
 **Không viết thêm design cho tới khi có executable spec.** Căn cứ ở §4.2.
 
-## Ưu tiên 1 — nền kỹ thuật
+## Ưu tiên 1 — nền kỹ thuật (xong, trừ 1.1)
 
-| # | Việc | Xong khi |
-|---|---|---|
-| 1.1 | `git init` repo `van-dao`, push remote nội bộ | Người khác `clone` được |
-| 1.2 | Chuyển `kiem-bi-kip.py` vào `bin/` | Nằm trong VCS |
-| 1.3 | `tests/` với pytest, ba regression test từ §5 | `pytest` xanh |
-| 1.4 | Test fixture: bí kíp sạch, bí kíp lỗi, tàn quyển | Tái tạo được |
-| 1.5 | CI tối thiểu — chạy pytest mỗi push | Vỡ thì biết ngay |
+| # | Việc | Xong khi | Trạng thái |
+|---|---|---|---|
+| 1.1 | `git init` repo `van-dao`, push remote | Người khác `clone` được | `git init` xong (cả `van-dao` và workspace) — **push: chưa**, chưa chọn nơi lưu |
+| 1.2 | Chuyển `kiem-bi-kip.py` vào `bin/` | Nằm trong VCS | ✅ |
+| 1.3 | `tests/` với pytest, ba regression test từ §5 | `pytest` xanh | ✅ — 9/9 pass |
+| 1.4 | Test fixture: bí kíp sạch, bí kíp lỗi, tàn quyển | Tái tạo được | ✅ |
+| 1.5 | CI tối thiểu — chạy pytest mỗi push | Vỡ thì biết ngay | ✅ — chạy cả `ubuntu-latest` và `windows-latest` |
 
-Không có bước này thì mọi việc sau đều dựng trên nền không kiểm được.
+Việc còn lại của ưu tiên này chỉ là **chọn nơi push** (GitHub cá nhân, nội bộ, hay khác) — quyết định của tác giả, không tự chọn được.
 
 ## Ưu tiên 2 — vertical slice
 
@@ -148,7 +145,7 @@ Data contract viết just-in-time: `lo-do` và `ho-so` khi tới bước cần c
 | Routing | Trigger eval | ~3 |
 | Judgment quality | Manual + κ calibration | ~8 |
 
-**Mục tiêu: kéo 29 requirement manual xuống dưới 10.** Không nhắm 100% — nhóm cuối vốn không tự động hoá được.
+**Mục tiêu: kéo 31 requirement manual xuống dưới 10.** Không nhắm 100% — nhóm cuối vốn không tự động hoá được.
 
 ---
 
@@ -222,11 +219,15 @@ Nó giữ cho hệ không phình mỗi lần một bí kíp viết kém.
 
 # 10 · VIỆC TIẾP THEO
 
-1. `git init` + push repo — **không chặn bởi gì**
-2. Chuyển `kiem-bi-kip.py` vào repo, viết ba regression test
-3. `giam-dinh.py` + skill `thu-bi-kip`
-4. Thu một quyển thật bằng chính plugin
-5. `thu-linh` — F0 · F1 · F2
-6. Tự bế quan quyển đó bằng plugin
+Ưu tiên 1 xong trừ push (§6). Còn lại theo đúng thứ tự phụ thuộc ở §16 đặc tả, Vòng 1:
 
-Bước 6 là lần đầu có người học thật, và là thứ duy nhất chạm được cột *giá trị* — cột duy nhất vẫn ở 0% sau tất cả những gì đã làm.
+1. Push remote — **cần bạn chọn nơi lưu trước**, không chặn bởi gì khác
+2. `bin/giam-dinh.py` + skill `thu-bi-kip` (Tàng kinh trưởng lão) — ba pha, dừng ở pha 2. Phụ thuộc ngoài: `book-to-skill` (virgiliojr94)
+3. Thu một quyển thật, 3 chương
+4. `tham-chieu/lo-do.schema.md` + skill `thu-linh` — F-1 · F0 · F0′ · F1 · F2
+5. `.pham-vi.json` + `bin/kiem-thu.py` bản đầu (R26/R27) — chỉ phụ thuộc bước đã xong, làm song song với 2-4 được
+6. `agents/nghiem-cong.md` — chấm chương
+7. skill `nhap-mon` · `dao-tam` · `bin/tang-kinh-cac.py` — song song
+8. **Tự bế quan quyển đó bằng plugin**
+
+Bước 8 là lần đầu có người học thật, và là thứ duy nhất chạm được cột *giá trị* — cột duy nhất vẫn ở 0% sau tất cả những gì đã làm.

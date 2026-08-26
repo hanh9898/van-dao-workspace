@@ -40,9 +40,9 @@
 | **Xuất quan** | Bỏ giữa chừng — **tạm dừng**, không phải dứt |
 | **Kiêm tu** | Luyện nhiều mạch cùng lúc. *(Tán tu là người tu ngoài mọi tông môn — khác nghĩa)* |
 
-**Tám vai:** Trưởng môn · **Tàng kinh trưởng lão** (giám định và thu sách) · Thư linh · Giám khảo · **Trưởng lão mạch** (định cảnh giới) · nghiệm công · phúc khảo · chú giải. Xem §4.
+**Tám vai:** Trưởng môn · **Tàng kinh trưởng lão** (giám định và thu sách) · Thư linh · Giám khảo · **Sơn phong trưởng lão** (định cảnh giới) · **Nghiệm Công Sứ** · **Phúc Khảo Sứ** · **Chú Giải Sứ**. Xem §4.
 
-*Hai trưởng lão, đừng lẫn:* **Tàng kinh** coi kho sách; **Trưởng lão mạch** đo cảnh giới trên một trục.
+*Hai trưởng lão, đừng lẫn:* **Tàng kinh** coi kho sách; **Sơn phong trưởng lão** đo cảnh giới trên một trục.
 
 ## 0.2 Kỹ thuật
 
@@ -80,7 +80,7 @@ Một plugin Claude Code biến sách người học **đã có** thành lộ tr
 | Nhóm | Vai | Nói với người học? |
 |---|---|---|
 | **Dẫn đường và dạy** | Trưởng môn · Tàng kinh trưởng lão · Thư linh · Giám khảo | Có |
-| **Soát và ghi nhận** | Trưởng lão mạch · nghiệm công · phúc khảo · chú giải | Không |
+| **Soát và ghi nhận** | Sơn phong trưởng lão · Nghiệm Công Sứ · Phúc Khảo Sứ · Chú Giải Sứ | Không |
 
 Cộng **đệ tử** — người học cũng là một chủ thể ghi (§4.2), không chỉ là đối tượng.
 
@@ -109,7 +109,7 @@ Từ đó, người học phải trả lời liên tục ba câu ở ba nhịp k
 | Câu hỏi | Nhịp | Cần nhìn gì | Vai |
 |---|---|---|---|
 | Luyện mạch nào tiếp? | Xong một mạch | Toàn bản đồ + lịch sử | **Trưởng môn** |
-| Ta đang ở cảnh giới nào? | Sau nhiều bí kíp cùng mạch | Nhiều bài nghiệm công, nhiều nguồn | **Trưởng lão mạch** |
+| Ta đang ở cảnh giới nào? | Sau nhiều bí kíp cùng mạch | Nhiều bài nghiệm công, nhiều nguồn | **Sơn phong trưởng lão** |
 | Chương này đã thấm chưa? | Mỗi chương | Một chương + tình huống thật | **Thư linh** |
 
 Ba câu không gộp được vì ba tầm nhìn khác nhau. Bỏ vai nào cũng mất đúng một câu không ai trả lời.
@@ -119,10 +119,10 @@ Năm vai còn lại sinh ra từ **tách trách nhiệm**, không từ thêm câ
 | Tách | Vì sao |
 |---|---|
 | **Tàng kinh trưởng lão** khỏi thư linh | Thu sách vào kho là việc một lần; dạy là việc lặp lại. Trộn thì thư linh mang cả logic giám định vào mỗi lượt dạy |
-| **Giám khảo** khỏi nghiệm công | Coi thi và chấm thi là hai người — cùng một vai thì nó **nới đề cho vừa bài** |
-| **nghiệm công** khỏi thư linh | Người dạy không được là người cấp chứng nhận |
-| **phúc khảo** khỏi nghiệm công | Hai người soát cùng cơ chế chỉ tốn gấp đôi; trực giao mới bắt được lỗi khác loại (§9) |
-| **chú giải** khỏi thư linh | Nó là vai duy nhất có đầu ra rời khỏi máy người học — cần phạm vi đọc hẹp riêng |
+| **Giám khảo** khỏi **Nghiệm Công Sứ** | Coi thi và chấm thi là hai người — cùng một vai thì nó **nới đề cho vừa bài** |
+| **Nghiệm Công Sứ** khỏi thư linh | Người dạy không được là người cấp chứng nhận |
+| **Phúc Khảo Sứ** khỏi **Nghiệm Công Sứ** | Hai người soát cùng cơ chế chỉ tốn gấp đôi; trực giao mới bắt được lỗi khác loại (§9) |
+| **Chú Giải Sứ** khỏi thư linh | Nó là vai duy nhất có đầu ra rời khỏi máy người học — cần phạm vi đọc hẹp riêng |
 
 ## 1.3 Đạt khi
 
@@ -132,7 +132,7 @@ Năm vai còn lại sinh ra từ **tách trách nhiệm**, không từ thêm câ
 flowchart TD
     A["Học một ý"] --> B{"Nộp nghiệm công?"}
     B -->|Không| C["chua_nghiem_cong<br/>VẪN tính là đã qua"]
-    B -->|Có| D["nghiệm công chấm"]
+    B -->|Có| D["Nghiệm Công Sứ chấm"]
     D --> E{"Đạt tiêu chí chương?"}
     E -->|Chưa| A
     E -->|Đạt| F["ĐỘT PHÁ CHƯƠNG"]
@@ -141,7 +141,7 @@ flowchart TD
     G -->|Còn| A
     G -->|Hết| H["/vd:khao-thi"]
     H --> I["Giám khảo sinh đề"]
-    I --> J["nghiệm công + phúc khảo"]
+    I --> J["Nghiệm Công Sứ + Phúc Khảo Sứ"]
     J --> K{"Trưởng môn xử"}
     K -->|"Chưa qua"| A
     K -->|"Qua"| L["ĐỘT PHÁ QUYỂN<br/>= tiêu chí đạt của hệ"]
@@ -219,10 +219,10 @@ Nghi thức không có việc thật đứng sau thì thành huy hiệu rỗng �
 | Thư linh | **Backward design** + **retrieval practice** | Bằng chứng viết trước, nội dung sau; câu hỏi là phần học chính |
 | Thư linh (F0′) | **Conceptual change** | Quan niệm cũ phải được nêu ra và đối chất, nếu không nội dung mới bị đồng hoá vào khung cũ |
 | Giám khảo | **Tách ra đề khỏi chấm** | Coi thi và chấm thi là hai người — cùng một vai thì nó nới đề cho vừa bài |
-| nghiệm công | **Rubric neo + bằng chứng trước khẳng định** | Chấm theo tiêu chí, mỗi phán quyết phải trích được câu làm căn cứ |
-| phúc khảo | **Soát trực giao** (BMAD: adversarial + edge-case-hunter) | Hai người soát cùng cơ chế chỉ tốn gấp đôi; khác cơ chế mới bắt được lỗi khác loại |
-| Trưởng lão mạch | **Dreyfus** + **self-consistency k=3** | Năm cảnh giới — đo **một mạch**. Độ tản mát giữa k lần là thước đo độ tin |
-| chú giải | **Chú giải đời sau** | Lớp bồi chồng lên bí kíp gốc, không sửa bản gốc |
+| Nghiệm Công Sứ | **Rubric neo + bằng chứng trước khẳng định** | Chấm theo tiêu chí, mỗi phán quyết phải trích được câu làm căn cứ |
+| Phúc Khảo Sứ | **Soát trực giao** (BMAD: adversarial + edge-case-hunter) | Hai người soát cùng cơ chế chỉ tốn gấp đôi; khác cơ chế mới bắt được lỗi khác loại |
+| Sơn phong trưởng lão | **Dreyfus** + **self-consistency k=3** | Năm cảnh giới — đo **một mạch**. Độ tản mát giữa k lần là thước đo độ tin |
+| Chú Giải Sứ | **Chú giải đời sau** | Lớp bồi chồng lên bí kíp gốc, không sửa bản gốc |
 | Xuyên suốt | **Bloom sửa đổi** | Phân loại câu hỏi — đo **một chương**, không đo một mạch |
 
 **Bloom và Dreyfus không chồng nhau vì khác cấp đo.** Bloom nói câu hỏi này đòi tầng nhận thức nào (Nhớ · Hiểu · **Áp dụng** · Phân tích · Đánh giá · Sáng tạo); sàn tính là bằng chứng là **Áp dụng trở lên**. Dreyfus nói người học đứng ở đâu trên cả một mạch sau nhiều bí kíp.
@@ -294,10 +294,10 @@ flowchart TD
     end
 
     subgraph TUOI["SUBAGENT TƯƠI — KHÔNG nói với người học"]
-        NC["nghiệm công<br/>chấm theo TIÊU CHÍ"]
-        PK["phúc khảo<br/>chấm theo MỤC TIÊU"]
-        TLAO["trưởng lão mạch ×3<br/>định cảnh giới"]
-        CG["chú giải<br/>bồi sai lầm phổ biến"]
+        NC["Nghiệm Công Sứ<br/>chấm theo TIÊU CHÍ"]
+        PK["Phúc Khảo Sứ<br/>chấm theo MỤC TIÊU"]
+        TLAO["sơn phong trưởng lão ×3<br/>định cảnh giới"]
+        CG["Chú Giải Sứ<br/>bồi sai lầm phổ biến"]
     end
 
     subgraph CONGCU["CÔNG CỤ — không phải vai"]
@@ -339,7 +339,7 @@ flowchart TD
 **Ba cạnh mang tải nặng nhất là ba cạnh nói rõ thứ KHÔNG mang theo:**
 
 - `TL → NC` không mang giáo án và ghi chép — người dạy không được là người cấp chứng nhận
-- `TL → PK` không mang tiêu chí — thấy tiêu chí thì phúc khảo chấm lại đúng thứ nghiệm công vừa chấm, trực giao mất
+- `TL → PK` không mang tiêu chí — thấy tiêu chí thì Phúc Khảo Sứ chấm lại đúng thứ Nghiệm Công Sứ vừa chấm, trực giao mất
 - `TM → TLAO` mang `pham_vi_doc` không chứa `thu-linh/**`
 
 **Không có cạnh nào từ vùng subagent về thẳng người học.** Subagent thiếu dữ kiện thì trả `thieu_du_kien` kèm câu cần hỏi; vai cầm lượt hỏi hộ.
@@ -348,7 +348,7 @@ flowchart TD
 
 Tám vai, cộng **đệ tử** — người học cũng là một chủ thể ghi, không phải chỉ là đối tượng.
 
-| Hoạt động | Trưởng môn | Tàng kinh | Thư linh | Giám khảo | Trưởng lão mạch | nghiệm công | phúc khảo | chú giải | Đệ tử |
+| Hoạt động | Trưởng môn | Tàng kinh | Thư linh | Giám khảo | Sơn phong trưởng lão | Nghiệm Công Sứ | Phúc Khảo Sứ | Chú Giải Sứ | Đệ tử |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | Nói với người học | **Có** | **Có** | **Có** | **Có** | Cấm | Cấm | Cấm | Cấm | — |
 | Chỉ điểm sách, xếp lớp nhiệm vụ | **Sở hữu** | Cấm | Cấm | — | — | — | — | — | — |
@@ -371,11 +371,11 @@ Tám vai, cộng **đệ tử** — người học cũng là một chủ thể g
 
 **Năm ô đáng chú ý:**
 
-- **Giám khảo tách khỏi nghiệm công** — coi thi và chấm thi là hai người. Giám khảo sinh đề và giữ luật; nó **không được chấm**, nên không thể nới đề cho vừa bài.
-- **Tàng kinh trưởng lão ghi trường đủ dùng chỉ lúc thu** — sau đó chúng **bất biến**. Trường đủ chuẩn được phép **thêm** khi bồi, thẳng vào bí kíp gốc (R15) — không phải "mọi bồi đắp vào lớp chú giải" như bản trước; lớp chú giải (`chu-giai/`) là kênh riêng của vai **chú giải**, không phải nơi Tàng kinh trưởng lão ghi.
-- **Phúc khảo và trưởng lão cùng bị cấm đọc `tieu_chi_dat`** — cùng lý do, khác tầng: cho đọc thì cả hai trượt về đo lại thứ nghiệm công vừa đo.
+- **Giám khảo tách khỏi Nghiệm Công Sứ** — coi thi và chấm thi là hai người. Giám khảo sinh đề và giữ luật; nó **không được chấm**, nên không thể nới đề cho vừa bài.
+- **Tàng kinh trưởng lão ghi trường đủ dùng chỉ lúc thu** — sau đó chúng **bất biến**. Trường đủ chuẩn được phép **thêm** khi bồi, thẳng vào bí kíp gốc (R15) — không phải "mọi bồi đắp vào lớp chú giải" như bản trước; lớp chú giải (`chu-giai/`) là kênh riêng của vai **Chú Giải Sứ**, không phải nơi Tàng kinh trưởng lão ghi.
+- **Phúc Khảo Sứ và trưởng lão cùng bị cấm đọc `tieu_chi_dat`** — cùng lý do, khác tầng: cho đọc thì cả hai trượt về đo lại thứ Nghiệm Công Sứ vừa đo.
 - **Đệ tử sở hữu sổ đạo tâm.** Đây là lý do `dao-tam` tắt model-invocation: không vai nào được ghi hộ bằng chứng đo lường.
-- **Chú giải cấm đọc tình huống thật** — vai duy nhất có đầu ra rời khỏi máy người học.
+- **Chú Giải Sứ cấm đọc tình huống thật** — vai duy nhất có đầu ra rời khỏi máy người học.
 
 `tra-tang-kinh-cac` **không có trong bảng** — nó là công cụ quét kho của trưởng môn, không sở hữu quyết định nào.
 
@@ -388,7 +388,7 @@ flowchart LR
     end
 
     TK["Tàng kinh<br/>trưởng lão"] -->|ghi 1 lần| BK
-    CG["chú giải"] -->|ghi| LCG[("chu-giai/<br/>lớp bồi")]
+    CG["Chú Giải Sứ"] -->|ghi| LCG[("chu-giai/<br/>lớp bồi")]
 
     subgraph RIENG["Vùng riêng — mỗi vùng đúng một chủ ghi"]
         VTK2[("tang-kinh/<br/>nháp pha 2")]
@@ -438,7 +438,7 @@ flowchart LR
 1. **Thư linh chỉ biết một quyển.** Không được tuyên bố người học đạt một *mạch*. Đây là đặc tính nhân vật, không phải luật phải nhớ.
 2. **Trưởng môn không dạy, không chấm.** Ẩn dụ kéo mạnh về hướng sai — phải cấm thẳng trong SKILL.md.
 3. **Trưởng lão không thấy giáo án và ghi chép dạy.** Subagent **tươi**, không bao giờ fork.
-4. **Chú giải ra ngoài không mang tình huống thật của người học.** Chặn bằng phạm vi đọc, không bằng lời dặn.
+4. **Chú Giải Sứ ra ngoài không mang tình huống thật của người học.** Chặn bằng phạm vi đọc, không bằng lời dặn.
 
 ---
 
@@ -909,7 +909,7 @@ Ranh giới giữa hai loại tín hiệu là chỗ dễ trượt nhất: **th�
 
 Lưu ở `ban-giao/tam-ma/<mạch>.jsonl` — thư linh ghi, nhưng **vùng chia sẻ** vì tâm ma theo người chứ không theo quyển: phát hiện ở bí kíp này thì bí kíp sau phải biết. Trưởng lão đọc được, và đó là chủ ý — bám quy tắc cũ cứng nhắc là **dấu hiệu cảnh giới** rõ hơn nhiều thứ khác.
 
-**Chú giải ghi vào lớp riêng, không sửa bí kíp gốc.** `~/.vandao/chu-giai/<bí kíp>/<chương>.md` — thư linh đọc bí kíp rồi đọc chồng lớp này lên ở F0 và F4. Bí kíp **bất biến sau khi thu**, nên không cần ai duyệt việc ghi, và gỡ lớp bồi ra lúc nào cũng quay về bản gốc. Đúng nghĩa chú giải đời sau: lời chú bên lề, không phải chép lại sách.
+**Chú Giải Sứ ghi vào lớp riêng, không sửa bí kíp gốc.** `~/.vandao/chu-giai/<bí kíp>/<chương>.md` — thư linh đọc bí kíp rồi đọc chồng lớp này lên ở F0 và F4. Bí kíp **bất biến sau khi thu**, nên không cần ai duyệt việc ghi, và gỡ lớp bồi ra lúc nào cũng quay về bản gốc. Đúng nghĩa chú giải đời sau: lời chú bên lề, không phải chép lại sách.
 
 **Chuyển sang `da_go` chỉ bằng bằng chứng** ở nghiệm công hoặc khảo thí — người học tự làm khác đi. Thư linh **không được tự tuyên bố** đã gỡ.
 
@@ -947,13 +947,13 @@ Hai adapter — PDF và EPUB — **một lược đồ ra**. EPUB rẻ hơn hẳ
 
 ```mermaid
 flowchart TD
-    A["/vd:thu-bi-kip <đường dẫn>"] --> G["GIÁM ĐỊNH"]
-    G --> G2{"Rút được chữ?"}
+    A["/vd:thu-bi-kip <đường dẫn>"] --> G["GIÁM ĐỊNH<br/>book_to_skill.extract_single_file() — gọi trực tiếp, không qua CLI"]
+    G --> G2{"Rút được chữ?<br/>ExtractionError → Không"}
     G2 -->|Không| Z["Báo: tìm bản khác. DỪNG"]
     G2 -->|Có| B["Ước lượng: token · số file · cấu trúc"]
     B --> C{"Người duyệt?"}
     C -->|Không| Z
-    C -->|Có| D["PHA 1 — TRÍCH XUẤT<br/>tái dùng book-to-skill, chế độ analyze-only"]
+    C -->|Có| D["PHA 1 — TRÍCH XUẤT<br/>làm theo book-to-skill SKILL.md Bước 0-3, chế độ Analyze Only"]
     D --> E["Ra: khung · nguyên tắc · kỹ thuật · mục lục"]
     E --> F["PHA 2 — THIẾT KẾ SƯ PHẠM<br/>máy ĐỀ XUẤT kèm lý do từng cái"]
     F --> H{"NGƯỜI SỬA VÀ DUYỆT"}
@@ -970,6 +970,17 @@ flowchart TD
 **Người bắt buộc chen vào pha 2.** Xương sống, tiêu chí đạt và điểm hạ sơn chỉ người có nghề quyết được; model đoán ra thứ nghe hợp lý mà sai, và cái sai truyền xuống mọi chương.
 
 **Kỹ thuật xử sách lớn:** `grep`/`sed` lấy lát cắt thay vì đọc cả file. Sách 200 trang ≈ 75k token; đọc lại một lần cho mỗi chương qua 28 lượt tốn ~2 triệu token đầu vào.
+
+**`book-to-skill` là dependency thật, hai lớp — không viết lại:**
+
+| Lớp | Cài bằng | Dùng ở |
+|---|---|---|
+| Engine trích chữ (`book_to_skill.extract_single_file()`, hàm Python thuần) | `pip install "book-to-skill[pdf,epub] @ git+https://github.com/virgiliojr94/book-to-skill.git"` | `giam-dinh.py` import trực tiếp, dùng cho GIÁM ĐỊNH — nhanh, tất định, không cần cả luồng skill |
+| Skill hội thoại (SKILL.md, LLM đọc và làm theo) | `npx skills add virgiliojr94/book-to-skill` → cài vào `.claude/skills/book-to-skill/` | Pha 1 — Tàng kinh trưởng lão đọc và làm theo Bước 0–3 của chính SKILL.md đó (Bước 2 tự gọi `scripts/extract.py`, không phải hàm ở trên — hai đường vào cùng một engine) |
+
+**"Analyze Only" là cụm từ kích hoạt trong hội thoại, không phải cờ CLI** — SKILL.md gốc: *"Trigger: User says 'analyze', 'just extract', or 'I want to review before generating'. Action: Run Steps 0–3, then produce a structured extraction report... Stop — do NOT generate skill files."* `thu-bi-kip` cần nói rõ trong lời gọi rằng chỉ muốn phân tích, không sinh skill. Báo cáo trích xuất (Bước 3: khung tác giả, nguyên tắc, kỹ thuật, mục lục chương) là input cho Pha 2 — output cuối cùng của `book-to-skill` (một skill hoàn chỉnh, Bước 4-11) thì Vấn Đạo **không dùng tới**, vì đó không phải hình dạng bí kíp.
+
+Pha 2 (thiết kế sư phạm theo mô hình bí kíp: xương sống, `tieu_chi_dat`, `khuon_cau_hoi`...) không có ở `book-to-skill` — việc riêng của Vấn Đạo, không tái dùng được từ đâu. Cả hai lệnh cài đặt trên đã chạy thật (`uv run --with` cho lớp engine, `npx skills add ... --host claude-code` cho lớp skill), không chỉ đọc tài liệu — và đã đọc trực tiếp `SKILL.md` cài về, không dựa vào tóm tắt tìm kiếm nữa.
 
 **Cấm nhồi:** chương không có gì để mở rộng thì để dưới sàn ngân sách, không phồng cho đủ số.
 
@@ -1179,7 +1190,7 @@ flowchart TD
     M -->|Còn| E
     M -->|Hết| N{"Người học nộp<br/>nghiệm công?"}
     N -->|Không| O["Đánh dấu chưa_nghiem_cong<br/>đi tiếp — KHÔNG chặn"]
-    N -->|Có| P["F2 · nghiệm công chấm"]
+    N -->|Có| P["F2 · Nghiệm Công Sứ chấm"]
     P --> Q["Phản hồi + ghi ban-giao/"]
     O --> R["Chương sau"]
     Q --> R
@@ -1250,7 +1261,7 @@ Không có F5′ thì thư linh giảng lại vô hạn, và người học kẹ
 | R9 | Trưởng lão | Không nhận giáo án và ghi chép dạy | Subagent tươi; `pham_vi_doc` không chứa `thu-linh/**` |
 | R10 | Trưởng lão | Định cảnh giới dựa trên ≥2 nguồn **và** k lần đồng thuận. Nguồn = bài nộp của **mọi bí kíp gắn thẻ mạch đó** | Dưới ngưỡng → "chưa đủ để định cảnh giới" |
 | R11 | Hệ | **Không công bố cảnh giới khi hiệu chuẩn κ < 0,6** | Sổ hiệu chuẩn §11 |
-| R12 | Chú giải | Không mang chi tiết tình huống thật ra ngoài | Đọc chú giải: không có tên người, công ty, dự án |
+| R12 | Chú Giải Sứ | Không mang chi tiết tình huống thật ra ngoài | Đọc chú giải: không có tên người, công ty, dự án |
 | R13 | Bí kíp | Thiếu trường của mức **đủ dùng** → không vào tàng kinh các. **Rỗng ≠ vắng** | `kiem-bi-kip.py --muc du-dung` fail |
 | R13b | Thư linh | Chương mức **đủ dùng** → nói rõ **trước khi người học làm bài**, không nói sau | Câu báo phải nêu *tiêu chí còn thô nên sẽ hỏi kỹ hơn bằng miệng*, không nêu *chấm lỏng hơn* |
 | R14 | Người học | Tự nhập vai và mạch mới | Nhập tên chưa có → tạo, kèm gợi ý mục tương tự |
@@ -1264,11 +1275,11 @@ Không có F5′ thì thư linh giảng lại vô hạn, và người học kẹ
 | R22 | Thư linh | Sai lần ba cùng chỗ → **báo trưởng môn**, không giảng lại lần nữa | F5′ có bản ghi trong giáo án |
 | R23 | Hệ | Chương **bỏ qua nghiệm công vẫn tính là đã qua** | Không chặn vào khảo thí; chương đó không làm nguồn định vị |
 | R24 | Tài liệu | Mọi ví dụ trong đặc tả và `tham-chieu/` là **ví dụ tổng hợp**, không lấy từ bí kíp có thật | Soát: không ví dụ nào trùng nội dung một bí kíp trong kho |
-| R25 | Hệ | Mỗi ràng buộc cấm-đọc có **một ca đối chứng** ở §11.3 | R9 · phúc khảo · chú giải — thiếu ca thì ràng buộc đó chưa được chứng minh |
-| R26 | Mọi thư mục con của `ban-giao/` | Có `.pham-vi.json` khai `ghi` (một vai) và `doc` (danh sách vai) | Thiếu file → coi như **không vai nào đọc được**, fail an toàn |
+| R25 | Hệ | Mỗi ràng buộc cấm-đọc có **một ca đối chứng** ở §11.3 | R9 · Phúc Khảo Sứ · Chú Giải Sứ — thiếu ca thì ràng buộc đó chưa được chứng minh |
+| R26 | Mọi thư mục con của `ban-giao/` | Có `.pham-vi.json` khai `ghi` (một vai, hoặc `"*"` — chỉ `thu/` được dùng giá trị này, xem §15.1) và `doc` (danh sách vai, hoặc `["*"]`) | Thiếu file → coi như **không vai nào đọc được**, fail an toàn |
 | R27 | Mọi vai | `pham_vi_doc` trong thư phải là **tập con** của `doc` trong `.pham-vi.json` | `kiem-thu.py` đối chiếu trước khi gọi subagent |
-| R28 | nghiệm công | Thấy người học **làm nhiều hơn tiêu chí đòi** → ghi ứng viên vào `ung-vien-boi/tieu-chi/` | Có bản ghi kèm trích dẫn câu vượt tiêu chí |
-| R29 | Trưởng môn | Bất đồng loại `tieu_chi_khong_phan_biet` → chép **nguyên văn** `nhan_dinh` của phúc khảo vào `bat-dong.jsonl`, không tóm tắt | Bản ghi có `nhan_dinh_phuc_khao` và `ung_vien_tieu_chi` |
+| R28 | Nghiệm Công Sứ | Thấy người học **làm nhiều hơn tiêu chí đòi** → ghi ứng viên vào `ung-vien-boi/tieu-chi/` | Có bản ghi kèm trích dẫn câu vượt tiêu chí |
+| R29 | Trưởng môn | Bất đồng loại `tieu_chi_khong_phan_biet` → chép **nguyên văn** `nhan_dinh` của Phúc Khảo Sứ vào `bat-dong.jsonl`, không tóm tắt | Bản ghi có `nhan_dinh_phuc_khao` và `ung_vien_tieu_chi` |
 | R30 | Trưởng lão | `dau_hieu[]` **không được chứa nhãn bậc**; nhãn chỉ nằm ở `bac` và `nhan_dinh` | `kiem-thu.py` quét `dau_hieu[]` tìm 5 tên cảnh giới → có thì fail |
 | R31 | Vai cầm lượt | `bac: null` → dựng câu từ `thieu` + `dau_hieu[]`, **không** từ `nhan_dinh` | Câu nói với người học không chứa tên cảnh giới nào |
 | R32 | Trưởng môn (`phuc-menh`) | **Không ghi hộ** dòng đạo tâm thay đệ tử — chỉ dẫn qua `dao-tam` để đệ tử **tự ghi** | Sổ đạo tâm không có bản ghi nào tác giả khác đệ tử; `dao-tam` giữ `disable-model-invocation` |
@@ -1302,9 +1313,9 @@ Chi phí vì vậy là **một lượt thêm mỗi quyển**, không phải gấ
 
 `phuc-khao` không thấy tiêu chí là **chủ ý**: thấy tiêu chí thì nó chấm lại đúng thứ `nghiem-cong` vừa chấm, và trực giao mất.
 
-**Cơ chế trực giao nằm ở đâu.** Không phải ở thái độ — không phải một vai khắt khe hơn vai kia. Nó nằm ở chỗ **tiêu chí là bản diễn giải có mất mát của mục tiêu**: nghiệm công đọc bản diễn giải, phúc khảo đọc bản gốc. Chỗ mất mát chính là chỗ bất đồng lộ ra.
+**Cơ chế trực giao nằm ở đâu.** Không phải ở thái độ — không phải một vai khắt khe hơn vai kia. Nó nằm ở chỗ **tiêu chí là bản diễn giải có mất mát của mục tiêu**: Nghiệm Công Sứ đọc bản diễn giải, Phúc Khảo Sứ đọc bản gốc. Chỗ mất mát chính là chỗ bất đồng lộ ra.
 
-Điều này cũng giải thích vì sao phúc khảo chỉ đặt ở **khảo thí quyển**: chỉ ở cấp quyển mới có `muc_tieu` đủ rộng để chỗ lệch hiện ra. Ở cấp chương, mục tiêu hẹp gần bằng tiêu chí, nên hai vai sẽ luôn khớp và vai thứ hai thành thừa.
+Điều này cũng giải thích vì sao Phúc Khảo Sứ chỉ đặt ở **khảo thí quyển**: chỉ ở cấp quyển mới có `muc_tieu` đủ rộng để chỗ lệch hiện ra. Ở cấp chương, mục tiêu hẹp gần bằng tiêu chí, nên hai vai sẽ luôn khớp và vai thứ hai thành thừa.
 
 ## 9.3 Luồng khảo thí quyển
 
@@ -1312,8 +1323,8 @@ Chi phí vì vậy là **một lượt thêm mỗi quyển**, không phải gấ
 sequenceDiagram
     participant NH as Người học
     participant KT as khảo thí
-    participant NC as nghiệm công
-    participant PK as phúc khảo
+    participant NC as Nghiệm Công Sứ
+    participant PK as Phúc Khảo Sứ
     participant TM as Trưởng môn
 
     NH->>KT: /vd:khao-thi <bí kíp>
@@ -1344,15 +1355,15 @@ sequenceDiagram
 | Đạt | **`khong_ro`** | **Vẫn đột phá** | Cờ **đề không ép khẳng định** — xem dưới |
 | Chưa đạt | `khong_ro` | Chưa qua, học tiếp | — |
 
-**Tổ hợp cuối không phải nhánh bất thường.** `khong_ro` của phúc khảo không phải bằng chứng phản bác — nó không có căn cứ nói đạt lẫn không đạt, nên không lật được kết quả *chưa đạt* của nghiệm công. Xử như hàng thứ hai: không cờ, không đột phá.
+**Tổ hợp cuối không phải nhánh bất thường.** `khong_ro` của Phúc Khảo Sứ không phải bằng chứng phản bác — nó không có căn cứ nói đạt lẫn không đạt, nên không lật được kết quả *chưa đạt* của Nghiệm Công Sứ. Xử như hàng thứ hai: không cờ, không đột phá.
 
-**Nhánh `khong_ro` (đi kèm nghiệm công đạt) không phải bất đồng.** Nghiệm công *đạt*, phúc khảo *không kết luận được* — khác với hai bên nói ngược nhau.
+**Nhánh `khong_ro` (đi kèm Nghiệm Công Sứ đạt) không phải bất đồng.** Nghiệm Công Sứ *đạt*, Phúc Khảo Sứ *không kết luận được* — khác với hai bên nói ngược nhau.
 
 Nó xuất hiện khi bài làm **không sai gì cả, chỉ không đi tới cùng**: chọn đúng nhóm, loại trừ đúng, rồi dừng ở *"còn tuỳ đặc điểm dữ liệu"*. Cả hai vai đều không có căn cứ nói chưa làm được, vì không có gì hỏng để chỉ ra.
 
 **Thủ phạm là đề, không phải tiêu chí.** Đề hỏi *"nên dùng cách tiếp cận nào"* thì trả lời bằng liệt kê vẫn hợp lệ. Cờ `de_khong_ep_khang_dinh` trỏ về `khao_thi_quyen`, không trỏ về `tieu_chi_dat`.
 
-**Cả ba nhánh bất thường đều cho qua.** Hệ không gác cổng, và một tín hiệu yếu hơn không được phép chặn người học. Giá trị của phúc khảo **không nằm ở việc chặn** — nó nằm ở cái cờ để lại.
+**Cả ba nhánh bất thường đều cho qua.** Hệ không gác cổng, và một tín hiệu yếu hơn không được phép chặn người học. Giá trị của Phúc Khảo Sứ **không nằm ở việc chặn** — nó nằm ở cái cờ để lại.
 
 **Trưởng môn xử, không phải thư linh.** Thư linh là người dạy; cho nó phân xử bất đồng về kết quả dạy của chính nó là mở lại đúng xung đột mà `nghiem-cong` sinh ra để đóng. Trưởng môn không dạy, không chấm — nó chỉ ghi nhận và định tuyến.
 
@@ -1371,15 +1382,15 @@ Ghi vào `~/.vandao/truong-mon/bat-dong.jsonl`:
   "luc": "…" }
 ```
 
-**`nhan_dinh_phuc_khao` chép nguyên vào bản ghi, không tóm tắt.** Đây là chỗ phúc khảo nói ra **thiếu vế gì** — thông tin đắt nhất trong cả lần bất đồng. Chỉ ghi `tieu_chi_nghi_ngo: [kq2]` thì biết tiêu chí nào hỏng mà không biết hỏng ra sao, và lần sửa pha 2 phải đoán lại.
+**`nhan_dinh_phuc_khao` chép nguyên vào bản ghi, không tóm tắt.** Đây là chỗ Phúc Khảo Sứ nói ra **thiếu vế gì** — thông tin đắt nhất trong cả lần bất đồng. Chỉ ghi `tieu_chi_nghi_ngo: [kq2]` thì biết tiêu chí nào hỏng mà không biết hỏng ra sao, và lần sửa pha 2 phải đoán lại.
 
-**Không thêm đường ghi nào.** Phúc khảo vẫn chỉ trả thư; trưởng môn vẫn là vai duy nhất ghi `bat-dong.jsonl`. Luật một-người-ghi không đổi.
+**Không thêm đường ghi nào.** Phúc Khảo Sứ vẫn chỉ trả thư; trưởng môn vẫn là vai duy nhất ghi `bat-dong.jsonl`. Luật một-người-ghi không đổi.
 
 **Hai cấp, hai sổ:**
 
 | Sổ | Cấp | Ai ghi | Phát hiện lúc |
 |---|---|---|---|
-| `ung-vien-boi/tieu-chi/` | Chương | nghiệm công | Nghiệm công chương |
+| `ung-vien-boi/tieu-chi/` | Chương | Nghiệm Công Sứ | Nghiệm công chương |
 | `bat-dong.jsonl` | Quyển | trưởng môn | Khảo thí quyển |
 
 Tàng kinh trưởng lão đọc **cả hai** khi bồi bí kíp lên đủ chuẩn — một sổ cho tiêu chí chương, một sổ cho tiêu chí khảo thí.
@@ -1566,12 +1577,12 @@ Mỗi lần chấm lệch, xếp vào một trong năm ô:
 | Ràng buộc | Lần A (đúng thiết kế) | Lần B (cố tình thêm ngữ cảnh cấm) |
 |---|---|---|
 | **R9** — trưởng lão không đọc giáo án | Chỉ bài nộp + tiêu chí bậc | Thêm giáo án và ghi chép dạy |
-| **Phúc khảo** — không đọc `tieu_chi_dat` | Bài + mục tiêu | Thêm `tieu_chi_dat` của quyển |
-| **Chú giải** — không đọc tình huống thật | Bảng tổng hợp vấp | Thêm `tinh-huong/` |
+| **Phúc Khảo Sứ** — không đọc `tieu_chi_dat` | Bài + mục tiêu | Thêm `tieu_chi_dat` của quyển |
+| **Chú Giải Sứ** — không đọc tình huống thật | Bảng tổng hợp vấp | Thêm `tinh-huong/` |
 
-Ba ràng buộc còn lại (nghiệm công không đọc giáo án, giám khảo không chấm, thư linh không phán năng lực) kiểm bằng **soát payload**, không cần ca đối chứng — chúng là chuyện *có gửi hay không*, không phải chuyện *thấy rồi có đổi hành vi không*.
+Ba ràng buộc còn lại (Nghiệm Công Sứ không đọc giáo án, giám khảo không chấm, thư linh không phán năng lực) kiểm bằng **soát payload**, không cần ca đối chứng — chúng là chuyện *có gửi hay không*, không phải chuyện *thấy rồi có đổi hành vi không*.
 
-Ví dụ dưới đây cho R9 và phúc khảo — chạy hai lần trên **cùng một bài**:
+Ví dụ dưới đây cho R9 và Phúc Khảo Sứ — chạy hai lần trên **cùng một bài**:
 
 | Lần | Ngữ cảnh |
 |---|---|
@@ -1738,8 +1749,8 @@ flowchart TD
 | Tàng kinh trưởng lão | `thu-bi-kip` |
 | Thư linh | `thu-linh` |
 | Giám khảo | `khao-thi` |
-| Trưởng lão mạch | `truong-lao` (subagent ×3) |
-| nghiệm công · phúc khảo · chú giải | subagent cùng tên |
+| Sơn phong trưởng lão | `truong-lao` (subagent ×3) |
+| Nghiệm Công Sứ · Phúc Khảo Sứ · Chú Giải Sứ | subagent cùng tên |
 | **Đệ tử** | `dao-tam` — `disable-model-invocation`, không vai nào ghi hộ |
 
 Bốn skill của Trưởng môn là **bốn thao tác của cùng một vai**, không phải bốn vai. Chúng tách file vì kích hoạt ở bốn thời điểm khác nhau, không vì trách nhiệm khác nhau.
@@ -1776,12 +1787,13 @@ Ba bậc cộng dồn. **Luật chọn loại:** script nếu phải đúng *m�
 | 11 | `dao-tam` | skill · `disable-model-invocation` · **đệ tử sở hữu** | Ghi nhật ký con đường, có `kiem_chung` |
 | 11c | `nghiem-cong` | **subagent tươi** | Chấm nghiệm công chương **và khảo thí quyển**, không thấy giáo án. Ghi được **đúng một đường dẫn**: `ung-vien-boi/tieu-chi/` (R28) |
 | 11b | `khao-thi` | skill · **vai Giám khảo** | Sinh biến thể đề từ khuôn, coi thi. **Không chấm** — gọi `nghiem-cong` và `phuc-khao` |
+| 11d | `phuc-khao` | **subagent tươi** | Người soát thứ hai ở **khảo thí quyển**, không đọc `tieu_chi_dat` — xem §9. Dời từ Bậc 3: cần cho lời hứa "cờ bất đồng" ở PRFAQ, và §16 đã đặt nó ở Vòng 2 (trong phạm vi vertical slice), không phải Vòng 4 |
 
 `kiem-bi-kip.py` kiểm ba thứ tất định model không nên đoán: đồ thị `phu_thuoc` **không có vòng** · mọi chương xương sống **tới được** từ chương đầu · `lop_nhiem_vu` **phủ hết** chương.
 
 `dao-tam` tắt model-invocation vì đạo tâm là bằng chứng đo lường — model tự ghi hộ là làm hỏng phép đo.
 
-**Phụ thuộc ngoài:** `book-to-skill` (virgiliojr94) cho pha 1.
+**Phụ thuộc ngoài:** `book-to-skill` (virgiliojr94), hai lớp cài riêng — xem §6.2. Engine: `pip install "book-to-skill[pdf,epub] @ git+https://github.com/virgiliojr94/book-to-skill.git"`. Skill: `npx skills add virgiliojr94/book-to-skill`. Cả hai đã chạy thật để xác minh (không chỉ đọc tài liệu).
 
 ### Bậc 2 — CỘNG THÊM
 
@@ -1802,7 +1814,6 @@ Ba bậc cộng dồn. **Luật chọn loại:** script nếu phải đúng *m�
 | # | Thành phần | Loại | Vai trò |
 |---|---|---|---|
 | 19 | `truong-lao` | **subagent tươi ×k=3** | Định cảnh giới trên một mạch |
-| 20b | `phuc-khao` | **subagent tươi** | Người soát thứ hai ở **khảo thí quyển**, không đọc `tieu_chi_dat` — xem §9 |
 | 21 | `chu-giai` | **subagent tươi**, phạm vi hẹp | Vấp lặp ở F4 → **bồi vào `sai_lam_pho_bien`** của chương đó, cờ nguồn `nguoi` |
 | 22 | `thu.schema.md` | tham chiếu | Quy cách thư + **trần chưng cất** theo §5.10 |
 | 23 | `kiem-thu.py` | **script** | Kiểm lược đồ **và trần**; vượt → yêu cầu chưng cất lại. **Bản đầu đã dựng từ Vòng 1 bước 5b** (chỉ đối chiếu `.pham-vi.json`, đủ cho R26/R27) — mục này là bản bồi thêm phần kiểm nội dung theo `thu.schema.md` |
@@ -1924,12 +1935,13 @@ Không gắn nhãn bậc — đã chốt làm đầy đủ (§18), nên bậc ch
                   tinh-huong/<id>.md
                   ung-vien-boi/sai-lam/<bí kíp>/<chương>.jsonl
                   ung-vien-boi/tieu-chi/<bí kíp>/<chương>.jsonl
+                  thu/<id>.json             hộp thư chung cho tín hiệu chéo vai không định kỳ — xem §6.1, §15.1
   so-tay.jsonl · thuat-ngu.json
 ```
 
 **Tên môn phái người học tự đặt là một trường trong hồ sơ, không phải tên thư mục.** Đổi tên mà mất hồ sơ là lỗi kinh điển.
 
-**Quyền ghi độc nhất:** mỗi thư mục đúng một vai ghi. Chống lấn đến từ quyền ghi, không từ việc chia thư mục.
+**Quyền ghi độc nhất:** mỗi thư mục đúng một vai ghi, trừ `thu/` — một ngoại lệ duy nhất, xem §15.1. Chống lấn đến từ quyền ghi, không từ việc chia thư mục.
 
 ## 15.1 `ban-giao/` không phải "mọi vai đọc"
 
@@ -1939,8 +1951,8 @@ Soát lại thì thấy hai chỗ **mâu thuẫn thẳng với ma trận §4.2**
 
 | Thư mục | §4.2 nói | `ban-giao/` cũ cho phép |
 |---|---|---|
-| `tinh-huong/` | Trưởng lão · nghiệm công · phúc khảo · chú giải **Cấm** | Cả bốn đọc được |
-| `tam-ma/` | Không vai chấm nào nên thấy bối cảnh cá nhân của người học | Phúc khảo đọc được → nhiễm ngữ cảnh, phá tính trực giao |
+| `tinh-huong/` | Trưởng lão · Nghiệm Công Sứ · Phúc Khảo Sứ · Chú Giải Sứ **Cấm** | Cả bốn đọc được |
+| `tam-ma/` | Không vai chấm nào nên thấy bối cảnh cá nhân của người học | Phúc Khảo Sứ đọc được → nhiễm ngữ cảnh, phá tính trực giao |
 
 **Mỗi thư mục con khai một `.pham-vi.json`:**
 
@@ -1950,18 +1962,24 @@ Soát lại thì thấy hai chỗ **mâu thuẫn thẳng với ma trận §4.2**
 
 | Thư mục | Ghi | Đọc |
 |---|---|---|
-| `nghiem-cong/` | thư linh | thư linh · nghiệm công · trưởng lão · trưởng môn |
-| `khao-thi/` | giám khảo | nghiệm công · phúc khảo · trưởng lão · trưởng môn |
+| `nghiem-cong/` | thư linh | thư linh · Nghiệm Công Sứ · trưởng lão · trưởng môn |
+| `khao-thi/` | giám khảo | Nghiệm Công Sứ · Phúc Khảo Sứ · trưởng lão · trưởng môn |
 | `tam-ma/` | thư linh | thư linh · trưởng lão |
 | `tinh-huong/` | trưởng môn | trưởng môn · thư linh · giám khảo |
-| `ung-vien-boi/sai-lam/` | thư linh | thư linh · chú giải · tàng kinh |
-| `ung-vien-boi/tieu-chi/` | nghiệm công | chú giải · tàng kinh |
+| `ung-vien-boi/sai-lam/` | thư linh | thư linh · Chú Giải Sứ · tàng kinh |
+| `ung-vien-boi/tieu-chi/` | Nghiệm Công Sứ | Chú Giải Sứ · tàng kinh |
 
 `truong-mon/bat-dong.jsonl` nằm ngoài `ban-giao/` nhưng **tàng kinh trưởng lão đọc được** — nó là vai bồi bí kíp lên đủ chuẩn (§9.5).
 
-**Vẫn một vai ghi.** Chia sẻ chỉ nới ở chiều **đọc**; luật §4.3 số 1 không đổi.
+**Vẫn một vai ghi — trừ đúng một ngoại lệ.** Chia sẻ chỉ nới ở chiều **đọc**; luật §4.3 số 1 không đổi, trừ `thu/`:
 
-`ung-vien-boi/` có hai thư mục con vì **hai vai khác nhau ghi**: thư linh ghi sai lầm phát hiện lúc dạy, nghiệm công ghi tiêu chí thiếu vế phát hiện lúc chấm. Một chỗ về khái niệm — *thứ cần bồi lên bí kíp* — nhưng vẫn một vai ghi mỗi thư mục.
+| Thư mục | Ghi | Đọc |
+|---|---|---|
+| `thu/` | **mọi vai** (mỗi file một tác giả, khai ở trường `tu`) | mọi vai |
+
+`thu/` là hộp thư tín hiệu chéo vai **không định kỳ, không có cặp gửi-nhận cố định** — ví dụ Tàng kinh báo Trưởng môn sách không rút được chữ (§6.1). Dựng một `ban-giao/` con mới, một vai ghi, cho mỗi tín hiệu hiếm gặp kiểu này là phí; dùng chung một hộp thư rẻ hơn. Không mất truy vết tác giả: mỗi file `<id>.json` tự khai `tu` trong nội dung (xem ví dụ §6.1), chỉ riêng **cấp thư mục** không còn một vai cố định — `.pham-vi.json` của nó khai `{ "schema": 1, "ghi": "*", "doc": ["*"] }` (R26).
+
+`ung-vien-boi/` có hai thư mục con vì **hai vai khác nhau ghi**: thư linh ghi sai lầm phát hiện lúc dạy, Nghiệm Công Sứ ghi tiêu chí thiếu vế phát hiện lúc chấm. Một chỗ về khái niệm — *thứ cần bồi lên bí kíp* — nhưng vẫn một vai ghi mỗi thư mục.
 
 **Khai trong chính thư mục, không khai tập trung.** Danh sách nằm cạnh dữ liệu nó gác — mở thư mục ra là biết, và không có bảng trung tâm để trôi lệch khỏi thực tế.
 
@@ -2083,7 +2101,7 @@ Ba mức xác minh, **đừng gộp**: *đã đọc bản gốc* · *đã tra t�
 
 | Nguồn | Lấy gì vào đâu | Mức |
 |---|---|---|
-| **book-to-skill** — virgiliojr94<br>`github.com/virgiliojr94/book-to-skill` | Chế độ **analyze-only** → pha 1 trong §6.2 · truy cập sách lớn bằng `grep`/`sed` thay vì đọc cả file · ngân sách token theo loại sách × độ sâu · **luật cấm nhồi** (dưới sàn còn hơn phồng) · ước lượng chi phí trước khi chạy · ba tầng lộ dần | **Đã đọc SKILL.md gốc** |
+| **book-to-skill** — virgiliojr94<br>`github.com/virgiliojr94/book-to-skill` | Chế độ **Analyze Only** (kích hoạt bằng câu, không phải cờ CLI) → pha 1 trong §6.2 · truy cập sách lớn bằng `grep`/`sed` thay vì đọc cả file · ngân sách token theo loại sách × độ sâu · **luật cấm nhồi** (dưới sàn còn hơn phồng) · ước lượng chi phí trước khi chạy · ba tầng lộ dần — **không chỉ học kỹ thuật, dùng thẳng làm dependency (§6.2, §13.1)** | **Đã cài thật cả 2 lớp** (`uv run --with`, `npx skills add --host claude-code`) và đọc trực tiếp `SKILL.md`/`extract_single_file` đã cài về — không còn dựa vào tóm tắt tìm kiếm |
 | **BMAD Method**<br>bản cài trong `opms-thinking/.claude/skills/bmad-*` | `bmad-help` đọc catalog CSV → §5.6 · **suy trạng thái từ artifact** thay vì file trạng thái → §5.7 · tách `preceded-by` (mềm) khỏi `required` (cứng) → §5.6 · dòng `_meta` trỏ tài liệu · `customize.toml` ba lớp → §12.1 (ta rút còn hai) · **script có thì văn bản cũng phải có** → §12.3 · micro-file mỗi bước một file → §12.5 · "Xong khi" và "Khi nào skill này không giúp được" → §12.4 · trình tự "On Activation" (nạp customize.toml trước việc chính) → §12.4 quy ước thứ 4 | **Đã đọc SKILL.md và config trên đĩa** |
 | **superpowers** — Jesse Vincent (obra)<br>`github.com/obra/superpowers` | **Bằng chứng trước khẳng định** → R19. Đây là thứ duy nhất trong superpowers giải đúng bài của Vấn Đạo | **Đã tra qua tìm kiếm**, chưa đọc SKILL.md gốc |
 | **claude-tutor** — kirilxd<br>`github.com/kirilxd/claude-tutor` | Đối chiếu để biết mặt bằng chung. Lấy: **thư mục `evals/`** — trigger eval + functional eval (còn thiếu, xem §17) · bảng *Known limitations* trong README | **Đã đọc README** |
