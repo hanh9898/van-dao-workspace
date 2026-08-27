@@ -1,7 +1,7 @@
 # VẤN ĐẠO — Đặc tả v1.0
 
 **Tác giả:** hanhnt2 (hanhnt2@hblab.vn)
-**Plugin:** `van-dao` · **Lệnh:** `/vd:*` · **Giấy phép:** MIT
+**Plugin:** `van-dao` · **Lệnh:** `/van-dao:*` · **Giấy phép:** MIT
 
 Đây là bản đặc tả chính thức đầu tiên. Bản này tự đủ — không cần đọc kèm bản nào khác.
 
@@ -139,7 +139,7 @@ flowchart TD
     C --> G
     F --> G{"Hết chương<br/>trong lộ đồ?"}
     G -->|Còn| A
-    G -->|Hết| H["/vd:khao-thi"]
+    G -->|Hết| H["/van-dao:khao-thi"]
     H --> I["Giám khảo sinh đề"]
     I --> J["Nghiệm Công Sứ + Phúc Khảo Sứ"]
     J --> K{"Trưởng môn xử"}
@@ -947,7 +947,7 @@ Hai adapter — PDF và EPUB — **một lược đồ ra**. EPUB rẻ hơn hẳ
 
 ```mermaid
 flowchart TD
-    A["/vd:thu-bi-kip <đường dẫn>"] --> G["GIÁM ĐỊNH<br/>book_to_skill.extract_single_file() — gọi trực tiếp, không qua CLI"]
+    A["/van-dao:thu-bi-kip <đường dẫn>"] --> G["GIÁM ĐỊNH<br/>book_to_skill.extract_single_file() — gọi trực tiếp, không qua CLI"]
     G --> G2{"Rút được chữ?<br/>ExtractionError → Không"}
     G2 -->|Không| Z["Báo: tìm bản khác. DỪNG"]
     G2 -->|Có| B["Ước lượng: token · số file · cấu trúc"]
@@ -1061,7 +1061,7 @@ Thư linh dạy chương mức *đủ dùng* phải **nói rõ**: *"chương nà
 ```mermaid
 stateDiagram-v2
     [*] --> NgoaiHe: PDF/EPUB trên máy
-    NgoaiHe --> GiamDinh: /vd:thu-bi-kip
+    NgoaiHe --> GiamDinh: /van-dao:thu-bi-kip
     GiamDinh --> TuChoi: không rút được chữ
     TuChoi --> [*]: tìm bản khác
     GiamDinh --> ChoDuyetChiPhi: rút được chữ
@@ -1071,7 +1071,7 @@ stateDiagram-v2
     state Pha2 {
         [*] --> DangSoan
         DangSoan --> NhapDangDo: đóng máy → ghi tang-kinh/nhap-dang-do
-        NhapDangDo --> DangSoan: /vd:thu-bi-kip lần sau
+        NhapDangDo --> DangSoan: /van-dao:thu-bi-kip lần sau
         DangSoan --> [*]: người duyệt
     }
     Pha2 --> Pha3
@@ -1086,7 +1086,7 @@ stateDiagram-v2
     TamDung --> DangBeQuan: F8 nối mạch cũ
     DangBeQuan --> HocXongChuong: hết chương
     HocXongChuong --> DangBeQuan: học lại
-    HocXongChuong --> DangKhaoThi: /vd:khao-thi
+    HocXongChuong --> DangKhaoThi: /van-dao:khao-thi
     DangKhaoThi --> HocXongChuong: chưa qua
     DangKhaoThi --> DaDotPha: qua khảo thí quyển
     DaDotPha --> DangBeQuan: học lại
@@ -1095,7 +1095,7 @@ stateDiagram-v2
     TrongKho --> GayConTro: file dời chỗ
     DangBeQuan --> GayConTro: file dời chỗ
     DaDotPha --> GayConTro: file dời chỗ
-    GayConTro --> TrongKho: /vd:noi-lai
+    GayConTro --> TrongKho: /van-dao:noi-lai
 ```
 
 **Bốn điều máy trạng thái này chốt:**
@@ -1105,7 +1105,7 @@ stateDiagram-v2
 | **Nháp pha 2 lưu được** | Thiết kế sư phạm mất nhiều lượt; đóng máy giữa chừng mà mất nháp thì lần sau người ta bỏ luôn việc thu sách. Nháp ở `tang-kinh/nhap-dang-do/<id>.json` — vùng riêng của Tàng kinh trưởng lão. `thu-bi-kip` gọi lại vào thẳng pha 2, không chạy lại pha 1 |
 | **Xuất quan là tạm dừng** | F9 ghi lý do bỏ; F8 đưa quay lại. Hai luồng này giờ nối vào nhau — trước đó chúng rời nhau trong đặc tả |
 | **Đột phá không phải trạng thái cuối** | Học lại được, thi lại được, và **giữ cả hai lần** |
-| **Gãy con trỏ vắt ngang** | Xảy ra ở bất cứ trạng thái nào sau khi thu; `/vd:noi-lai` đưa về đúng chỗ cũ, lớp sư phạm không phải dựng lại |
+| **Gãy con trỏ vắt ngang** | Xảy ra ở bất cứ trạng thái nào sau khi thu; `/van-dao:noi-lai` đưa về đúng chỗ cũ, lớp sư phạm không phải dựng lại |
 
 **Vì sao giữ cả hai lần thi thay vì ghi đè:** mỗi lần khảo thí là một mẫu cho `bat-dong.jsonl` và cho sổ hiệu chuẩn §11. Ghi đè là vứt dữ liệu — mà dữ liệu chấm ở n=1 vốn đã hiếm. Bản đồ hiển thị **lần gần nhất**; sổ giữ **tất cả**.
 
@@ -1140,7 +1140,7 @@ Tàn quyển **có khảo thí**, nên nó tự đứng được — mở đúng
 
 ## 6.9 Nối lại khi file dời chỗ
 
-Bí kíp giữ con trỏ. File bị di chuyển hay đổi tên thì bí kíp gãy — chắc chắn sẽ gặp. `/vd:noi-lai <bí kíp>` hỏi đường dẫn mới, giám định lại vân tay file, gắn lại con trỏ. Lớp sư phạm giữ nguyên, không phải phân giải lại.
+Bí kíp giữ con trỏ. File bị di chuyển hay đổi tên thì bí kíp gãy — chắc chắn sẽ gặp. `/van-dao:noi-lai <bí kíp>` hỏi đường dẫn mới, giám định lại vân tay file, gắn lại con trỏ. Lớp sư phạm giữ nguyên, không phải phân giải lại.
 
 ---
 
@@ -1159,7 +1159,7 @@ Bí kíp giữ con trỏ. File bị di chuyển hay đổi tên thì bí kíp g�
 | F5′ | **Báo trưởng môn: có thể thiếu nền** | **Sai lần ba cùng chỗ** | 1 |
 | F6 | Nhắc lại trong bí kíp | Vào chương mới | 2 |
 | F7 | Hệ thống hoá cuối quyển | Hết chương cuối | 2 |
-| F8 | Nối lại mạch cũ | `/vd:tiep` vào chương dở ở phiên mới | 2 |
+| F8 | Nối lại mạch cũ | `/van-dao:tiep` vào chương dở ở phiên mới | 2 |
 | F9 | Xuất quan | Người học bỏ | 2 |
 | F10 | Chú giải cho đời sau | Vấp lặp | 3 |
 
@@ -1327,7 +1327,7 @@ sequenceDiagram
     participant PK as Phúc Khảo Sứ
     participant TM as Trưởng môn
 
-    NH->>KT: /vd:khao-thi <bí kíp>
+    NH->>KT: /van-dao:khao-thi <bí kíp>
     KT->>KT: sinh biến thể đề từ khuôn + tham số
     KT->>NH: đề thi (kèm dữ kiện thừa)
     NH->>KT: bài làm
@@ -1407,7 +1407,7 @@ Tàng kinh trưởng lão đọc **cả hai** khi bồi bí kíp lên đủ chu�
 
 ```mermaid
 flowchart TD
-    A["/vd:nhap-mon"] --> B["Bái sư: đặt tên môn phái<br/>ghi nhập môn ký"]
+    A["/van-dao:nhap-mon"] --> B["Bái sư: đặt tên môn phái<br/>ghi nhập môn ký"]
     B --> C{"Đã biết muốn<br/>luyện gì chưa?"}
     C -->|"Biết rồi"| D["Khai vai + mạch"]
     C -->|"Chưa biết"| E["Hỏi VAI trước<br/>'ngươi làm nghề gì'"]
@@ -1420,7 +1420,7 @@ flowchart TD
     I --> J["Ghi chi-diem.jsonl<br/>trạng thái: dang_treo"]
     J --> K(("Người học đi kiếm PDF/EPUB"))
     K --> L{"Kết quả"}
-    L -->|"Kiếm được"| M["/vd:thu-bi-kip → Tàng kinh trưởng lão"]
+    L -->|"Kiếm được"| M["/van-dao:thu-bi-kip → Tàng kinh trưởng lão"]
     L -->|"Không thấy SÁCH"| N["Ghi chi-diem-hong.jsonl<br/>chỉ điểm quyển khác"]
     L -->|"Thấy sách, bản hỏng"| BH["ban_hong — GIỮ quyển<br/>khuyên tìm bản khác"]
     L -->|"Chưa đụng tới"| O["Phiên sau: nhắc MỘT câu<br/>xin chỉ điểm mới → lô cũ hết hiệu lực"]
@@ -1836,27 +1836,27 @@ Bản đầu cắt từ 15 xuống 8. Ba lệnh thêm vào sau, mỗi cái có l
 
 | Thêm | Vì sao không gộp được |
 |---|---|
-| `/vd:khao-thi` | §1.3 cho phép bỏ hết chương thi luôn — phải gọi được độc lập |
-| `/vd:noi-lai` | Sửa chữa, xảy ra ngoài luồng học bình thường |
-| `/vd:chi-diem` | Kho rỗng thì `chi-duong` chưa có gì để định hướng |
+| `/van-dao:khao-thi` | §1.3 cho phép bỏ hết chương thi luôn — phải gọi được độc lập |
+| `/van-dao:noi-lai` | Sửa chữa, xảy ra ngoài luồng học bình thường |
+| `/van-dao:chi-diem` | Kho rỗng thì `chi-duong` chưa có gì để định hướng |
 
 **Đây là chỗ cần đếm lại mỗi lần thêm.** 11 vẫn nằm dưới mức phình nguy hiểm, nhưng cơ chế làm nó phình — thêm dần từng cái có lý do chính đáng — không tự dừng.
 
 | Lệnh | Bậc | Làm gì |
 |---|:---:|---|
-| `/vd:nhap-mon` | 1 | Bái sư nhập môn: khai vai + mạch, nhận chỉ điểm |
-| `/vd:thu-bi-kip <đường dẫn>` | 1 | Giám định + phân giải PDF/EPUB ba pha |
-| `/vd:noi-lai <bí kíp>` | 1 | Gắn lại con trỏ khi file dời chỗ |
-| `/vd:be-quan [bí kíp]` | 1 | Vào học. **Không tham số** = liệt kê bí kíp và chỗ đang dở |
-| `/vd:ghi-dao-tam` | 1 | Ghi sự kiện có `kiem_chung` |
-| `/vd:chi-diem [vai/mạch]` | 1 | Xin thêm chỉ điểm sách — kho rỗng vẫn dùng được |
-| `/vd:chi-duong [câu hỏi]` | 2 | **Một cửa định hướng** — xem §14.1 |
-| `/vd:khao-thi` | 1 | Sơn môn khảo thí — đột phá tầng quyển |
-| `/vd:ha-son` | 2 | Nhận nhiệm vụ lịch luyện (đường bằng chứng mạnh hơn) |
-| `/vd:phuc-menh` | 2 | Về báo cáo thực chiến |
-| `/vd:chu-giai` | 3 | Gom vấp lặp → sinh chú giải |
+| `/van-dao:nhap-mon` | 1 | Bái sư nhập môn: khai vai + mạch, nhận chỉ điểm |
+| `/van-dao:thu-bi-kip <đường dẫn>` | 1 | Giám định + phân giải PDF/EPUB ba pha |
+| `/van-dao:noi-lai <bí kíp>` | 1 | Gắn lại con trỏ khi file dời chỗ |
+| `/van-dao:be-quan [bí kíp]` | 1 | Vào học. **Không tham số** = liệt kê bí kíp và chỗ đang dở |
+| `/van-dao:ghi-dao-tam` | 1 | Ghi sự kiện có `kiem_chung` |
+| `/van-dao:chi-diem [vai/mạch]` | 1 | Xin thêm chỉ điểm sách — kho rỗng vẫn dùng được |
+| `/van-dao:chi-duong [câu hỏi]` | 2 | **Một cửa định hướng** — xem §14.1 |
+| `/van-dao:khao-thi` | 1 | Sơn môn khảo thí — đột phá tầng quyển |
+| `/van-dao:ha-son` | 2 | Nhận nhiệm vụ lịch luyện (đường bằng chứng mạnh hơn) |
+| `/van-dao:phuc-menh` | 2 | Về báo cáo thực chiến |
+| `/van-dao:chu-giai` | 3 | Gom vấp lặp → sinh chú giải |
 
-## 14.1 `/vd:chi-duong` — một cửa, bốn ý định
+## 14.1 `/van-dao:chi-duong` — một cửa, bốn ý định
 
 Người học không phải chọn góc nhìn; họ hỏi tự nhiên và trưởng môn định tuyến:
 
@@ -1875,13 +1875,13 @@ Một cửa **không xoá độ phức tạp, nó dời chỗ**: người học 
 
 | Lệnh cũ | Đi đâu |
 |---|---|
-| `/vd:tang-kinh-cac` | ý định 2 của `chi-duong`; ở bậc 1 thì `be-quan` không tham số |
-| `/vd:ban-do` | ý định 3 của `chi-duong` |
-| `/vd:lo-do` | ý định 3; lộ đồ đang chạy cũng hiện khi `be-quan` không tham số |
-| `/vd:do-canh-gioi` | ý định 4 của `chi-duong` |
-| `/vd:tiep` | `be-quan` không tham số |
-| `/vd:kiem-bi-kip` | `thu-bi-kip` trỏ vào bí kíp đã có |
-| `/vd:xuat-quan` | **không phải lệnh** — xuất quan xảy ra *trong lúc* bế quan, nên nó là nhánh đối thoại như F3 và F4 |
+| `/van-dao:tang-kinh-cac` | ý định 2 của `chi-duong`; ở bậc 1 thì `be-quan` không tham số |
+| `/van-dao:ban-do` | ý định 3 của `chi-duong` |
+| `/van-dao:lo-do` | ý định 3; lộ đồ đang chạy cũng hiện khi `be-quan` không tham số |
+| `/van-dao:do-canh-gioi` | ý định 4 của `chi-duong` |
+| `/van-dao:tiep` | `be-quan` không tham số |
+| `/van-dao:kiem-bi-kip` | `thu-bi-kip` trỏ vào bí kíp đã có |
+| `/van-dao:xuat-quan` | **không phải lệnh** — xuất quan xảy ra *trong lúc* bế quan, nên nó là nhánh đối thoại như F3 và F4 |
 
 **Cắt lệnh không cắt thành phần.** `tang-kinh-cac.py`, `ban-do.py`, `truong-lao` vẫn còn nguyên trong §12 — chỉ khác là chúng được gọi qua ý định, không qua lệnh riêng. Bộ máy giữ nguyên, bề mặt hẹp lại.
 
