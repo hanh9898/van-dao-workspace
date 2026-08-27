@@ -1,5 +1,5 @@
 <!-- bmad:context -->
-<!-- Verified 2026-08-27. Workspace root ở HEAD b2a1cd6; van-dao/ đối chiếu ở HEAD 55d3c36. Managed by bmad-project-context; sửa trong khối này sẽ bị ghi đè ở lần refresh sau. Nội dung ngoài marker được giữ nguyên. -->
+<!-- Verified 2026-08-27. Workspace root ở HEAD ff7ac81; van-dao/ đối chiếu ở HEAD a4cb1cb. Managed by bmad-project-context; sửa trong khối này sẽ bị ghi đè ở lần refresh sau. Nội dung ngoài marker được giữ nguyên. -->
 
 ## van-dao
 
@@ -32,7 +32,10 @@ nạp cả file. Đang ở đâu, làm gì tiếp: `docs/VAN-DAO-trang-thai-du-a
   `van-dao/bin/kiem-bi-kip.py` (§6 của schema là luật bằng lời của đúng những phép kiểm script thực thi,
   §7 là phần script không làm — đổi một bên thì đổi bên kia trong cùng một thay đổi, kèm fixture và test)
 - Eval skill/agent: `ARCHITECTURE-SPINE.md` AD-10 (nhẹ lúc viết, đầy đủ trước khi phát hành) + AD-11
-  (skill tự đủ, không trích FR/NFR/§) — mẫu chi tiết: `docs/VAN-DAO-setup-du-an.md` Phần 4
+  (skill tự đủ, không trích FR/NFR/§) — mẫu chi tiết: `docs/VAN-DAO-setup-du-an.md` Phần 4. Kiểm hai AD
+  này có thật sự được tuân thủ trong một `SKILL.md`/`evals/` cụ thể: lens `skill-quality`
+  (`_bmad/custom/lenses/skill-quality.md`, đăng ký ở `_bmad/custom/bmad-review.toml`), gọi qua
+  `bmad-review lenses=skill-quality`.
 - Artifact kế hoạch BMAD: `_bmad-output/planning-artifacts`, `_bmad-output/implementation-artifacts`
 - Kiến trúc ràng buộc mọi epic/story: `_bmad-output/planning-artifacts/architecture/architecture-van-dao-workspace-2026-08-25/ARCHITECTURE-SPINE.md`
   — 11 invariant (AD-1..AD-11)
@@ -48,6 +51,10 @@ nạp cả file. Đang ở đâu, làm gì tiếp: `docs/VAN-DAO-trang-thai-du-a
 - Script BMAD ở đây (`_bmad/scripts/*.py` qua `uv run`) trên Windows phải kèm `PYTHONIOENCODING=utf-8`,
   vd: `PYTHONIOENCODING=utf-8 uv run _bmad/scripts/resolve_config.py --project-root .` — thiếu biến này
   sẽ crash `UnicodeEncodeError` vì stdout mặc định code page cp1252, không xử lý được Unicode trong output
+- Eval hành vi thật (`claude -p`) cho skill có ghi file ra ngoài thư mục dự án (mọi skill ghi vào
+  `~/.vandao/...`) cần CẢ HAI `--add-dir <home cô lập>` và `--permission-mode acceptEdits` ở đúng lượt
+  ghi — thiếu `--add-dir` thì bị chặn "ngoài phạm vi thư mục dự án"; có `--add-dir` mà thiếu
+  `--permission-mode` thì bị chặn "chưa được cấp quyền ghi" (headless không có TTY để tự duyệt)
 
 ## Conventions that differ from defaults
 
@@ -100,5 +107,11 @@ nạp cả file. Đang ở đâu, làm gì tiếp: `docs/VAN-DAO-trang-thai-du-a
   nhưng vẫn bị vi phạm thật (thêm `eval.md` + 1 file mới vào đó, phải gỡ ra sau). Quy ước mới cho
   skill/eval luôn vào `ARCHITECTURE-SPINE.md` (qua `bmad-architecture`) hoặc `docs/`, không bao giờ
   vào `van-dao/`.
+- Đổi tên bề mặt gọi lệnh (tiền tố plugin, tên slash command...) làm bằng chứng eval CŨ hoá lỗi thời ở
+  MỌI `evals.json` có trích transcript cũ, không chỉ file của skill đang đổi tên — bắt được thật: đổi
+  `/vd:` → `/van-dao:` đã sửa hết `SKILL.md`/tài liệu nhưng bỏ sót `nhap-mon/evals/evals.json` (đã
+  `done`) vẫn trích `/vd:` trong 2 transcript thật, chỉ lộ ra khi lens `skill-quality` chạy trên MỘT
+  skill khác rồi lần ngược lại. Đổi tên bề mặt gọi lệnh thì `grep` chuỗi cũ trên toàn bộ
+  `van-dao/skills/**/evals/` trước khi coi là xong.
 
 <!-- /bmad:context -->
