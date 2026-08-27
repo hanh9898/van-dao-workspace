@@ -142,7 +142,7 @@ behavioral eval của từng skill sang Ưu tiên 3 — sai, đã sửa bằng n
 giữa các skill — không phải lý do bỏ qua xác minh đúng-sai của một skill đã viết xong. Đặc tả §16
 ("ba thứ dựng xuyên suốt") đã yêu cầu `evals/` đi cùng từng skill ngay lúc viết; quy trình chính
 thức `skill-creator` của Anthropic làm đúng vậy. Mỗi story viết skill mới (kể cả trong Vòng 1 này)
-tự mang theo eval **nhẹ** của nó — xem `van-dao/.claude/rules/eval.md`.
+tự mang theo eval **nhẹ** của nó — xem AD-10, `ARCHITECTURE-SPINE.md` (mẫu chi tiết: `VAN-DAO-setup-du-an.md` Phần 4).
 
 ## Ưu tiên 3 — kéo verification lên
 

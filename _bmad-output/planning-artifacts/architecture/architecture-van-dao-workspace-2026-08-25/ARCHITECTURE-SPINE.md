@@ -85,6 +85,18 @@ Hai paradigm này khớp nhau: actor cách ly cần lịch sử bất biến đ�
 - **Prevents:** phiên đóng giữa lúc lộ đồ vừa sinh nhưng người học chưa duyệt/từ chối → phiên sau âm thầm sinh một lộ đồ **khác**, người học không biết mình đang xem bản nào — đúng kiểu thất bại "resume chạy lại từ đầu, không phải từ điểm ngắt" mà LangGraph/Temporal đều cảnh báo (nghiên cứu plugin/HITL §2.2)
 - **Rule:** lộ đồ vừa sinh ở F-1, **trước khi** có quyết định duyệt/từ chối, phải ghi lại (append, đúng AD-2) ngay lúc sinh xong — không chờ đóng máy mới lưu. Phiên sau gặp lại bí kíp ở trạng thái "đã nhận, chưa duyệt lộ đồ" phải trình lại **đúng bản đã lưu**, không sinh bản mới, trừ khi người học chủ động yêu cầu sinh lại. Cùng khuôn với `tang-kinh/nhap-dang-do/` (nháp Pha 2 đã có) — tái dùng cơ chế, không phát minh mới.
 
+### AD-10 — Eval đi cùng skill lúc viết, nhẹ trước — đầy đủ theo mốc, không theo vertical slice [ADOPTED]
+
+- **Binds:** mọi `skills/**`, `agents/**`, `commands/**` mới hoặc bị sửa hành vi
+- **Prevents:** hoãn behavioral eval của một skill đã viết xong tới khi có vertical slice nhiều-skill — không tiền lệ nào ủng hộ (nghiên cứu `_bmad-output/planning-artifacts/research/technical-quy-trinh-eval-khi-viet-skill-claude-ski-2026-08-27/research.md`: quy trình chính thức `skill-creator` của Anthropic tự thực hiện đúng nhịp "viết nháp → vài eval nhỏ ngay → lặp lại"); suýt để lọt một bug thật ở Story 1.1 — `nhap-mon` đọc `communication_language` thẳng từ `.claude-plugin/plugin.json` (chỉ có schema/default tĩnh) thay vì qua cơ chế thế chỗ `${user_config.KEY}`, chỉ phát hiện được nhờ chạy eval hành vi **thật** ngay lúc viết skill, không phải nhờ suy diễn
+- **Rule:** viết eval **ngay** khi skill đó viết xong nháp — mức **nhẹ** là đủ để coi "xong nháp": 2-3 kịch bản khớp I/O & Edge-Case Matrix của chính story đó, mỗi `evidence` trích **nguyên văn** transcript chạy thật (không suy diễn, không chỉ trỏ đường dẫn scratchpad tạm của một phiên làm việc — thư mục đó mất theo phiên, người đọc sau không tìm lại được). Mức **đầy đủ** (trigger eval 20 câu, 8–10 dương/8–10 âm near-miss, chạy 3 lần, chia 60/40 train/test) có thể dời tới **trước khi chia sẻ/phát hành plugin** — một mốc chung cho mọi skill, không phải mỗi story tự chọn mốc riêng (hai skill dời tới hai mốc khác nhau thì tại bất kỳ thời điểm nào cũng không biết chắc skill nào đã đạt mức đầy đủ) — không dời vô thời hạn theo kiểu "sau khi có vertical slice". Lệnh/script tái tạo eval phải chạy được cả Windows lẫn Linux (đúng CI đang chạy `ubuntu-latest` + `windows-latest`, `van-dao/.github/workflows/kiem.yml`). Cơ chế và mẫu chi tiết: `docs/VAN-DAO-setup-du-an.md` Phần 4.
+
+### AD-11 — Skill/agent tự đủ, không trích định danh chỉ tồn tại ở workspace ngoài [ADOPTED]
+
+- **Binds:** `skills/**`, `agents/**`, `commands/**`
+- **Prevents:** người dùng cài plugin thật chỉ nhận `van-dao/` — không có `docs/` hay `_bmad-output/` đi kèm (Policy AGENTS.md: `van-dao/` chỉ chứa mã nguồn) — đọc phải một câu trích "(FR32)", "(NFR8)", "§12.4" vô nghĩa hoặc gây hiểu lầm vì không tra được nguồn; đã bắt 2 ca thật trong `van-dao/skills/nhap-mon/SKILL.md` (đã tự sửa)
+- **Rule:** nội dung trong `skills/**`, `agents/**`, `commands/**` không được trích số hiệu requirement (FR/NFR) hay số mục đặc tả (§...) — viết lại đúng nội dung cần thiết bằng lời tự nhiên, đủ để một người/agent không có quyền truy cập workspace ngoài vẫn hiểu và làm đúng. Định danh đó — để truy vết quyết định bắt nguồn từ đâu — vẫn được ghi, nhưng ở phía workspace: story spec (`Spec Change Log`), commit message, hoặc chính spine/PRD này.
+
 ### Sơ đồ hướng phụ thuộc (ai được gọi/ghi tới ai)
 
 ```mermaid
@@ -210,7 +222,7 @@ van-dao/
 | 4.5 Đo | skill `dao-tam` (đệ tử sở hữu, `disable-model-invocation`); `truong-lao` k=3 | AD-2, AD-3, AD-8 (truy vấn lọc theo mạch) |
 | 4.6 Nền | 3 hook hệ thống, `kiem-thu.py` | AD-7 |
 | 4.6 Nền — Chỉ điểm (FR36, đặc tả §10) | skill `truong-mon`, ghi `truong-mon/chi-diem.jsonl` · `chi-diem-hong.jsonl` | AD-3 (vùng ghi riêng của `truong-mon`, không AD mới) |
-| 4.7 Nguyên tắc xuyên suốt | all | AD-1 … AD-9 (tổng hợp, không một AD riêng) |
+| 4.7 Nguyên tắc xuyên suốt | all | AD-1 … AD-11 (tổng hợp, không một AD riêng) |
 
 ## Deferred
 

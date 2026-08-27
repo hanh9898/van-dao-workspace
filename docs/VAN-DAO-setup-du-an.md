@@ -216,6 +216,11 @@ Grader chấm **từ transcript** và trả `grading.json`: mỗi expectation c�
 
 **Hội tụ đáng chú ý:** `evidence` bắt buộc chính là R19 trong đặc tả. Anthropic áp luật *bằng chứng trước khẳng định* cho máy chấm skill; Vấn Đạo áp cho máy chấm người học. Cùng một bài toán, cùng một cách chặn.
 
+**Evidence phải tự đủ, không phụ thuộc hệ điều hành.** Khi chạy thật skill để lấy `evidence` (cài plugin vào môi trường cô lập, gọi `claude -p`...):
+
+- Trích **nguyên văn** transcript ngay trong `evals.json` — không chỉ trỏ đường dẫn tới file transcript nằm trong thư mục scratchpad của phiên làm việc. Thư mục đó tạm, gắn với một phiên cụ thể; người đọc sau (hay CI) sẽ không tìm thấy file đó nữa.
+- Lệnh/script tái tạo lại eval phải chạy giống nhau trên cả Windows lẫn Linux (đúng CI đang chạy cả `ubuntu-latest` và `windows-latest`). Tránh cú pháp chỉ đúng một shell (vd. `VAR=val cmd` tiền tố biến môi trường kiểu POSIX); nêu cách làm tương đương trên cả hai, hoặc dùng cách trung lập (đặt biến môi trường bằng lệnh riêng trước, không viết dính vào một dòng lệnh shell cụ thể).
+
 **Viết trước cho hai skill:**
 
 | Skill | Expectation quan trọng nhất |
