@@ -1,0 +1,11 @@
+# Team override for bmad-review. Merges over the shipped customize.toml per
+# BMad structural rules (arrays of tables keyed by `code`: matching key
+# replaces, new keys append). See {project-root}/.claude/skills/bmad-review/customize.toml
+# for the full field reference and merge semantics — not edited here.
+
+[[workflow.lenses]]
+code = "skill-quality"
+name = "Skill Quality"
+applies_to = "docs"
+when = "Content that is itself a Claude Code skill artifact — a SKILL.md, its evals/ companion, or agents/*.md / commands/*.md in the same family. Skip specs, stories, or PRDs that merely describe or commission the skill."
+instruction = "Load `{project-root}/_bmad/custom/lenses/skill-quality.md` and follow it."

@@ -8,6 +8,8 @@ _bmad/*
 # version control để sống sót qua lần cài lại BMAD, và để "future session" nào cũng thấy được
 !_bmad/custom/
 !_bmad/custom/*.toml
+!_bmad/custom/*.md
+!_bmad/custom/lenses/
 _bmad/custom/*.user.toml
 
 # van-dao là repo git riêng — không lồng repo con vào đây
