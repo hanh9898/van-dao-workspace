@@ -1,0 +1,10 @@
+# Team override for bmad-prd. Committed — applies to every run of bmad-prd
+# in this workspace. See {skill-root}/customize.toml for merge rules
+# (scalars: override wins • arrays: append).
+
+[workflow]
+
+persistent_facts = [
+  "Khi đối chiếu một tài liệu nguồn có chứa sơ đồ (mermaid, flowchart, sequence, state diagram) — đặc biệt ở Finalize step 2 'Input reconciliation' — phải lần theo TỪNG NODE và TỪNG CẠNH của sơ đồ một cách tường minh, không chỉ đọc chữ bên trong node như văn xuôi rời rạc rồi bỏ qua cấu trúc đồ thị (thứ tự các bước, vòng lặp quay lại, nhánh rẽ, phân nhóm/tô màu mang nghĩa). Một khả năng/luồng được biểu diễn CHỦ YẾU qua sơ đồ (không có đoạn văn xuôi tương đương đầy đủ) dễ bị bỏ sót nếu chỉ đọc lướt — phải kiểm tra riêng, không gộp chung với việc 'đã đọc trọn tài liệu'.",
+  "Trong reconcile-{slug}.md (Input Reconciliation), liệt kê rõ những sơ đồ nào trong tài liệu nguồn đã được lần theo cấu trúc (không chỉ đọc chữ) và mỗi sơ đồ đó đã map sang FR/mục nào của PRD, hoặc ghi rõ là gap nếu chưa có FR tương ứng — không chỉ tự khai chung chung 'đã đọc trọn N dòng / mọi mục §1-§N'.",
+]

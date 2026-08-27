@@ -1,6 +1,14 @@
-# BMAD — cài lại được qua trình cài đặt (npx bmad-method install), không cần version control
-_bmad/
+# BMAD — cài lại được qua trình cài đặt (npx bmad-method install), không cần version control.
+# Dùng "_bmad/*" (không phải "_bmad/") vì git không cho un-ignore một path nếu thư mục cha của nó
+# bị ignore theo dạng thư mục trọn gói — "_bmad/" sẽ chặn traversal, "_bmad/*" thì không.
+_bmad/*
 .claude/skills/
+
+# ...trừ tuỳ biến đội (persistent_facts, review_guidance...) — đây là quyết định thật, phải theo
+# version control để sống sót qua lần cài lại BMAD, và để "future session" nào cũng thấy được
+!_bmad/custom/
+!_bmad/custom/*.toml
+_bmad/custom/*.user.toml
 
 # van-dao là repo git riêng — không lồng repo con vào đây
 van-dao/
