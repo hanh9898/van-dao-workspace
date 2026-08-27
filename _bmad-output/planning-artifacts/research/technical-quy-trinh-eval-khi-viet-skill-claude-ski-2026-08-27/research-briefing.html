@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quy trình eval khi viết skill Claude — Research Briefing</title>
+<style>
+  :root {
+    --bg: #faf9f7;
+    --surface: #ffffff;
+    --surface-2: #f2f0ec;
+    --border: #e2ded6;
+    --text: #23201b;
+    --text-dim: #5c574d;
+    --accent: #8a5a2b;
+    --accent-soft: #f3e6d6;
+    --verified-bg: #e4f2e6; --verified-fg: #1f6e34; --verified-bd: #a9d8b3;
+    --medium-bg: #fdf2df;  --medium-fg: #92620a;  --medium-bd: #f0cf8f;
+    --low-bg: #f1efe9;     --low-fg: #66604f;     --low-bd: #d8d2c3;
+    --unverified-bg: #fdeae6; --unverified-fg: #a3341c; --unverified-bd: #f0b6a6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1b1815;
+      --surface: #242019;
+      --surface-2: #2c2720;
+      --border: #3c352a;
+      --text: #ede8e0;
+      --text-dim: #b8b0a1;
+      --accent: #d8a86a;
+      --accent-soft: #3a2e1c;
+      --verified-bg: #1c3624; --verified-fg: #7fd696; --verified-bd: #2d5a3b;
+      --medium-bg: #3a2f16;  --medium-fg: #f0c065;  --medium-bd: #5c4a20;
+      --low-bg: #2c2822;     --low-fg: #b3ab9a;     --low-bd: #443e33;
+      --unverified-bg: #3a2018; --unverified-fg: #f3947a; --unverified-bd: #5c3226;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1b1815;
+    --surface: #242019;
+    --surface-2: #2c2720;
+    --border: #3c352a;
+    --text: #ede8e0;
+    --text-dim: #b8b0a1;
+    --accent: #d8a86a;
+    --accent-soft: #3a2e1c;
+    --verified-bg: #1c3624; --verified-fg: #7fd696; --verified-bd: #2d5a3b;
+    --medium-bg: #3a2f16;  --medium-fg: #f0c065;  --medium-bd: #5c4a20;
+    --low-bg: #2c2822;     --low-fg: #b3ab9a;     --low-bd: #443e33;
+    --unverified-bg: #3a2018; --unverified-fg: #f3947a; --unverified-bd: #5c3226;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Iowan Old Style", "Georgia", "Times New Roman", serif;
+    line-height: 1.6;
+  }
+  a { color: var(--accent); }
+  .layout { display: grid; grid-template-columns: 240px minmax(0,1fr); gap: 0; max-width: 1180px; margin: 0 auto; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } .toc { position: static !important; } }
+
+  header.hero {
+    padding: 2.5rem 1.75rem 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .eyebrow {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-size: .72rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: .6rem;
+  }
+  h1 { font-size: 1.7rem; margin: 0 0 .8rem; text-wrap: balance; line-height: 1.25; }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: .9rem 1.5rem;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: .85rem;
+    margin-top: 1.2rem;
+  }
+  .meta-grid dt { color: var(--text-dim); font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; margin-bottom: .2rem; }
+  .meta-grid dd { margin: 0; font-weight: 600; }
+
+  .toc {
+    position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+    padding: 2rem 1rem 2rem 1.75rem;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: .84rem;
+    border-right: 1px solid var(--border);
+  }
+  .toc-title { text-transform: uppercase; letter-spacing: .08em; font-size: .7rem; color: var(--text-dim); margin-bottom: .8rem; }
+  .toc a { display: block; color: var(--text); text-decoration: none; padding: .3rem 0; border-left: 2px solid transparent; padding-left: .7rem; margin-left: -.7rem; }
+  .toc a:hover { color: var(--accent); border-left-color: var(--accent); }
+
+  main { padding: 0 1.75rem 4rem; min-width: 0; }
+  section { padding-top: 2.4rem; scroll-margin-top: 1rem; }
+  section h2 {
+    font-size: 1.2rem; margin: 0 0 1rem;
+    padding-bottom: .5rem; border-bottom: 2px solid var(--accent-soft);
+  }
+  section h3 { font-size: 1rem; margin: 1.4rem 0 .6rem; color: var(--text); }
+  p { max-width: 72ch; }
+  ul, ol { max-width: 72ch; padding-left: 1.3rem; }
+  li { margin-bottom: .5rem; }
+
+  .summary-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 1.5rem 1.75rem; margin-top: 1.5rem;
+  }
+  .summary-card h2 { border: none; padding: 0; margin-bottom: .3rem; }
+  .kicker { font-family: -apple-system, "Segoe UI", sans-serif; font-weight: 600; color: var(--accent); margin: 0 0 1rem; font-size: 1.02rem; }
+  .summary-card ol { margin-top: .6rem; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: .3rem;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: .72rem; font-weight: 700; letter-spacing: .02em;
+    padding: .15rem .55rem; border-radius: 99px; border: 1px solid;
+    white-space: nowrap;
+  }
+  .badge.verified { background: var(--verified-bg); color: var(--verified-fg); border-color: var(--verified-bd); }
+  .badge.medium   { background: var(--medium-bg);   color: var(--medium-fg);   border-color: var(--medium-bd); }
+  .badge.low      { background: var(--low-bg);      color: var(--low-fg);      border-color: var(--low-bd); }
+  .badge.unverified { background: var(--unverified-bg); color: var(--unverified-fg); border-color: var(--unverified-bd); font-weight: 800; }
+
+  .cite { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--accent); text-decoration: none; padding: 0 .1rem; }
+  .cite:hover { text-decoration: underline; }
+
+  blockquote {
+    margin: 1rem 0; padding: .3rem 0 .3rem 1rem; border-left: 3px solid var(--accent-soft);
+    color: var(--text-dim); font-style: italic; max-width: 68ch;
+  }
+
+  .rec {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 1rem 1.2rem; margin-bottom: 1rem;
+  }
+  .rec-conf { display: block; margin-bottom: .4rem; }
+
+  details.sources { margin-top: 1rem; }
+  details.sources summary {
+    cursor: pointer; font-family: -apple-system, "Segoe UI", sans-serif;
+    font-weight: 600; padding: .6rem 0; color: var(--accent);
+  }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+  table.sources { border-collapse: collapse; width: 100%; font-size: .82rem; font-family: -apple-system, "Segoe UI", sans-serif; }
+  table.sources td { padding: .6rem .7rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.sources tr:last-child td { border-bottom: none; }
+  table.sources tr:target { background: var(--accent-soft); }
+
+  .staleness-list { list-style: none; padding: 0; margin: 0; }
+  .staleness-list li {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: .8rem 1rem; margin-bottom: .7rem; max-width: none;
+  }
+  .staleness-list .when { font-family: -apple-system, "Segoe UI", sans-serif; font-weight: 700; color: var(--accent); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; display: block; margin-bottom: .3rem; }
+
+  footer.page-footer {
+    font-family: -apple-system, "Segoe UI", sans-serif; font-size: .78rem; color: var(--text-dim);
+    padding: 2rem 1.75rem 3rem; border-top: 1px solid var(--border); margin-top: 2rem;
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc" aria-label="Mục lục">
+    <div class="toc-title">Mục lục</div>
+    <a href="#tom-tat">Tóm tắt điều hành</a>
+    <a href="#d1">D1 — Quy trình chính thức skill-creator</a>
+    <a href="#d2">D2 — Bằng chứng thực tiễn</a>
+    <a href="#cross">Cross-dimension</a>
+    <a href="#contrary">Bằng chứng trái chiều</a>
+    <a href="#rec">Khuyến nghị</a>
+    <a href="#open">Câu hỏi còn mở</a>
+    <a href="#sources">Nguồn (15)</a>
+    <a href="#staleness">Độ cũ</a>
+  </nav>
+
+  <div>
+    <header class="hero">
+      <div class="eyebrow">Technical Research · Deep Recon</div>
+      <h1>Quy trình eval khi phát triển một skill Claude — eval ngay từ đầu hay sau vertical slice?</h1>
+      <dl class="meta-grid">
+        <div><dt>Quyết định phục vụ</dt><dd>Story 1.1 (skill <code>nhap-mon</code>) — dừng viết eval ngay hay tiếp tục sang story kế tiếp trước</dd></div>
+        <div><dt>Loại</dt><dd>Technical</dd></div>
+        <div><dt>Ngày</dt><dd>2026-08-27</dd></div>
+        <div><dt>Độ sâu</dt><dd>Standard — 2 dimension breadth-first + 1 round lead-following</dd></div>
+        <div><dt>Mức xác minh</dt><dd>Normal — 11/12 claim verified</dd></div>
+      </dl>
+    </header>
+
+    <main>
+      <section id="tom-tat">
+        <div class="summary-card">
+          <h2>Tóm tắt điều hành</h2>
+          <p class="kicker">Bằng chứng không ủng hộ việc hoãn eval của một skill đã viết xong đến khi có vertical slice nhiều-skill.</p>
+          <ol>
+            <li>Công cụ chính thức <code>skill-creator</code> của Anthropic <span class="badge verified">verified</span> thực hiện: viết draft <strong>một</strong> skill → tạo vài test prompt/eval nhỏ ngay sau đó, cùng phiên làm việc → lặp lại tới khi hài lòng <a class="cite" href="#src-2">[2]</a>. Không phải "dồn eval sang sau khi có nhiều skill".</li>
+            <li>Không tài liệu chính thức hay thực tiễn nào ủng hộ hoãn eval một skill đã xong <a class="cite" href="#src-1">[1]</a><a class="cite" href="#src-6">[6]</a><a class="cite" href="#src-7">[7]</a>. Nguồn multi-agent duy nhất tìm được <span class="badge unverified">unverified</span> đi <strong>ngược</strong> hướng "hoãn": validate từng agent riêng lẻ trước, hệ thống sau <a class="cite" href="#src-15">[15]</a>.</li>
+            <li>"Vertical slice trước" có tiền lệ thật (Walking Skeleton, Spike) nhưng phục vụ rủi ro <strong>tích hợp/kiến trúc</strong>, không phải lý do bỏ qua xác minh đúng-sai của một component đã viết xong <a class="cite" href="#src-9">[9]</a><a class="cite" href="#src-11">[11]</a>.</li>
+          </ol>
+          <p><strong>Áp dụng cho Story 1.1:</strong> viết một vòng eval <strong>nhẹ</strong> (2-3 kịch bản khớp I/O matrix) trước khi sang Story 1.2 — không cần bộ máy đầy đủ 20-câu/<code>evals.json</code>/60-40 train-test ngay <a class="cite" href="#src-4">[4]</a>.</p>
+          <p><strong>Caveat lớn nhất:</strong> không nguồn nào bàn thẳng kịch bản "nhiều skill Claude phối hợp, hoãn eval". Kết luận là suy luận có căn cứ từ việc ghép quy trình per-skill (mạnh) với 1 nguồn multi-agent tổng quát ngoài hệ sinh thái Claude (vừa, chưa xác minh chéo).</p>
+        </div>
+      </section>
+
+      <section id="d1">
+        <h2>D1 — Quy trình chính thức của <code>skill-creator</code></h2>
+        <p>Tài liệu chính thức Anthropic tự mâu thuẫn nhẹ về <strong>thứ tự</strong> khi phát triển một skill đơn lẻ, dù cả hai đều không bàn kịch bản nhiều-skill.</p>
+        <blockquote>"Create evaluations BEFORE writing extensive documentation." — best-practices <span class="badge verified">verified</span> <a class="cite" href="#src-1">[1]</a></blockquote>
+        <blockquote>"Write a draft of the skill" → "Create a few test prompts..." → lặp lại → "expand the test set and try again at larger scale." — SKILL.md thật của skill-creator, ngược thứ tự trên <span class="badge verified">verified</span> <a class="cite" href="#src-2">[2]</a></blockquote>
+        <ul>
+          <li><code>code.claude.com/docs/en/skills</code> coi eval là bước <strong>sau khi</strong> skill đã tồn tại và chạy được, không phải điều kiện tiên quyết <span class="badge verified">verified</span> <a class="cite" href="#src-3">[3]</a>.</li>
+          <li><code>agentskills.io</code> (nguồn tham chiếu chuẩn của code.claude.com) mở đầu với giả định skill đã viết xong; khuyến nghị "start with 2-3 test cases", "don't over-invest before you've seen your first round of results" <span class="badge verified">verified</span> <a class="cite" href="#src-4">[4]</a>.</li>
+          <li>Blog Anthropic nhấn mạnh giá trị testing nhưng không tuyên bố dứt khoát về thời điểm; ví dụ minh hoạ là một skill đơn <span class="badge medium">medium</span> <a class="cite" href="#src-5">[5]</a>.</li>
+        </ul>
+        <p>Cả bốn tài liệu chính thức thống nhất ở một điểm: eval xảy ra <strong>ngay trong vòng đời của một skill</strong>, gần thời điểm skill đó được viết — không tài liệu nào hình dung một giai đoạn "dồn eval lại" sau khi nhiều skill khác đã viết xong.</p>
+        <p>GitHub Issue #490 (<code>anthropics/skills</code>) ghi nhận vấn đề <strong>tổ chức thư mục</strong> evals khi có nhiều skill — không bàn <strong>trình tự</strong> viết eval <span class="badge verified">verified</span> <a class="cite" href="#src-13">[13]</a>.</p>
+      </section>
+
+      <section id="d2">
+        <h2>D2 — Bằng chứng thực tiễn rộng hơn</h2>
+        <h3>Ủng hộ eval sớm, theo sát từng skill (không hoãn)</h3>
+        <ul>
+          <li>OpenAI: "Define success before you write the skill" <span class="badge medium">medium</span> <a class="cite" href="#src-6">[6]</a>.</li>
+          <li>Minko Gechev (26/02/2026): "Don't ship skills without evals" <span class="badge medium">medium-high</span> <a class="cite" href="#src-7">[7]</a>.</li>
+          <li>Paul Twist (13/07/2026): "eval debt" compounds mỗi tuần, khuyến nghị hạ tầng eval "co-equal" từ ngày đầu <span class="badge medium">medium</span> <a class="cite" href="#src-8">[8]</a>.</li>
+          <li>Hamel Husain & Shreya Shankar: "evaluation is part of the development process rather than a distinct line item" <span class="badge medium">medium-high</span> <a class="cite" href="#src-14">[14]</a>.</li>
+          <li>PwC — nguồn multi-agent cụ thể duy nhất: validate từng agent/skill riêng lẻ <strong>trước</strong>, hệ thống tích hợp <strong>sau</strong> <span class="badge unverified">unverified — 1 proxy read, chưa xác minh chéo</span> <a class="cite" href="#src-15">[15]</a>.</li>
+        </ul>
+        <h3>Tiền lệ lý thuyết cho "dựng luồng chạy được trước" — không đặc thù AI eval</h3>
+        <ul>
+          <li>Walking Skeleton (Cockburn, 2000): "kiến trúc và chức năng tiến hoá song song" sau khi có skeleton end-to-end tối thiểu <span class="badge verified">verified</span> <a class="cite" href="#src-9">[9]</a>. Rủi ro của việc không làm: "data contracts, latency limits... fail late" <a class="cite" href="#src-9">[9]</a>; defmyfunc nêu cùng rủi ro bằng ngôn ngữ chung hơn <span class="badge medium">medium</span> <a class="cite" href="#src-10">[10]</a>.</li>
+          <li>Architectural Spike: giai đoạn nới lỏng chuẩn kiểm thử hình thức để ưu tiên tốc độ chứng minh khái niệm <span class="badge medium">medium</span> <a class="cite" href="#src-11">[11]</a>.</li>
+        </ul>
+        <p>Không nguồn lý thuyết nào áp logic đó cho câu hỏi cụ thể "bỏ qua/hoãn xác minh đúng-sai của một AI skill đã viết xong". Braintrust — cơ hội trực tiếp để bàn đúng câu hỏi này — im lặng hoàn toàn, một phát hiện phủ định có ý nghĩa <span class="badge verified">verified — negative finding</span> <a class="cite" href="#src-12">[12]</a>.</p>
+      </section>
+
+      <section id="cross">
+        <h2>Cross-dimension: điểm chỉ có được khi ghép hai hướng lại</h2>
+        <ul>
+          <li>D1 và D2 <strong>hội tụ độc lập</strong> về cùng câu trả lời thực hành dù tra cứu tách biệt: eval nên diễn ra sớm, nhẹ, ngay sau khi viết skill — không hoãn tới cột mốc tích hợp sau này.</li>
+          <li>"Vertical slice trước" trong kế hoạch van-dao hoá ra là khái niệm mượn từ kỹ nghệ phần mềm tổng quát, áp cho <strong>rủi ro kiến trúc</strong> — khác loại rủi ro mà AI skill eval giải quyết (<strong>hành vi-sai của một component</strong>). Đúng từ vựng, có thể sai loại rủi ro.</li>
+        </ul>
+      </section>
+
+      <section id="contrary">
+        <h2>Bằng chứng trái chiều</h2>
+        <ul>
+          <li>Anthropic tự mâu thuẫn về <strong>thứ tự</strong> (không phải có-nên-hoãn-hay-không): best-practices "eval trước" <a class="cite" href="#src-1">[1]</a> vs. skill-creator SKILL.md "draft trước, eval sau" <a class="cite" href="#src-2">[2]</a>. Không tài liệu nào đối chiếu tài liệu kia — nhưng cả hai diễn ra trong cùng một skill, gần nhau về thời gian.</li>
+          <li>PwC <a class="cite" href="#src-15">[15]</a> là nguồn duy nhất bàn đúng bối cảnh nhiều-agent và đi ngược "hoãn eval" — độ tin cậy trung bình, không dùng một mình để quyết định.</li>
+          <li>Red-team pass không chạy (mặc định off, không có dấu hiệu cần bật cho một quyết định quy trình nội bộ).</li>
+        </ul>
+      </section>
+
+      <section id="rec">
+        <h2>Khuyến nghị</h2>
+        <div class="rec">
+          <span class="badge verified rec-conf">Tin cậy cao — 4 nguồn chính thức hội tụ</span>
+          Viết một vòng eval <strong>nhẹ</strong> cho <code>nhap-mon</code> (Story 1.1) trước khi chuyển sang Story 1.2 — 2-3 kịch bản khớp I/O matrix đã có (chưa cấu hình / đã cấu hình / phiên mới giữ nguyên) là đủ, không cần bộ máy 20-câu/<code>evals.json</code> hoàn chỉnh ngay <a class="cite" href="#src-4">[4]</a>.
+        </div>
+        <div class="rec">
+          <span class="badge medium rec-conf">Tin cậy trung bình — 1 nguồn multi-agent, chưa xác minh chéo</span>
+          Không áp "vertical slice trước" cho việc kiểm ĐÚNG-SAI hành vi từng skill — chỉ áp cho quyết định KIẾN TRÚC/TÍCH HỢP thật (vd. 2 skill truyền trạng thái cho nhau) <a class="cite" href="#src-9">[9]</a><a class="cite" href="#src-11">[11]</a>.
+        </div>
+        <div class="rec">
+          <span class="badge verified rec-conf">Tin cậy cao — meta</span>
+          Cân nhắc sửa <code>van-dao/.claude/rules/eval.md</code>: phân biệt eval NHẸ bắt buộc ngay khi skill "viết xong nháp" vs. bộ eval ĐẦY ĐỦ có thể hoãn tới một cột mốc hợp lý (không hoãn vô thời hạn tới "sau vertical slice").
+        </div>
+      </section>
+
+      <section id="open">
+        <h2>Câu hỏi còn mở</h2>
+        <ul>
+          <li>Không nguồn nào bàn trực tiếp kịch bản "nhiều skill Claude phối hợp, hoãn eval tới vertical slice" — nếu rủi ro cao hơn, nên tự thực nghiệm RED→GREEN→REFACTOR / Claude-A-viết/Claude-B-test thay vì tiếp tục suy luận từ tài liệu.</li>
+          <li>PwC <a class="cite" href="#src-15">[15]</a> cần xác minh chéo qua nguồn thứ hai độc lập nếu trở thành căn cứ cho quyết định kiến trúc lớn hơn.</li>
+          <li>Ngày xuất bản chính xác của các trang docs Anthropic không xác nhận được (Mintlify không hiển thị ngày công khai).</li>
+        </ul>
+      </section>
+
+      <section id="sources">
+        <h2>Nguồn</h2>
+        <details class="sources" open>
+          <summary>15 nguồn — bấm để thu gọn</summary>
+          <div class="table-wrap">
+            <table class="sources"><tbody><tr id="src-1"><td>[1]</td><td><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices" target="_blank" rel="noopener">platform.claude.com — best-practices, "eval trước khi viết docs mở rộng"</a></td><td>Anthropic</td><td>không rõ</td><td>2026-08-27</td><td>Cao</td></tr><tr id="src-2"><td>[2]</td><td><a href="https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md" target="_blank" rel="noopener">github.com/anthropics/skills — skill-creator SKILL.md, "draft trước, eval sau"</a></td><td>Anthropic</td><td>không rõ</td><td>2026-08-27</td><td>Cao</td></tr><tr id="src-3"><td>[3]</td><td><a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener">code.claude.com/docs/en/skills — eval là bước sau khi skill tồn tại</a></td><td>Anthropic</td><td>không rõ</td><td>2026-08-27</td><td>Cao</td></tr><tr id="src-4"><td>[4]</td><td><a href="https://agentskills.io/skill-creation/evaluating-skills" target="_blank" rel="noopener">agentskills.io — evaluating-skills, bắt đầu nhỏ</a></td><td>Agent Skills spec (Anthropic-khởi-xướng)</td><td>không rõ</td><td>2026-08-27</td><td>Trung bình-cao</td></tr><tr id="src-5"><td>[5]</td><td><a href="https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills" target="_blank" rel="noopener">claude.com/blog — improving skill-creator</a></td><td>Anthropic</td><td>~2026-03 (chưa xác nhận độc lập)</td><td>2026-08-27</td><td>Trung bình</td></tr><tr id="src-6"><td>[6]</td><td><a href="https://developers.openai.com/blog/eval-skills" target="_blank" rel="noopener">developers.openai.com — Testing Agent Skills Systematically with Evals</a></td><td>OpenAI</td><td>không rõ</td><td>2026-08-27</td><td>Trung bình</td></tr><tr id="src-7"><td>[7]</td><td><a href="https://blog.mgechev.com/2026/02/26/skill-eval/" target="_blank" rel="noopener">blog.mgechev.com — Unit Tests for AI Agent Skills</a></td><td>Minko Gechev (cá nhân)</td><td>2026-02-26</td><td>2026-08-27</td><td>Trung bình-cao</td></tr><tr id="src-8"><td>[8]</td><td><a href="https://dev.to/paultwist/the-evaluation-debt-you-dont-know-you-have-why-agent-evals-fail-in-production-2md8" target="_blank" rel="noopener">dev.to/paultwist — The Evaluation Debt You Don&#x27;t Know You Have</a></td><td>DEV Community (Paul Twist)</td><td>2026-07-13</td><td>2026-08-27</td><td>Trung bình</td></tr><tr id="src-9"><td>[9]</td><td><a href="https://distilledpatterns.org/patterns/walking-skeleton/" target="_blank" rel="noopener">distilledpatterns.org / henricodolfing.ch / forbes.com — Walking Skeleton, kể cả câu trích rủi ro tích hợp trễ ("data contracts, latency limits... fail late")</a></td><td>Alistair Cockburn (qua 3 nguồn thứ cấp độc lập)</td><td>2000 (khái niệm gốc)</td><td>2026-08-27</td><td>Cao</td></tr><tr id="src-10"><td>[10]</td><td><a href="https://www.defmyfunc.com/2019_10_18_walking_skeleton/" target="_blank" rel="noopener">defmyfunc.com — rủi ro không làm walking skeleton, diễn đạt chung hơn — không phải nguồn của câu trích cụ thể ở nguồn 9</a></td><td>defmyfunc (cá nhân)</td><td>2019-10-18</td><td>2026-08-27</td><td>Trung bình</td></tr><tr id="src-11"><td>[11]</td><td><a href="https://vijayanant.com/posts/from-patterns-to-practice/the-spike/" target="_blank" rel="noopener">vijayanant.com — The Architectural Spike</a></td><td>Vijay Anant (cá nhân)</td><td>không rõ</td><td>2026-08-27</td><td>Trung bình</td></tr><tr id="src-12"><td>[12]</td><td><a href="https://www.braintrust.dev/articles/ai-agent-evaluation-framework" target="_blank" rel="noopener">braintrust.dev — AI agent evaluation: A practical framework (negative finding)</a></td><td>Braintrust</td><td>2026-02-02</td><td>2026-08-27</td><td>Cao</td></tr><tr id="src-13"><td>[13]</td><td><a href="https://github.com/anthropics/skills/issues/490" target="_blank" rel="noopener">github.com/anthropics/skills/issues/490 — tổ chức thư mục evals</a></td><td>Anthropic (GitHub issue)</td><td>2026-03-02</td><td>2026-08-27</td><td>Cao</td></tr><tr id="src-14"><td>[14]</td><td><a href="https://hamel.dev/blog/posts/evals-faq/" target="_blank" rel="noopener">hamel.dev — LLM Evals: Everything You Need to Know</a></td><td>Hamel Husain &amp; Shreya Shankar</td><td>~2025-05-28</td><td>2026-08-27</td><td>Trung bình-cao</td></tr><tr id="src-15"><td>[15]</td><td><a href="https://www.pwc.com/us/en/services/audit-assurance/library/validating-multi-agent-ai-systems.html" target="_blank" rel="noopener">pwc.com — Validating multi-agent AI systems</a></td><td>PwC US</td><td>không rõ</td><td>2026-08-27 (qua proxy, HTTP 403 trực tiếp)</td><td>Trung bình (unverified)</td></tr></tbody></table>
+          </div>
+        </details>
+      </section>
+
+      <section id="staleness">
+        <h2>Bản đồ độ cũ</h2>
+        <ul class="staleness-list">
+          <li><span class="when">Kiểm lại sớm nhất — trước 2026-09-01</span>[5] claude.com blog, [13] GitHub issue #490 — cửa sổ 6 tháng cho tín hiệu hệ sinh thái, đã gần nửa quãng.</li>
+          <li><span class="when">Sắp tới hạn — trước 2026-11-01</span>[1][2][3][4][6][15] — tài liệu chính thức/vendor không rõ ngày xuất bản, tính bảo thủ theo ngày truy cập.</li>
+          <li><span class="when">"Quá hạn" theo cửa sổ máy tính — không cần tái kiểm</span>[9] Walking Skeleton (2000), [10] defmyfunc (2019), [7] Gechev, [12] Braintrust, [14] Hamel/Shankar — trích dẫn tiền lệ lịch sử/quan sát đã kết luận xong, không phải claim về trạng thái hiện tại.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      research-briefing.html — mặt hiển thị của <code>research.md</code> (cùng claim, cùng số, cùng trích dẫn). Chạy bởi bmad-deep-recon, 2026-08-27. Memlog: <code>.memlog.md</code> trong cùng thư mục.
+    </footer>
+  </div>
+</div>
+</body>
+</html>

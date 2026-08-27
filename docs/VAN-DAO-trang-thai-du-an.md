@@ -135,13 +135,22 @@ Vòng 1 của §16 đặc tả: **ingest → teach → assess**, một quyển, 
 
 Data contract viết just-in-time: `lo-do` và `ho-so` khi tới bước cần chúng.
 
+**Không áp dụng cho eval từng skill.** Đọc trước đây coi "vertical slice trước" là lý do hoãn cả
+behavioral eval của từng skill sang Ưu tiên 3 — sai, đã sửa bằng nghiên cứu
+`_bmad-output/planning-artifacts/research/technical-quy-trinh-eval-khi-viet-skill-claude-ski-2026-08-27/research.md`
+(2026-08-27): "vertical slice trước" (Walking Skeleton) chỉ phục vụ rủi ro **kiến trúc/tích hợp**
+giữa các skill — không phải lý do bỏ qua xác minh đúng-sai của một skill đã viết xong. Đặc tả §16
+("ba thứ dựng xuyên suốt") đã yêu cầu `evals/` đi cùng từng skill ngay lúc viết; quy trình chính
+thức `skill-creator` của Anthropic làm đúng vậy. Mỗi story viết skill mới (kể cả trong Vòng 1 này)
+tự mang theo eval **nhẹ** của nó — xem `van-dao/.claude/rules/eval.md`.
+
 ## Ưu tiên 3 — kéo verification lên
 
 | Nhóm requirement | Cách verify | Ước số |
 |---|---|---|
 | Schema / graph constraint | Script — đã có khung | ~8 |
 | Message contract | `kiem-thu.py` | ~5 |
-| Skill behavior | Behavioral eval (`skill-creator`) | ~10 |
+| Skill behavior — nâng lên mức đầy đủ (đã có bản nhẹ từ lúc viết, xem Ưu tiên 2) | Behavioral eval đầy đủ + trigger eval 20-câu/60-40 (`skill-creator`) | ~10 |
 | Routing | Trigger eval | ~3 |
 | Judgment quality | Manual + κ calibration | ~8 |
 
