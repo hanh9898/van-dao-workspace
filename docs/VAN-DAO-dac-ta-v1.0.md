@@ -1468,7 +1468,7 @@ Không có bộ phân loại vai/mạch cố định — người học tự nh�
 
 **Luật chống bịa:** model gợi ý từ hiểu biết sẵn có, nên phải nêu đủ ba dữ kiện đầu — ba thứ cụ thể khó bịa trót lọt hơn một cái tên trần. Và **không chắc thì nói không chắc**, đừng bù bằng một cái tên nghe được.
 
-**Ba trạng thái của một chỉ điểm**, ghi trong `truong-mon/chi-diem.jsonl`:
+**Năm trạng thái của một chỉ điểm**, ghi trong `truong-mon/chi-diem.jsonl`:
 
 | Trạng thái | Nghĩa | Trưởng môn làm gì |
 |---|---|---|
@@ -1625,6 +1625,19 @@ Phơi ra ở bậc 1:
 | `phuc-khao` | `nguong_khong_ro` |
 | `truong-lao` | `rubric_canh_gioi` · `k` (mặc định 3) |
 | `chu-giai` | `mau_issue` |
+
+**Hình dạng `so_chi_diem`** (bảng hai khoá, mỗi khoá một cặp trường con):
+
+| Khoá | Trường con | Mặc định | Nhánh áp dụng |
+|---|---|---|---|
+| `da_biet` | `cong_phap`, `tam_phap` | 3, 2 | Người học đã biết muốn luyện gì (`mach_nguon = tu_khai`) |
+| `chua_biet` | `cong_phap`, `tam_phap` | 1, 1 | Người học chưa biết (`mach_nguon = suy_tu_vai`) |
+
+```toml
+[so_chi_diem]
+da_biet = { cong_phap = 3, tam_phap = 2 }
+chua_biet = { cong_phap = 1, tam_phap = 1 }
+```
 
 Chưa có lớp nhóm. Một người dùng thì hai lớp là đủ; thêm lớp thứ ba khi có người thứ hai.
 
