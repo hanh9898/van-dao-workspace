@@ -1,5 +1,5 @@
 <!-- bmad:context -->
-<!-- Verified 2026-08-27. Workspace root ở HEAD 3073cd3; van-dao/ đối chiếu ở HEAD b69d801. Managed by bmad-project-context; sửa trong khối này sẽ bị ghi đè ở lần refresh sau. Nội dung ngoài marker được giữ nguyên. -->
+<!-- Verified 2026-08-27. Workspace root ở HEAD b2a1cd6; van-dao/ đối chiếu ở HEAD 55d3c36. Managed by bmad-project-context; sửa trong khối này sẽ bị ghi đè ở lần refresh sau. Nội dung ngoài marker được giữ nguyên. -->
 
 ## van-dao
 
@@ -31,11 +31,11 @@ nạp cả file. Đang ở đâu, làm gì tiếp: `docs/VAN-DAO-trang-thai-du-a
 - Data contract một bí kíp: `van-dao/tham-chieu/bi-kip.schema.md` — đi cặp với
   `van-dao/bin/kiem-bi-kip.py` (§6 của schema là luật bằng lời của đúng những phép kiểm script thực thi,
   §7 là phần script không làm — đổi một bên thì đổi bên kia trong cùng một thay đổi, kèm fixture và test)
-- Eval skill/agent: `van-dao/.claude/rules/eval.md` — tự nạp khi làm việc trong `van-dao/skills/` hoặc
-  `van-dao/agents/`
+- Eval skill/agent: `ARCHITECTURE-SPINE.md` AD-10 (nhẹ lúc viết, đầy đủ trước khi phát hành) + AD-11
+  (skill tự đủ, không trích FR/NFR/§) — mẫu chi tiết: `docs/VAN-DAO-setup-du-an.md` Phần 4
 - Artifact kế hoạch BMAD: `_bmad-output/planning-artifacts`, `_bmad-output/implementation-artifacts`
 - Kiến trúc ràng buộc mọi epic/story: `_bmad-output/planning-artifacts/architecture/architecture-van-dao-workspace-2026-08-25/ARCHITECTURE-SPINE.md`
-  — 9 invariant (AD-1..AD-9)
+  — 11 invariant (AD-1..AD-11)
 
 ## Running and verifying
 
@@ -62,7 +62,8 @@ nạp cả file. Đang ở đâu, làm gì tiếp: `docs/VAN-DAO-trang-thai-du-a
 - Mọi ví dụ trong đặc tả và `van-dao/tham-chieu/` phải là ví dụ tổng hợp, không lấy từ bí kíp thật (R24).
 - Yêu cầu ở đặc tả §8 gồm **34 mục**: `R1`–`R31` cộng `R13b`, `R32`, `R33`. Sửa hành vi thì trỏ đúng R nào.
 - Tham chiếu tương đối từ file trong `van-dao/` sang `docs/` ở workspace này phụ thuộc độ sâu (`../docs/`
-  từ gốc `van-dao/`, `../../docs/` từ thư mục con cấp 1, `../../../docs/` từ `.claude/rules/`).
+  từ gốc `van-dao/`, `../../docs/` từ thư mục con cấp 1). Không áp dụng cho `skills/**`/`agents/**`/
+  `commands/**` — AD-11 cấm hẳn các file đó tham chiếu `docs/`/`_bmad-output/`.
 - Tên vai hiển thị (Trưởng môn, Nghiệm Công Sứ, Phúc Khảo Sứ, Sơn phong trưởng lão...) và định danh kỹ
   thuật kebab-case (`truong-mon`, `nghiem-cong`, `phuc-khao`, `truong-lao`...) là hai lớp tách biệt — đổi
   tên vai trong văn xuôi/tài liệu không kéo theo đổi file, `id`, hay identifier kỹ thuật.
@@ -94,5 +95,10 @@ nạp cả file. Đang ở đâu, làm gì tiếp: `docs/VAN-DAO-trang-thai-du-a
 - Edit nối tiếp theo mục đánh số (Epic N, Story N.M...) vào file lớn với anchor text lặp lại đã từng ghi
   nhầm vị trí thật (`epics.md`: thứ tự Epic Details xáo trộn, AC lạc sang story khác, phải Write lại cả
   file để sửa) — đảm bảo anchor đủ duy nhất, hoặc đọc lại file sau mỗi lần nối.
+- Tài liệu quy ước (kể cả dạng `.claude/rules/*.md`, dù có cơ chế path-scoped auto-load hợp lệ của
+  Claude Code) tuyệt đối không đặt trong `van-dao/` — policy "chỉ chứa mã nguồn" ở trên đã ghi rõ
+  nhưng vẫn bị vi phạm thật (thêm `eval.md` + 1 file mới vào đó, phải gỡ ra sau). Quy ước mới cho
+  skill/eval luôn vào `ARCHITECTURE-SPINE.md` (qua `bmad-architecture`) hoặc `docs/`, không bao giờ
+  vào `van-dao/`.
 
 <!-- /bmad:context -->
