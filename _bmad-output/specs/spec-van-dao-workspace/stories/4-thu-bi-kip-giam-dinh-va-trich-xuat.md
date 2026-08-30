@@ -2,7 +2,7 @@
 title: 'Thu bí kíp — giám định và trích xuất'
 type: 'feature'
 created: '2026-08-28'
-status: 'in-progress'
+status: 'done'
 baseline_commit: 'dbe11c22215026ec484f778cb0b2cd5ec3de3cce'
 approved: '2026-08-28'
 review_loop_iteration: 0
@@ -146,3 +146,55 @@ Nhưng hỏi thẳng *"sách này chuỗi hay mạng?"* lại lặp đúng lỗi
 - Đọc `thu-bi-kip/SKILL.md` xác nhận đủ **bốn** phép giám định, và nhánh "không có mục lục" đi tiếp chứ không dừng
 - Đọc `thu-bi-kip/SKILL.md` xác nhận phép kiểm đường dẫn hỏi `is_file()` (không phải `exists()`) và so đuôi sau khi `.lower()` — hai lỗ đã đo, mỗi lỗ hỏng một chiều: một để thư mục lọt vào rồi bị vu là bản hỏng, một chặn oan sách `.EPUB` hợp lệ
 - Đọc `thu-bi-kip/evals/evals.json` xác nhận evidence trích nguyên văn transcript chạy thật trên sách chung, phủ đủ 8 dòng I/O matrix
+
+## Suggested Review Order
+
+**Ranh giới cơ chế — chỗ lời dặn được thay bằng thứ không lách được**
+
+- Điểm vào: chỉ 16 khoá số liệu rời script; `text` không có đường ra
+  [`giam-dinh.py:137`](../../../../van-dao/bin/giam-dinh.py#L137)
+
+- Danh sách khoá cho phép, viết tường minh thay vì lọc ngầm
+  [`giam-dinh.py:49`](../../../../van-dao/bin/giam-dinh.py#L49)
+
+- Engine in log ra stdout; chuyển sang stderr để stdout chỉ còn JSON
+  [`giam-dinh.py:129`](../../../../van-dao/bin/giam-dinh.py#L129)
+
+- Mã thoát tách "đường dẫn sai" khỏi "sách hỏng thật" — quyết định có gửi thư sang vai khác
+  [`giam-dinh.py:73`](../../../../van-dao/bin/giam-dinh.py#L73)
+
+**Luồng skill**
+
+- Gọi script, không gọi engine trực tiếp — ràng buộc nằm ở đây
+  [`SKILL.md:63`](../../../../van-dao/skills/thu-bi-kip/SKILL.md#L63)
+
+- Kiểm kho trước vì rẻ nhất; chuyển lên bước 1 sau khi chạy eval thật
+  [`SKILL.md:54`](../../../../van-dao/skills/thu-bi-kip/SKILL.md#L54)
+
+- Nhánh Đ: từ chối sạch, gửi thư báo, không ghi gì vào kho
+  [`SKILL.md:120`](../../../../van-dao/skills/thu-bi-kip/SKILL.md#L120)
+
+- Nhánh E và G tách bằng `is_file()` — hai ca trông giống nhau, xử lý ngược nhau
+  [`SKILL.md:134`](../../../../van-dao/skills/thu-bi-kip/SKILL.md#L134)
+
+**Bằng chứng**
+
+- Khoá `text` không bao giờ ra stdout — test khoá lại ràng buộc cốt lõi
+  [`test_giam_dinh.py:44`](../../../../van-dao/tests/test_giam_dinh.py#L44)
+
+- Bản hỏng thật ra mã thoát riêng, không lẫn với đường dẫn sai
+  [`test_giam_dinh.py:116`](../../../../van-dao/tests/test_giam_dinh.py#L116)
+
+- Thư mục đội lốt file `.epub` không bị coi là sách hỏng
+  [`test_giam_dinh.py:83`](../../../../van-dao/tests/test_giam_dinh.py#L83)
+
+- Tám kịch bản chạy thật, phủ 1-1 tám hàng I/O matrix
+  [`evals.json`](../../../../van-dao/skills/thu-bi-kip/evals/evals.json)
+
+**Ngoại vi**
+
+- Lược đồ bản ghi kho và thư, tách khỏi SKILL.md để giữ ngân sách token
+  [`dinh-dang.md`](../../../../van-dao/skills/thu-bi-kip/references/dinh-dang.md)
+
+- Phơi `ngan_sach_token` cho người dùng chỉnh
+  [`customize.toml`](../../../../van-dao/skills/thu-bi-kip/customize.toml)
