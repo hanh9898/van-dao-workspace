@@ -138,6 +138,49 @@ Hai chỗ đáng nói:
 `source: book` là chỗ duy nhất `book` được dùng, và nó đúng: ở đây `sach` nghĩa là **cuốn sách vật lý
 gốc**, không phải bí kíp trong hệ. Bí kíp vẫn là `scripture` (§1).
 
+## 2.2 · Định danh nội bộ của script
+
+Khác §2.1 ở một điểm quyết định: đây **không** phải data contract. Đổi chúng không đụng file người
+dùng, nên rủi ro thấp hơn hẳn — nhưng vẫn phải vào bảng, vì hai script sẽ được dịch ở hai lô khác nhau.
+
+**Hàm**
+
+| Cũ | Mới | | Cũ | Mới |
+|---|---|---|---|---|
+| `doc_yaml` | `read_yaml` | | `kiem_mot` | `check_one` |
+| `kiem_manifest` | `check_manifest` | | `kiem_enum` | `check_enum` |
+| `kiem_khoi_su_pham` | `check_pedagogy_block` | | `kiem_do_thi` | `check_graph` |
+| `kiem_truong_bat_buoc` | `check_required_fields` | | `kiem_khao_thi` | `check_ordeal` |
+| `van_tay` | `fingerprint` | | `in_text` | `print_report` |
+| `ra` | `emit` | | | |
+
+**Hằng**
+
+| Cũ | Mới | | Cũ | Mới |
+|---|---|---|---|---|
+| `TRUONG_QUYEN` | `VOLUME_FIELDS` | | `CANH_GIOI` | `REALMS` |
+| `TRUONG_BI_KIP` | `SCRIPTURE_FIELDS` | | `DO_PHUC_TAP` | `COMPLEXITY` |
+| `TRUONG_SU_PHAM` | `PEDAGOGY_FIELDS` | | `GIAN_GIAO` | `SCAFFOLD` |
+| `CHO_PHEP_RONG` | `MAY_BE_EMPTY` | | `LOAI_CAU_HOI` | `QUESTION_KINDS` |
+| `KHOA_SO_LIEU` | `METRIC_KEYS` | | `ORIGIN_MISTAKE` | `MISTAKE_ORIGINS` |
+| `BIEU` | `LABELS` | | `BLOOM_TINH_BANG_CHUNG` | `BLOOM_COUNTS_AS_EVIDENCE` |
+| `SO_TIEU_DE_MAU` | `SAMPLE_TITLE_COUNT` | | `API` · `SCHEMA` · `BLOOM` | *(giữ)* |
+
+**Khoá đầu ra JSON** — script in ra cho skill đọc, nên đây là contract giữa script và skill
+
+| Cũ | Mới | | Cũ | Mới |
+|---|---|---|---|---|
+| `trang_thai` | `status` | | `ket_qua` | `result` |
+| `loi` | `errors` | | `canh_bao` | `warnings` |
+| `ghi_chu` | `notes` | | `thong_diep` | `message` |
+| `ma` | `code` | | `o` | `where` |
+| `dat` | `passed` | | `so_lieu` | `metrics` |
+| `bi_kip` | `scripture` | | `duoi_nhan_duoc` | `accepted_extensions` |
+
+Khoá đầu ra là **contract giữa script và skill**, không phải biến nội bộ: SKILL.md đọc chúng theo tên.
+Đổi ở đây thì mọi chỗ trong SKILL.md nhắc tới chúng phải đổi cùng lô — nếu không, skill đọc một khoá
+không còn tồn tại và im lặng nhận `None`.
+
 ## 3 · Quy tắc đặt tên định danh
 
 - **Thư mục và tệp:** `kebab-case`, tiếng Anh. `thu-bi-kip/` → `scripture-intake/`
