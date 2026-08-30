@@ -127,7 +127,17 @@ Lý do không phải người tự chấm cẩu thả. Tự chấm hỏi *"có l
 
 **Khi nào bắt buộc review.** Output trong luồng BMAD đã có cổng sẵn (`bmad-build` step-04). Output **ngoài luồng** thì không có cổng nào — nó phụ thuộc ai đó nhớ, và điều đó đã hỏng thật: `work-state` được review vì có người bảo, `orca-help` thì không cho tới khi có người để ý.
 
-Ranh giới cái gì cần: **output mà người hoặc agent khác sẽ dùng làm chuẩn, hoặc sẽ chạy.** Skill, script, lens, tài liệu quy tắc thì có. Bản ghi sự kiện (sprint-status, deferred-work, Spec Change Log) thì không — chúng ghi lại quyết định đã có, không tạo hành vi mới.
+**Ranh giới cái gì cần một vòng review riêng** — và nó hẹp hơn ta tưởng:
+
+| Cần | Không cần |
+|---|---|
+| Skill, lens, tài liệu quy tắc — **chuẩn để người khác làm theo** | **Bản ghi sự kiện** (sprint-status, deferred-work, sổ review) — ghi lại quyết định đã có, không tạo hành vi mới |
+| Script chạy trong luồng thật | **Test** — có oracle riêng (chạy được, xanh/đỏ); review cùng lượt với code nó kiểm |
+| | **Config** — review cùng lượt với thứ nó cấu hình |
+
+Ba mục cột phải không phải là miễn trừ vì chúng kém quan trọng, mà vì chúng **đã được kiểm bằng đường khác**: bản ghi được kiểm bởi việc dùng, test bởi chính việc chạy, config bởi thứ nó cấu hình.
+
+Cạm bẫy đã mắc phải một lần: khi bị hỏi *"cơ chế này có review chính nó chưa"*, phản ứng đầu tiên là nhét mọi thứ vào phạm vi — và tạo ra 12 món nợ, phần lớn không đáng. **Có mặt trong sổ và cần review là hai câu hỏi khác nhau.** Sổ trả lời câu đầu cho mọi artifact; chỉ câu thứ hai mới là cổng.
 
 **Không cưỡng chế được hành động, nhưng cưỡng chế được bằng chứng.** Không có cách nào bắt ai chạy review — nó cần phán đoán, không đếm được. Đây đúng là bài toán AD-10 đã giải cho eval: không ép được ai chạy eval, nhưng ép được *"phải có `evals.json`"*.
 

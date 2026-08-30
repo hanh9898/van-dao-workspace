@@ -6,7 +6,9 @@ Mọi artifact harness được version control phải **có mặt trong sổ n�
 |---|---|
 | `da-review` | Đã qua `bmad-review`; ghi ngày, lens, số finding, số đã vá |
 | `no` | Trong phạm vi, chưa review, **có mốc quay lại** |
-| `mien-tru` | Ngoài phạm vi, kèm lý do |
+| `mien-tru` | **Không cần vòng review riêng**, kèm lý do. Hai lý do hợp lệ: (a) artifact có trước quy tắc và không phải chuẩn harness; (b) **được review cùng lượt với thứ khác** — ghi rõ thứ đó là gì |
+
+**Có mặt trong sổ ≠ cần review.** Đây là hai câu hỏi khác nhau, và gộp chúng làm mọi thứ thành nợ. Sổ trả lời câu đầu cho *mọi* artifact — biết cái gì tồn tại là rẻ. Chỉ câu thứ hai mới là cổng, và nó phải hẹp: **chuẩn để người khác làm theo, hoặc code chạy trong luồng thật**. Test, config, và bản ghi không nằm trong đó.
 
 Sổ tồn tại vì một lý do cụ thể: output trong luồng BMAD có cổng review sẵn (`bmad-build` step-04), output ngoài luồng thì không — nó phụ thuộc ai đó nhớ. Đã chứng minh thật: `work-state` được review vì người dùng bảo; `orca-help` thì không, cho tới khi có người để ý.
 
@@ -30,7 +32,7 @@ Phạm vi bản đầu bỏ sót ba nhóm, và cả ba đều là **thành phầ
 | Artifact | Trạng thái | Chi tiết |
 |---|---|---|
 | `bin/work-state.py` | `da-review` | 2026-08-31 · cùng vòng với skill `work-state` · 19 unit test khoá lại từng lỗi |
-| `bin/setup-hooks.py` | `no` | Cài git hook `pre-commit` chạy test. Chính nó là artifact đầu tiên cơ chế này bắt được trên ca thật: viết xong, `git add`, test đỏ vì chưa có dòng nào ở đây. Mốc: cùng lượt với lần sửa hook tiếp theo |
+| `bin/setup-hooks.py` | `no` | Code chạy thật và sửa `.git/` — thuộc phạm vi gate. Chính nó là artifact đầu tiên cơ chế bắt được trên ca thật: viết xong, `git add`, test đỏ vì chưa có dòng nào ở đây. Mốc: cùng lượt với lần sửa hook tiếp theo |
 
 ## Tài liệu
 
@@ -56,22 +58,22 @@ Phạm vi bản đầu bỏ sót ba nhóm, và cả ba đều là **thành phầ
 
 | Artifact | Trạng thái | Chi tiết |
 |---|---|---|
-| `tests/test_work_state.py` | `no` | Viết SAU vòng review của `work-state`, nên chưa nằm trong vòng nào. Hai test của nó từng fail vì kỳ vọng sai chứ không phải script sai. Mốc: cùng lượt với lần sửa `work-state.py` tiếp theo |
-| `tests/test_review_log.py` | `no` | Fail ngay lần chạy đầu vì bug của chính nó (đọc nhầm bảng giải thích thành bảng artifact). Mốc: **ngay sau khi cơ chế này chạy đủ một chu kỳ thật** — tức khi nó bắt được một artifact mới bị quên |
+| `tests/test_work_state.py` | `mien-tru` | Review cùng lượt với `bin/work-state.py` — thứ nó kiểm. Test có oracle riêng: nó chạy và xanh/đỏ, nên một kỳ vọng sai lộ ra ngay (đã xảy ra: hai test fail vì kỳ vọng sai chứ không phải script sai) |
+| `tests/test_review_log.py` | `mien-tru` | Review cùng lượt với `review-log.md` và §A.7 — cùng một quy tắc. Fail ngay lần chạy đầu vì bug của chính nó, và đó chính là oracle làm việc |
 
 ## Cấu hình
 
 | Artifact | Trạng thái | Chi tiết |
 |---|---|---|
-| `_bmad/custom/bmad-review.toml` | `no` | Đăng ký 6 lens; sai một dòng thì lens không chạy mà không gì báo. Mốc: khi thêm lens tiếp theo |
-| `_bmad/custom/bmad-prd.toml` | `no` | Override `persistent_facts` cho `bmad-prd`, đã dùng thật một lần. Mốc: lần sửa tiếp theo |
-| `_bmad/custom/config.toml` | `no` | Cấu hình chung. Mốc: lần sửa tiếp theo |
+| `_bmad/custom/bmad-review.toml` | `mien-tru` | Config, không phải chuẩn. Review cùng lượt với lens nó đăng ký. Sai cú pháp thì `resolve_customization.py` fail ngay; thiếu một entry thì lộ khi lens không chạy |
+| `_bmad/custom/bmad-prd.toml` | `mien-tru` | Config cho `bmad-prd`, review cùng lượt khi dùng skill đó |
+| `_bmad/custom/config.toml` | `mien-tru` | Config chung, review cùng lượt với thứ nó cấu hình |
 
 ## Chính cơ chế
 
 | Artifact | Trạng thái | Chi tiết |
 |---|---|---|
-| `_bmad-output/implementation-artifacts/review-log.md` | `no` | Sổ này định nghĩa phạm vi và ba trạng thái — nó là chuẩn, không chỉ là bản ghi. Mốc: **cùng lượt với `docs/VAN-DAO-chuan-muc-skill.md`**, vì §A.7 của tài liệu đó và sổ này là hai nửa của cùng một quy tắc; review một cái mà bỏ cái kia là bỏ nửa vấn đề |
+| `_bmad-output/implementation-artifacts/review-log.md` | `mien-tru` | Chủ yếu là **bản ghi**. Phần quy tắc của nó (khi nào bắt buộc review, ba trạng thái nghĩa gì) sống ở `docs/VAN-DAO-chuan-muc-skill.md` §A.7 — review ở đó, không review hai lần cùng một luật |
 
 ---
 
