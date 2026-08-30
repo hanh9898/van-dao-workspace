@@ -209,3 +209,20 @@ Hoãn mà không ghi mốc thì không phải hoãn, là quên.
     Trước khi viết skill thứ tư (Epic 2, lộ đồ) — đó là lúc tổng phiên chạm trần thật, và cũng là
     lúc duy nhất còn rẻ để quyết định giữa hai hướng: rà gọn hai skill cũ theo cùng cách đã làm với
     `thu-bi-kip`, hay đo lại xem con số trần 5K/25K có còn đúng với mô hình hiện tại không.
+
+- source_spec: `docs/VAN-DAO-harness-viet-skill.md`
+  summary: Không repo nào có remote, nên CI chưa từng chạy — mọi "phép kiểm tự động" hiện chỉ chạy được bằng tay.
+  evidence: >-
+    `git remote -v` ở cả hai repo đều rỗng. `van-dao/.github/workflows/kiem.yml` đã cấu hình
+    đầy đủ (ubuntu-latest + windows-latest, cài requirements, chạy pytest) nhưng **chưa chạy
+    lần nào**. Suốt phiên viết hai tài liệu harness, câu "CI chạy trên cả hai OS" được dùng
+    như một sự thật đang diễn ra — đúng ra là "đã cấu hình, sẽ chạy khi có remote".
+    Hệ quả nặng nhất: Giai đoạn 2 của kế hoạch harness — thứ được khuyến nghị làm trước tiên
+    vì nó "chặn tự động, không phụ thuộc ai nhớ chạy" — hiện KHÔNG chặn được gì. Test viết ra
+    vẫn có giá trị (19 test cho `work-state.py`, 20 cho `van-dao`, chạy tay được ngay), nhưng
+    tính chất "không phụ thuộc ai nhớ" thì chưa có.
+  revisit_when: >-
+    Khi đẩy repo lên remote — đó là điều kiện duy nhất làm CI có nghĩa. Trước lúc đó, mọi
+    câu trong tài liệu nói về CI phải đọc là "sẽ chạy khi có remote". Nếu quyết định không
+    bao giờ đẩy lên remote, phải chọn lại cơ chế cưỡng chế cho Giai đoạn 2 (git hook, hoặc
+    chấp nhận nó là kiểm-có-người-gọi ở tầng 3 thay vì tầng 2).

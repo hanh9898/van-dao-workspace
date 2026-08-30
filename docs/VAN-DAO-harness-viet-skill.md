@@ -199,11 +199,13 @@ Nguyên tắc chọn: **đặt mỗi yêu cầu vào tầng thấp nhất mà n�
 | Tầng | Cơ chế | Chặn được gì | Giá |
 |---|---|---|---|
 | **1 · Mã** | Script trong `bin/`, mã thoát phân biệt ca | *(không chứa yêu cầu nào)* — đây là **hệ quả** của B1: khi lens phán một ràng buộc thuộc loại phải-đúng-mọi-lần, script là thứ được viết ra | Phải viết và test; thêm thành phần |
-| **2 · Kiểm tự động** | Test trong `tests/`, chạy trong CI | A1, A3, **A4**, D2 — mọi thứ đếm được | Rẻ. Chỉ áp được cho thứ đo được bằng số |
+| **2 · Kiểm tự động** | Test trong `tests/` | A1, A3, **A4**, D2 — mọi thứ đếm được | Rẻ. Chỉ áp được cho thứ đo được bằng số. **Hiện chỉ chạy tay được** — xem cảnh báo dưới bảng |
 | **3 · Kiểm có người gọi** | Lens `skill-quality` trong `bmad-review`; và quy ước ghi chép ở bước đóng story | A2, B1, B2, B3, C1, C2, **D1** — thứ cần phán đoán hoặc cần người ghi | Chỉ chạy khi có người nhớ chạy |
 | **4 · Ràng buộc kiến trúc** | Một AD trong `ARCHITECTURE-SPINE.md` | **Nguyên tắc**, không phải yêu cầu cụ thể: ngân sách ngữ cảnh là tài nguyên dùng chung giữa mọi skill | Đắt để đổi; chỉ dùng cho thứ ổn định |
 
 **Vì sao A4 không ở tầng 4 dù nó là tài nguyên chung:** nguyên tắc thì thuộc spine, nhưng **ngưỡng cụ thể và phép đo** thì không — chúng còn đổi khi ta đo lại bằng tokenizer chính thức, và spine là lớp đắt nhất để sửa. Spine giữ câu *"ngân sách ngữ cảnh là tài nguyên chung, mỗi skill phải khai phần của mình"*; con số 25.000 và cách đếm nằm ở tầng 2, sửa được rẻ khi hiểu biết đổi.
+
+> **Tầng 2 chưa thật sự tự động.** Không repo nào có remote, nên CI chưa từng chạy — `van-dao/.github/workflows/kiem.yml` đã cấu hình nhưng chưa kích hoạt lần nào. Test viết ra vẫn chạy tay được và vẫn bắt lỗi thật, nhưng tính chất *"không phụ thuộc ai nhớ chạy"* — thứ khiến tầng 2 mạnh hơn tầng 3 — hiện **chưa có**. Cho tới khi có remote, tầng 2 trên thực tế hoạt động như tầng 3. Đã ghi mốc quay lại ở `deferred-work.md`.
 
 **Cái gì *không* vào tầng 4:** cách tổ chức file, phong cách viết, thứ tự mục. Phép thử của spine là *"hai đơn vị xây độc lập có thể chọn khác nhau đến mức **không tương thích** không?"* — hai skill viết theo hai phong cách vẫn chạy được cùng nhau. Không đồng đều không phải không tương thích. Chỉ **ngân sách ngữ cảnh** là tài nguyên chung thật, nên chỉ nó là invariant.
 
@@ -241,6 +243,8 @@ Việc này **thay thế** phương án "sắp xếp lại thứ tự trong từ
 | Đo lại chênh lệch tokenizer sau khi đã chuyển sang tiếng Anh | S | ứng phó rủi ro tokenizer | Có số đo mới; biên an toàn 10% được giữ hoặc bỏ có căn cứ |
 
 Đây là tầng 2 — rẻ nhất và chặn sớm nhất. **Làm trước khi viết skill thứ năm.**
+
+Lưu ý: cột "Xong khi" nói "CI đỏ" nhưng CI chưa chạy được (chưa có remote). Cho tới lúc đó, đọc là **"lệnh chạy tay báo đỏ"** — test vẫn viết như nhau, chỉ khác ai bấm nút.
 
 Hai điều phải quyết khi làm: (a) thêm `tiktoken` vào `requirements-dev.txt` — CI hiện chưa có; (b) chấp nhận phép đo là **proxy**. Proxy vẫn có giá trị: nó nhất quán giữa các lần đo nên bắt được *xu hướng phình*, kể cả khi con số tuyệt đối lệch.
 
