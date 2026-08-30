@@ -19,7 +19,7 @@ người đọc có tiếp xúc thể loại nhận ra ngay. Không dùng pinyin
 
 | Tiếng Việt | Hán tự | Tiếng Anh | Ghi chú |
 |---|---|---|---|
-| bí kíp | 秘笈 | **scripture** | Cuốn sách được nạp vào hệ. Không dùng `book` (bận nghĩa kỹ thuật) cũng không dùng `manual` — `manual` trong phần mềm nghĩa là sách hướng dẫn dùng sản phẩm, nên `manuals/` sẽ bị đọc thành docs của plugin |
+| bí kíp | 秘笈 | **scripture** | Cuốn sách được nạp vào hệ. Không dùng `book` (bận nghĩa kỹ thuật) cũng không dùng `manual` — `manual` trong phần mềm nghĩa là sách hướng dẫn dùng sản phẩm, nên `manuals/` sẽ bị đọc thành docs của plugin. Đã tra: `scripture` không phải thuật ngữ kỹ thuật nào. Có mang liên tưởng tôn giáo (tra ra gần như toàn phần mềm Kinh Thánh) — chấp nhận, vì trong ngữ cảnh môn phái và Tàng kinh các thì nghĩa "kinh thư" là đúng thứ ta muốn |
 | mạch | 脈 | **meridian** | Nhánh tri thức chạy xuyên nhiều bí kíp |
 | chỉ điểm | 指點 | **counsel** | Lời chỉ của Trưởng môn cho đệ tử. Không dùng `pointer` — trong một dự án Python, `pointers.jsonl` đọc như con trỏ. `counsel` là danh từ không đếm được, dùng nguyên dạng cho cả số nhiều |
 | Trưởng môn | 掌門 | **Sect Master** | Vai điều phối |
@@ -111,8 +111,23 @@ tâm vào **người học**, không vào kho sách hay thứ bậc, đúng th�
 | Thư mục dữ liệu | `~/.vandao/` | `~/.wayfarer/` |
 | Tiền tố tài liệu | `docs/VAN-DAO-*.md` | `docs/wayfarer-*.md` |
 
-**Chưa kiểm trùng tên hay nhãn hiệu** — phiên chốt tên không có mạng. Phải tra một lượt trước khi
-công khai repo hoặc phát hành plugin.
+**Đã tra trùng tên, 2026-08-31.** Kết quả và lý do vẫn giữ:
+
+- npm có package `wayfarer` (trie router, ~5.000 lượt tải/tuần, ngừng bảo trì). Khác registry — một
+  plugin Claude Code không tranh chấp không gian tên với npm.
+- Niantic từng có sản phẩm tên Wayfarer nhưng **đã đổi thành Niantic Recon**, tức tên đang được thả ra.
+- Vài repo GitHub cùng tên, không cái nào cùng lĩnh vực.
+
+Cái thật sự mất là **nhận diện tìm kiếm**: gõ "wayfarer" ra Niantic và một router JavaScript trước.
+Chấp nhận, vì "wayfarer" là từ tiếng Anh phổ thông — không ai độc quyền được, và cũng không ai chặn
+được ta dùng.
+
+Hai tên từng cân nhắc, tra ra tệ hơn: **Ninefold** đã có một app *"therapist-built inner work"* tổ
+chức quanh chín con đường — gần không gian sản phẩm này đến mức khó chịu; **Scriptorium** có game
+Steam, text editor cho người viết, và eScriptorium.
+
+Chưa tra: nhãn hiệu đăng ký (khác với trùng tên sản phẩm). Cần tra trước khi phát hành thương mại,
+không cần trước khi công khai repo.
 
 **Thư mục repo workspace** (`van-dao-workspace/`) để riêng, không đổi trong đợt này: đổi nó làm hỏng
 mọi đường dẫn tuyệt đối đang có trong config và phiên làm việc, mà lợi ích thì chỉ là thẩm mỹ. Mốc:
