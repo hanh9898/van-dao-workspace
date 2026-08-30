@@ -9,3 +9,36 @@ name = "Skill Quality"
 applies_to = "docs"
 when = "Content that is itself a Claude Code skill artifact — a SKILL.md, its evals/ companion, or agents/*.md / commands/*.md in the same family. Skip specs, stories, or PRDs that merely describe or commission the skill."
 instruction = "Load `{project-root}/_bmad/custom/lenses/skill-quality.md` and follow it."
+
+# --- Bộ lens theo kỹ thuật BABOK, cho tài liệu phân tích nghiệp vụ ---
+# Bốn lens phủ bốn knowledge area, trong đó hai cái BABOK ghi nhận là hay bị bỏ nhất:
+# Strategy Analysis (vấn đề có đáng giải không) và Solution Evaluation (sau khi giao,
+# có thật sự giải được không).
+
+[[workflow.lenses]]
+code = "ba-problem-validity"
+name = "BA · Tính chính đáng của vấn đề"
+applies_to = "docs"
+when = "Tài liệu phát biểu một vấn đề nghiệp vụ và đề xuất hướng giải: phân tích hiện trạng, business case, brief, tài liệu nhu cầu. Bỏ qua tài liệu kỹ thuật thuần và tài liệu tham chiếu."
+instruction = "Load `{project-root}/_bmad/custom/lenses/ba-problem-validity.md` and follow it."
+
+[[workflow.lenses]]
+code = "ba-requirements-quality"
+name = "BA · Chất lượng yêu cầu"
+applies_to = "docs"
+when = "Tài liệu chứa danh sách yêu cầu, tiêu chí, hoặc ràng buộc mà người khác sẽ thi hành theo — kể cả khi chúng không mang nhãn 'requirement'."
+instruction = "Load `{project-root}/_bmad/custom/lenses/ba-requirements-quality.md` and follow it."
+
+[[workflow.lenses]]
+code = "ba-traceability"
+name = "BA · Truy vết"
+applies_to = "docs"
+when = "Tài liệu có từ hai tầng trở lên trong chuỗi vấn đề → nhu cầu → yêu cầu → giải pháp → kế hoạch. Cần ít nhất hai tầng thì mới có gì để lần."
+instruction = "Load `{project-root}/_bmad/custom/lenses/ba-traceability.md` and follow it."
+
+[[workflow.lenses]]
+code = "ba-solution-evaluation"
+name = "BA · Nghiệm thu giải pháp"
+applies_to = "docs"
+when = "Tài liệu đề xuất một giải pháp hoặc kế hoạch triển khai, và người đọc sẽ cần biết khi nào coi là xong và ai ký."
+instruction = "Load `{project-root}/_bmad/custom/lenses/ba-solution-evaluation.md` and follow it."
