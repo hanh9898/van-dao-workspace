@@ -6,7 +6,9 @@ Mọi artifact harness được version control phải **có mặt trong sổ n�
 |---|---|
 | `da-review` | Đã qua `bmad-review`; ghi ngày, lens, số finding, số đã vá |
 | `no` | Trong phạm vi, chưa review, **có mốc quay lại** |
-| `mien-tru` | **Không cần vòng review riêng**, kèm lý do. Hai lý do hợp lệ: (a) artifact có trước quy tắc và không phải chuẩn harness; (b) **được review cùng lượt với thứ khác** — ghi rõ thứ đó là gì |
+| `mien-tru` | **Không cần vòng review riêng**, kèm lý do. Ba lý do hợp lệ: (a) artifact có trước quy tắc và không phải chuẩn harness; (b) có **oracle riêng** đủ mạnh; (c) **review cùng lượt với `<đường dẫn>`** — nêu tường minh trong backtick, vì test kiểm ràng buộc đó |
+
+> Lý do (c) không phải lời hứa suông: `test_review_log.py` kiểm rằng đường dẫn được nêu **có thật trong sổ**, và rằng khi nó chuyển sang `da-review` thì mục viện dẫn nó **cũng phải** `da-review`. Không nêu tường minh thì không có ràng buộc — và cũng không có bảo đảm nào.
 
 **Có mặt trong sổ ≠ cần review.** Đây là hai câu hỏi khác nhau, và gộp chúng làm mọi thứ thành nợ. Sổ trả lời câu đầu cho *mọi* artifact — biết cái gì tồn tại là rẻ. Chỉ câu thứ hai mới là cổng, và nó phải hẹp: **chuẩn để người khác làm theo, hoặc code chạy trong luồng thật**. Test, config, và bản ghi không nằm trong đó.
 
@@ -58,8 +60,8 @@ Phạm vi bản đầu bỏ sót ba nhóm, và cả ba đều là **thành phầ
 
 | Artifact | Trạng thái | Chi tiết |
 |---|---|---|
-| `tests/test_work_state.py` | `mien-tru` | Review cùng lượt với `bin/work-state.py` — thứ nó kiểm. Test có oracle riêng: nó chạy và xanh/đỏ, nên một kỳ vọng sai lộ ra ngay (đã xảy ra: hai test fail vì kỳ vọng sai chứ không phải script sai) |
-| `tests/test_review_log.py` | `mien-tru` | Review cùng lượt với `review-log.md` và §A.7 — cùng một quy tắc. Fail ngay lần chạy đầu vì bug của chính nó, và đó chính là oracle làm việc |
+| `tests/test_work_state.py` | `mien-tru` | Test có **oracle riêng**: nó chạy và xanh/đỏ, nên kỳ vọng sai lộ ra khi code đúng mà test đỏ — đã xảy ra thật, hai test fail vì kỳ vọng sai chứ không phải script sai. Không viện dẫn vòng review của `bin/work-state.py`: vòng đó diễn ra **trước khi test tồn tại** |
+| `tests/test_review_log.py` | `mien-tru` | Test có **oracle riêng** — fail ngay lần chạy đầu vì bug của chính nó (đọc nhầm bảng giải thích thành bảng artifact), và đó chính là oracle làm việc |
 
 ## Cấu hình
 

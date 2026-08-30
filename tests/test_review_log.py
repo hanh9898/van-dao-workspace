@@ -110,6 +110,50 @@ class TestSoDauVetReview(unittest.TestCase):
             + "\n  ".join(thieu_moc),
         )
 
+    def test_mien_tru_cung_luot_tro_toi_artifact_co_that(self):
+        """`mien-tru` viện dẫn "cùng lượt với `X`" thì X phải có thật trong sổ.
+
+        Không có test này, "sẽ review cùng lượt với X" là một lời hứa không ai kiểm:
+        X có thể là đường dẫn gõ sai, hoặc file đã bị xoá.
+        """
+        trong_so = {o[1].strip("`") for o in
+                    map(la_dong_artifact, self.noi_dung.splitlines()) if o}
+        hong = []
+        for d in self.noi_dung.splitlines():
+            o = la_dong_artifact(d)
+            if not o or o[2].strip("`") != "mien-tru":
+                continue
+            for x in re.findall(r"cùng lượt với `([^`]+)`", o[3]):
+                if "/" in x and x not in trong_so:
+                    hong.append(f"{o[1]} → viện dẫn `{x}` không có trong sổ")
+        self.assertEqual(hong, [], "miễn trừ trỏ tới artifact không tồn tại: " + " · ".join(hong))
+
+    def test_mien_tru_cung_luot_phai_theo_kip_muc_no_vien_dan(self):
+        """Nếu X đã `da-review` thì mục viện dẫn "cùng lượt với X" cũng phải `da-review`.
+
+        Đây là điều biến lý do (c) từ lời hứa thành thứ đỏ được. Không có nó, một mục
+        có thể viện dẫn X mãi mãi trong khi X đã review xong từ lâu — miễn trừ trở
+        thành bỏ qua vĩnh viễn, đúng thứ nó tuyên bố là không phải.
+
+        Giới hạn đã biết: regex khớp cụm "cùng lượt với `X`" ở bất kỳ đâu trong ô lý
+        do, kể cả khi câu văn đang PHỦ ĐỊNH việc viện dẫn. Đã cắn thật ngay lần chạy
+        đầu. Cách sống với nó: đừng viết cụm đó trong câu phủ định — diễn đạt khác đi.
+        """
+        trang_thai = {o[1].strip("`"): o[2].strip("`") for o in
+                      map(la_dong_artifact, self.noi_dung.splitlines()) if o}
+        tre = []
+        for d in self.noi_dung.splitlines():
+            o = la_dong_artifact(d)
+            if not o or o[2].strip("`") != "mien-tru":
+                continue
+            for x in re.findall(r"cùng lượt với `([^`]+)`", o[3]):
+                if trang_thai.get(x) == "da-review":
+                    tre.append(
+                        f"{o[1]} viện dẫn `{x}`, mà `{x}` đã `da-review` — "
+                        "mục này phải được review cùng lượt đó, hoặc đổi lý do miễn trừ"
+                    )
+        self.assertEqual(tre, [], "miễn trừ tụt lại sau thứ nó viện dẫn: " + " · ".join(tre))
+
     def test_khong_ghi_artifact_da_bien_mat(self):
         """Sổ liệt kê file không còn tồn tại nghĩa là nó lạc hậu theo chiều ngược lại."""
         trong_pham_vi = set(artifact_trong_pham_vi())
