@@ -177,6 +177,27 @@ dùng, nên rủi ro thấp hơn hẳn — nhưng vẫn phải vào bảng, vì 
 | `dat` | `passed` | | `so_lieu` | `metrics` |
 | `bi_kip` | `scripture` | | `duoi_nhan_duoc` | `accepted_extensions` |
 
+**Khoá đầu ra riêng của `giam-dinh.py`** — truyền vào `emit()` dưới dạng keyword argument rồi thành
+khoá JSON qua `**kwargs`, nên chúng *trông như* biến nội bộ mà thật ra là contract.
+
+| Cũ | Mới | | Cũ | Mới |
+|---|---|---|---|---|
+| `duong_dan` | `path` | | `cach_cai` | `install_command` |
+| `so_lieu` | `metrics` | | `duoi` | `extension` |
+| `thong_diep` | `message` | | `duoi_nhan_duoc` | `accepted_extensions` |
+
+**Giá trị của `status`** — skill phân nhánh theo mã thoát, nhưng vẫn hiển thị và ghi lại giá trị này
+
+| Cũ | Mới |
+|---|---|
+| `ok` | *(giữ)* |
+| `thieu_tham_so` | `missing_argument` |
+| `engine_chua_cai` | `engine_not_installed` |
+| `khong_phai_file` | `not_a_file` |
+| `duoi_khong_ho_tro` | `unsupported_extension` |
+| `file_rong` | `empty_file` |
+| `khong_rut_duoc_chu` | `extraction_failed` |
+
 Khoá đầu ra là **contract giữa script và skill**, không phải biến nội bộ: SKILL.md đọc chúng theo tên.
 Đổi ở đây thì mọi chỗ trong SKILL.md nhắc tới chúng phải đổi cùng lô — nếu không, skill đọc một khoá
 không còn tồn tại và im lặng nhận `None`.
