@@ -153,7 +153,68 @@ một test quét mọi định danh trong mã và tên tệp, đỏ nếu còn k
 "dịch một khái niệm thành hai từ", nhưng bắt được "quên dịch", và đó là kiểu sót nhiều nhất. Mốc: cùng
 lượt với lần refactor cuối.
 
-## 7 · Không đổi
+## 7 · Chiến lược dịch tài liệu dài
+
+Áp cho `docs/VAN-DAO-dac-ta-v1.0.md` (2.151 dòng, 1.224 dòng có tiếng Việt — 29% toàn bộ khối lượng
+dịch của dự án) và mọi tài liệu cùng cỡ. Tách thành **đợt riêng**, không làm chung với đợt đổi tên mã.
+
+**Vấn đề gốc:** "dịch có đúng nghĩa không" không có oracle. Nhưng phần lớn thiệt hại thật của một bản
+dịch tài liệu đặc tả không nằm ở nghĩa — nó nằm ở **mất mát âm thầm**: rơi một hàng bảng, mất một mã
+ràng buộc, gộp hai mục thành một. Thứ đó đếm được. Chiến lược này đổi câu hỏi không kiểm được lấy câu
+kiểm được, và chấp nhận rõ ràng rằng phần nghĩa vẫn phải soi bằng mắt.
+
+### 7.1 Hai loại dịch, làm theo thứ tự
+
+| Loại | Bản chất | Công cụ | Oracle |
+|---|---|---|---|
+| **Định danh** — tên, khoá, đường dẫn | Tất định, có bảng §1–§4 | script thay chuỗi | `grep` từ cũ ra 0 |
+| **Văn xuôi** | Phán đoán, không oracle tuyệt đối | dịch từng lô | bất biến §7.2 |
+
+Định danh **trước**. Làm ngược thì mọi định danh nằm trong văn xuôi phải sửa lần hai — và lần hai là
+lần người ta bỏ sót.
+
+### 7.2 Bất biến — chạy `bin/check-invariants.py`
+
+    python bin/check-invariants.py <file> --luu moc.json    trước khi đổi chữ đầu tiên
+    python bin/check-invariants.py <file> --so moc.json     sau mỗi lô
+
+Số phải khớp: heading H1/H2/H3 · số bảng và số cột mỗi bảng · tổng số hàng bảng · số khối mã · tập
+hợp mã `R<n>`, `AD-n`, `FR/NFR` · tập hợp tham chiếu `§`.
+
+Chú ý: script kiểm **tập hợp mã**, không kiểm số lượt xuất hiện — dịch được phép gộp câu làm đổi số
+lượt, nhưng làm mất hẳn một mã thì luôn là lỗi.
+
+Nó **không** kiểm nghĩa. Một bản dịch sai hoàn toàn mà giữ nguyên cấu trúc vẫn qua. Biết giới hạn đó
+thì nó hữu ích; quên thì nó nguy hiểm hơn không có.
+
+### 7.3 Chia lô theo H1, mỗi lô một commit
+
+Đặc tả có 21 mục H1. Không bao giờ dịch nửa mục: chỗ dịch dở là nơi hai cách gọi cùng một khái niệm
+gặp nhau, và nó lọt qua mọi phép kiểm cấu trúc.
+
+### 7.4 Khoá glossary trước khi dịch dòng đầu tiên
+
+Quét tài liệu lấy mọi thuật ngữ chưa có trong §1/§2, bổ sung hết **trước**. Không làm thì lô 3 sẽ tự
+nghĩ ra từ mà lô 1 đã đặt khác — đúng thứ tài liệu này tồn tại để chống.
+
+### 7.5 Không tạo bản copy tiếng Việt
+
+Git đã giữ. Thêm một file copy là tạo nguồn thật thứ hai. Thay vào đó, ghi SHA của bản tiếng Việt
+cuối cùng vào frontmatter bản tiếng Anh, để tra được bằng `git show <sha>:<path>`.
+
+### 7.6 Cái không dịch
+
+- Nội dung bên trong khối mã, trừ comment.
+- Ví dụ hội thoại với người dùng (đặc tả có 2). Chúng minh hoạ hành vi khi `communication_language`
+  là tiếng Việt, nên tiếng Việt ở đó là **nội dung đúng**, không phải sót. Thêm nhãn nói rõ.
+- Trích dẫn nguyên văn từ nguồn tiếng Việt.
+
+### 7.7 Spot-check nghĩa, không dịch ngược cả file
+
+Chọn các mục mà hiểu sai thì mọi story sau sai — định nghĩa thuật ngữ, 33 ràng buộc `R<n>`, bảng tiêu
+chí — dịch ngược và so nghĩa. Dịch ngược toàn bộ tốn gấp đôi mà bắt thêm rất ít.
+
+## 8 · Không đổi
 
 - `communication_language` và các khoá config chuẩn của BMad — thuộc nền tảng, không phải của ta.
 - Nội dung do người dùng viết ra: bài nộp, ghi chép, thư của họ.

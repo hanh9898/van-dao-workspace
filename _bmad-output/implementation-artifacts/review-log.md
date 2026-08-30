@@ -34,6 +34,7 @@ Phạm vi bản đầu bỏ sót ba nhóm, và cả ba đều là **thành phầ
 | Artifact | Trạng thái | Chi tiết |
 |---|---|---|
 | `bin/work-state.py` | `da-review` | 2026-08-31 · cùng vòng với skill `work-state` · 19 unit test khoá lại từng lỗi |
+| `bin/check-invariants.py` | `no` | Đếm bất biến cấu trúc markdown (heading · bảng và số cột · hàng bảng · khối mã · tập hợp mã `R<n>`/`AD-n`/`FR/NFR`/`§`) để bắt **mất mát âm thầm** khi dịch tài liệu dài. Code chạy thật nên thuộc phạm vi gate. Đã verify bằng cách phá thật: lưu mốc trên đặc tả, xoá một hàng bảng và một H2, script báo đúng hai chỗ lệch, mã thoát 1. Mốc: **trước lô dịch đầu tiên của đặc tả** |
 | `bin/setup-hooks.py` | `da-review` | 2026-08-31 · adversarial, edge-case-hunter · 5 finding, **vá 4, rút 1, hết** · hook dò `python3`·`python`·`py` bằng cách chạy thử `import sys` (`command -v` thấy cả stub Windows Store), không tìm được thì **chặn**; phép dò tách thành một nguồn dùng chung cho hook và cho lúc cài, nên `setup-hooks.py` báo ngay interpreter nào sẽ được gọi thay vì để lộ ở commit đầu; `--force` lưu `.bak` trước khi đè hook người khác; docstring ghi `--check` thắng `--force`. **Rút 1:** "tiếng Việt trong hook gây mojibake ở locale C" — sai, `sh` không transcode, verify bằng `LC_ALL=C LANG=C` thì chữ ra đúng; mojibake chỉ phụ thuộc codepage của terminal |
 
 ## Tài liệu
