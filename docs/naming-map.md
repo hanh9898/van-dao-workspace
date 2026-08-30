@@ -24,8 +24,18 @@ người đọc có tiếp xúc thể loại nhận ra ngay. Không dùng pinyin
 | chỉ điểm | 指點 | **counsel** | Lời chỉ của Trưởng môn cho đệ tử. Không dùng `pointer` — trong một dự án Python, `pointers.jsonl` đọc như con trỏ. `counsel` là danh từ không đếm được, dùng nguyên dạng cho cả số nhiều |
 | Trưởng môn | 掌門 | **Sect Master** | Vai điều phối |
 | trưởng lão | 長老 | **Elder** | Vai chấm bài |
+| Tàng kinh trưởng lão | 藏經長老 | **Scripture Hall Elder** | Giám định và thu sách |
+| Thư linh | 書靈 | **Tome Spirit** | Vai kèm học từng chương |
+| Giám khảo | 監考 | **Examiner** | Sinh đề khảo thí |
+| Sơn phong trưởng lão | 山峰長老 | **Peak Elder** | Định cảnh giới |
+| Nghiệm Công Sứ | 驗功使 | **Proving Envoy** | Chấm bài nghiệm công |
+| Chú Giải Sứ | 註解使 | **Annotation Envoy** | Bồi sai lầm phổ biến |
+| người học | | **learner** | Người dùng **trước khi** bái sư. Sau bái sư mới là `disciple` — gọi disciple lúc nhập môn là mâu thuẫn với chính tiền đề của skill |
 | đệ tử | 弟子 | **disciple** | Người học |
 | nhập môn | 入門 | **initiation** | Nghi thức gia nhập |
+| môn phái | 門派 | **sect** | Trường phái người học lập ra khi bái sư |
+| bái sư | 拜師 | **taking a master** | Nghi thức nhận thầy. Dạng danh từ: `master-taking`; dạng động từ dùng nguyên cụm |
+| nhập môn ký | 入門記 | **initiation record** | Lời cam kết người học tự gõ khi bái sư |
 | tàng kinh (các) | 藏經閣 | **Scripture Hall** | Nơi cất bí kíp. Cùng gốc từ với `scripture` là cố ý, không phải trùng lặp — tàng kinh các đúng nghĩa là nơi chứa kinh thư |
 | cảnh giới | 境界 | **realm** | Bậc tu vi |
 | tâm pháp | 心法 | **heart method** | Nguyên lý cốt lõi của một chương |
@@ -261,6 +271,95 @@ chạy lại, không sửa tay.
 
 `kiem-thu-dac-ta` là tên một bí kíp **mẫu** ("kiểm thử dựa trên đặc tả"), không phải thuật ngữ hệ —
 nên dịch theo nghĩa của nó, `spec-based-testing`.
+
+## 2.5 · Khoá `profile.json` và giá trị `counsel.jsonl`
+
+Contract thứ tư, lộ ra khi worker dịch lô 3b. Cùng chứng bệnh với §2.3: **không có file schema riêng**,
+định nghĩa nằm rải trong `initiation/SKILL.md` và `sect-master/SKILL.md`.
+
+**`profile.json`**
+
+| Cũ | Mới | | Cũ | Mới |
+|---|---|---|---|---|
+| `ten_vai` | `role_names` | | `mach_nguon` | `meridian_source` |
+| `ngan_sach_token` | `token_budget` | | `nhe` · `vua` · `nang` | `light` · `medium` · `heavy` |
+| `muc_chi_phi` | `cost_band` | | | |
+| `bi_kip_template` | `scripture_template` | | `pha2_reviewers` | `phase2_reviewers` |
+| `so_chi_diem` | `counsel_count` | | `da_biet` / `chua_biet` | `decided` / `undecided` |
+
+Bốn khoá kỹ thuật trong `role_names` là **id của vai**, không phải tên hiển thị:
+
+| Cũ | Mới |
+|---|---|
+| `truong-mon` | `sect-master` |
+| `tang-kinh-truong-lao` | `scripture-hall-elder` |
+| `thu-linh` | `tome-spirit` |
+| `giam-khao` | `examiner` |
+
+**Giá trị enum**
+
+| Trường | Cũ | Mới |
+|---|---|---|
+| `meridian_source` | `tu_khai` · `suy_tu_vai` | `self_declared` · `inferred_from_role` |
+| `confidence` | `so_lieu_that` · `nguon_khai_bao` · `suy_doan` | `measured` · `declared` · `inference` |
+| `status` (counsel) | `da_thu` · `ban_hong` | `collected` · `damaged_copy` |
+| loại thư | `bao_ban_hong` | `report_damaged_copy` |
+| khoá trong thư | `toi` · `hoi` · `bi_kip_chi_diem` | `to` · `kind` · `counseled_scripture` |
+
+`so_chi_diem` → `counsel_count` chứ không dịch sát "số chỉ điểm": nó là **số lượng** chỉ điểm phát ra
+mỗi lượt, và tên tiếng Anh phải nói ra điều đó.
+
+## 2.6 · Khoá bản ghi kho và thư — `references/format.md`
+
+Contract thứ năm. Lộ ra muộn nhất, vì lô 3b tôi chỉ giao `SKILL.md` cho worker mà quên
+`references/format.md` — lỗi phạm vi của coordinator, không phải của worker.
+
+**Bản ghi kho** (`scripture-hall/drafts/<id>.json`)
+
+| Cũ | Mới | | Cũ | Mới |
+|---|---|---|---|---|
+| `pha` | `phase` | | `giam_dinh` | `appraisal` |
+| `da_giam_dinh` | `appraised` | | `cau_truc_nguon` | `structure_source` |
+| `nguoi_hoc_khai` | `learner_declared` | | `mac_dinh` | `default` |
+
+**Thư** (`handover/letters/<id>.json`)
+
+| Cũ | Mới | | Cũ | Mới |
+|---|---|---|---|---|
+| `ten_sach` | `book_title` | | `ly_do` | `reason` |
+| `cho` *(status)* | `waiting` | | | |
+
+**Nhãn nhánh** trong SKILL.md: `Nhánh Đ` → `Branch D`. Chữ `Đ` là chữ cái tiếng Việt; giữ nó trong
+một file tiếng Anh làm nhãn nhánh thành thứ không gõ được trên bàn phím thường.
+
+## 2.7 · Khoá `evals/evals.json`
+
+Contract thứ sáu. Không phải dữ liệu người dùng — nó là **hồ sơ bằng chứng** của skill, và AD-10 nói
+mọi skill phải có. Người ngoài đọc repo công khai sẽ đọc file này để biết skill đã được chứng minh
+thế nào, nên nó cũng phải tiếng Anh.
+
+| Cũ | Mới | | Cũ | Mới |
+|---|---|---|---|---|
+| `tai_tao` | `reproduce` | | `cai_plugin` | `install_plugin` |
+| `cai_lai_sau_moi_lan_sua` | `reinstall_after_each_edit` | | `kiem_cache_dung_ban` | `verify_cache_version` |
+| `bat_buoc_khi_HOME_co_lap` | `required_when_home_isolated` | | `venv_trong_cho_kich_ban_engine_chua_cai` | `empty_venv_for_engine_missing` |
+| `vong_review_step_04` | `step04_review_round` | | `vong_chay_lai_lo_3c` | `rerun_round_batch_3c` |
+| `ngay` | `date` | | `vi_sao` | `why` |
+| `ket_qua` | `result` | | `cac_kich_ban` | `scenarios` |
+| `hang_matrix` | `matrix_row` | | `bang_chung` | `evidence` |
+| `bug_bat_duoc` | `bug_found` | | `van_de` | `problem` |
+| `chi_tiet` | `detail` | | `va` | `fix` |
+| `verify_ban_va` | `fix_verified` | | `thay_doi` | `changes` |
+| `ghi_chu` | `note` | | `luu_y_them` | `extra_note` |
+| `khong_phai_loi_skill` | `not_a_skill_defect` | | `note_lan_chay_truoc` | `note_previous_run` |
+| `ban_ghi_kho` | `hall_record` | | `thu_bao_ban_hong` | `damaged_copy_letter` |
+| `nguong_token_budget` | `token_budget_threshold` | | `vi_sao_bat_bien_khong_bat_duoc` | `why_invariants_missed_it` |
+| `bang_chung_chuoi_khoa_moi_thong_suot` | `evidence_new_keys_end_to_end` | | `sách chung` *(khoá fixtures)* | `shared_book` |
+
+Contract này lộ ra muộn nhất, và theo cách khó chịu nhất: **tôi tự tạo thêm hàng chục khoá tiếng Việt
+mới vào giữa đợt refactor sang tiếng Anh**, khi ghi kết quả vòng eval lô 3c. Người dùng phát hiện.
+Bài học không phải "quét kỹ hơn" mà là: mỗi lần *viết* nội dung mới trong lúc refactor, phải áp bảng
+ngay lúc viết — quét sau chỉ dọn được thứ mình nhớ ra để quét.
 
 ## 3 · Quy tắc đặt tên định danh
 
