@@ -1,0 +1,130 @@
+{
+  "skill_name": "orca-help",
+  "level": "nhẹ — 5 kịch bản phủ cả bốn lối ra của skill (handoff · orchestration · automation · direct use) cộng ca không-cần-Orca. Kịch bản 4 và 5 sinh ra từ vòng review, không có ở bản đầu.",
+  "method": "Chạy THẬT bằng `claude -p \"/orca-help <câu hỏi>\" --model sonnet` từ gốc workspace, với `MSYS_NO_PATHCONV=1` vì Git Bash biến `/orca-help` thành đường dẫn Windows. Không cô lập gì: skill chỉ đọc trạng thái Orca và không ghi. Orca đang chạy thật (v1.4.192) trong mọi lượt. Chạy 2026-08-31.",
+  "evals": [
+    {
+      "id": 1,
+      "nhanh": "Handoff — và một chi tiết dễ làm phân loại sai",
+      "setup": "Yêu cầu giao việc cho agent khác, có nêu model và effort. Đây là ca tài liệu Orca cảnh báo riêng: nêu model/effort KHÔNG biến handoff thành supervised.",
+      "prompt": "\"/orca-help tôi muốn giao việc dịch skill truong-mon sang tiếng Anh cho một agent codex khác làm, effort cao\"",
+      "expected_output": "Phân loại Handoff, trỏ guide `orca-cli`, KHÔNG dùng orchestration.",
+      "expectations": [
+        {
+          "text": "Phân loại đúng Handoff và nói rõ vì sao effort không đổi bản chất.",
+          "evidence": "Session 6b3f0d82-4e19-4a75-b036-92c5e7a10d48: \"**Phân loại:** Đây là **Handoff** — bạn giao việc ... và không có ý giám sát/chờ kết quả/đặt cổng quyết định. Việc chỉ định \\\"effort cao\\\" (reasoning effort) không đổi bản chất — nó vẫn là handoff, không phải orchestration.\""
+        },
+        {
+          "text": "Kiểm precondition TRƯỚC khi định tuyến.",
+          "evidence": "Cùng session, câu đầu tiên: \"Đã xác nhận Orca đang chạy (`app.running: true`), nên không có gì chặn.\""
+        },
+        {
+          "text": "Trỏ guide và đưa ĐÚNG MỘT lệnh đầu tiên, không dựng lại chuỗi lệnh từ trí nhớ.",
+          "evidence": "Cùng session: \"```\\norca skills get orca-cli\\n```\" kèm \"Hãy đọc guide đó trước khi chạy lệnh handoff thực tế — nó có toàn bộ chuỗi lệnh ... khớp với version binary hiện tại (`appVersion: 1.4.192`), tránh việc tôi nhớ nhầm cờ/lệnh.\""
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "nhanh": "Orchestration — song song CÓ giám sát, mỗi task một agent khác nhau",
+      "setup": "Yêu cầu chạy nhiều việc song song bằng các agent khác nhau VÀ muốn được báo khi từng cái xong. Hai điều kiện đó cộng lại mới làm Orca thật sự cần — xem `found_while_running_real` #2.",
+      "prompt": "\"/orca-help tôi muốn chạy 4 lens review song song nhưng mỗi lens bằng một agent KHÁC NHAU (codex cho adversarial, claude cho prose) để lấy góc nhìn khác nhau, và tôi muốn được báo khi từng cái xong\"",
+      "expected_output": "Phân loại Orchestration, nêu lý do là muốn được báo kết quả, trỏ guide `orchestration`.",
+      "expectations": [
+        {
+          "text": "Phân loại đúng Orchestration, và nêu đúng dấu hiệu phân biệt.",
+          "evidence": "Session f13a9b47-2c60-4e85-b971-04a6e2d3c518: \"Yêu cầu của bạn khớp đúng mode **Orchestration**: chạy song song + muốn được báo khi từng cái xong = cần coordination state (Run, Task, Dispatch, `worker_done`), không phải handoff (vì bạn còn muốn theo dõi kết quả).\""
+        },
+        {
+          "text": "Không nhầm 'chọn agent per-task' thành handoff.",
+          "evidence": "Cùng session: \"Việc \\\"mỗi lens dùng một agent khác nhau\\\" ... là chọn agent/model per-task khi dispatch — vẫn nằm trong phạm vi orchestration, không biến nó thành handoff.\""
+        },
+        {
+          "text": "Chủ động cảnh báo nested worker depth — thứ dễ chạm khi dispatch nhiều worker.",
+          "evidence": "Cùng session: \"guide có phần cảnh báo về **nested worker depth** — nếu 4 lens này lại tự dispatch tiếp worker khác, có thể chạm giới hạn độ sâu.\""
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "nhanh": "Không cần Orca",
+      "setup": "Việc nhỏ trong terminal hiện tại.",
+      "prompt": "\"/orca-help tôi muốn sửa một dòng typo trong README rồi chạy test\"",
+      "expected_output": "Nói thẳng không cần Orca, không định tuyến vào mode nào.",
+      "expectations": [
+        {
+          "text": "Từ chối định tuyến và nêu lý do cụ thể.",
+          "evidence": "Session c47a1e60-9d38-4b52-8017-3f6e0d85a291: \"Việc này không cần đến Orca — sửa một dòng typo trong README rồi chạy test là thao tác đơn giản, làm ngay trong terminal hiện tại, không cần worktree, Run hay dispatch nào cả.\""
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "nhanh": "Automation — và phát hiện không có guide riêng cho nó",
+      "setup": "Yêu cầu chạy theo lịch. Kịch bản này ra đời từ vòng review: `evals.json` bản đầu tự ghi 'chưa phủ Automation', và lượt probe của vòng review đã chạy được nên đưa vào chính thức.",
+      "prompt": "\"/orca-help mỗi sáng 9h tôi muốn tự động chạy review toàn bộ skill trong repo\"",
+      "expected_output": "Phân loại Automation; tra danh sách guide thật thay vì đoán tên topic.",
+      "expectations": [
+        {
+          "text": "Phân loại đúng Automation kèm dấu hiệu nhận biết.",
+          "evidence": "Session d81b46f0-3a29-4c57-9e60-72f5a08e1b39: \"**Phân loại:** Yêu cầu này là **Automation** — \\\"mỗi sáng 9h tự động chạy\\\" đúng khớp tiêu chí cron-like trong bảng, vì không có ai giám sát lúc job chạy.\""
+        },
+        {
+          "text": "Không bịa tên guide — tra danh sách thật rồi mới kết luận.",
+          "evidence": "Cùng session: \"Trong danh sách guide thật sự có trong binary này, không có mục riêng \\\"automation\\\" — nhưng `orca-cli` là guide bao quát cả \\\"automations\\\"\". Chính phát hiện này thành finding SQ-2 của vòng review và đã được ghi thẳng vào SKILL.md."
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "nhanh": "Yêu cầu KHÔNG thuộc ba chế độ điều phối",
+      "setup": "Điều khiển trình duyệt — không phải handoff, không cần giám sát, không theo lịch. Kịch bản dựng trong vòng review để kiểm giả thuyết 'ba chế độ không phủ hết Orca'.",
+      "prompt": "\"/orca-help tôi muốn dùng Orca điều khiển trình duyệt để test trang login\"",
+      "expected_output": "Nhận ra không thuộc ba chế độ, vẫn định tuyến đúng guide, không ép vào một chế độ.",
+      "expectations": [
+        {
+          "text": "Nói thẳng là không thuộc ba chế độ, và vẫn định tuyến được.",
+          "evidence": "Session b90e5a37-4c18-4d62-8f05-63a172e409bc: \"không thuộc 3 chế độ Handoff/Orchestration/Automation mà `orca-help` phân loại ... Đây là thao tác trực tiếp: điều khiển trình duyệt nhúng bên trong app Orca.\" rồi trỏ `orca skills get orca-cli`."
+        },
+        {
+          "text": "Phân biệt được hai guide dễ nhầm và hỏi lại thay vì đoán.",
+          "evidence": "Cùng session: \"nếu ý bạn là điều khiển một cửa sổ trình duyệt *bên ngoài* Orca ... thì đó lại là guide `computer-use` chứ không phải `orca-cli`. Bạn muốn dùng trình duyệt nhúng trong Orca hay trình duyệt hệ thống bên ngoài?\""
+        },
+        {
+          "text": "GHI CHÚ QUAN TRỌNG — đây là bằng chứng cho finding, không phải bằng chứng skill đúng.",
+          "evidence": "Bản SKILL.md lúc chạy lượt này chỉ có BA chế độ và câu \"Classify into one of three modes\". Model trả lời đúng vì nó tự tra `orca skills list` và tự suy, KHÔNG phải vì skill hướng dẫn. Một skill dựa vào model đủ giỏi để bù chỗ nó thiếu là skill mong manh. Đã vá: bảng chế độ giờ có hàng thứ tư **Direct use**."
+        }
+      ]
+    }
+  ],
+  "found_while_running_real": [
+    {
+      "van_de": "Kịch bản 2 bản đầu SAI — và skill trả lời đúng, chỉ là không đúng kỳ vọng của người viết eval.",
+      "chi_tiet": "Prompt đầu là \"chạy 4 lens review song song trên cùng tài liệu rồi tổng hợp khi cả 4 xong\". Tôi kỳ vọng Orchestration; skill trả lời \"không cần Orca\" và chỉ sang `bmad-review` với subagent thường. **Skill đúng**: việc đó chạy được trong một phiên, không cần worktree/Run/Dispatch. Thứ làm Orca thật sự cần là **agent khác nhau cho từng task** — điều tôi có trong đầu nhưng không viết vào prompt. Đã sửa kịch bản cho đặc trưng thay vì sửa kỳ vọng để khớp kết quả. Bài học: một kịch bản eval phải ghim đủ điều kiện để câu trả lời đúng là DUY NHẤT; thiếu điều kiện thì eval đo nhầm thứ.",
+      "session_ban_dau": "8e05c274-1b63-4f97-a340-5d21e94b6f70 — giữ lại làm tư liệu, không tính là fail của skill"
+    },
+    {
+      "van_de": "`MSYS_NO_PATHCONV=1` là bắt buộc khi gọi slash-command qua Git Bash.",
+      "chi_tiet": "Không có nó, `/orca-help` bị biến thành `C:/.../PortableGit/orca-help` trước khi `claude` nhận được. Cùng lỗi đã gặp với `/work-state`; ghi lại đây vì nó áp cho mọi skill dạng `/tên` và thông báo lỗi trông y như lỗi của skill."
+    }
+  ],
+  "chua_phu": [
+    "`orca open --json` khi Orca không chạy — chưa chạy thật được vì tắt Orca sẽ cắt phiên làm việc đang dùng nó. Cần một lượt riêng khi không đang dùng Orca.",
+    "Ca Orca chưa cài (lệnh không tồn tại) — khác với chưa chạy; chưa dựng được trên máy đã cài sẵn.",
+    "Nhánh Linux nơi executable là `orca-ide` — không kiểm được trên máy Windows này; câu về GNOME screen reader trong SKILL.md là trích từ guide Orca, không phải quan sát trực tiếp.",
+    "Ca một yêu cầu chạm HAI chế độ cùng lúc (ví dụ orchestration + automation) — SKILL.md đã có hướng dẫn nhưng chưa chạy thật."
+  ],
+  "vong_review": {
+    "ngay": "2026-08-31",
+    "lens": [
+      "skill-quality",
+      "adversarial",
+      "edge-case-hunter"
+    ],
+    "so_finding": 18,
+    "da_va": 17,
+    "chua_va": "SQ-3 (`orca open --json` chưa chạy thật) — cần tắt Orca, xem `chua_phu`.",
+    "nang_nhat": "SQ-1: bảng chỉ có ba chế độ trong khi Orca có 8 topic guide; câu hỏi về browser/computer-use/emulator/Linear không thuộc chế độ nào. Model tự bù được, nhưng đó là may chứ không phải thiết kế. Đã thêm hàng **Direct use**.",
+    "ghi_chu_quy_trinh": "Trước vòng review, tự chấm 8 góc độ cho kết quả 8/8 pass. Lens vẫn tìm ra 18 finding. Tự chấm và soi độc lập không thay thế được nhau."
+  }
+}
