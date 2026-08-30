@@ -2,6 +2,27 @@
 # BMad structural rules (arrays of tables keyed by `code`: matching key
 # replaces, new keys append). See {project-root}/.claude/skills/bmad-review/customize.toml
 # for the full field reference and merge semantics — not edited here.
+#
+# --- Hai quyết định đã chốt về bộ lens này, ghi ở đây để khỏi mở lại ---
+#
+# 1. NGÔN NGỮ: lens viết cùng ngôn ngữ với thứ nó soi.
+#
+#    Chốt 2026-08-31: hệ thống chuyển sang tiếng Anh toàn bộ — mã, tên file, định danh,
+#    tài liệu, skill, agent. Thế giới quan tiên hiệp giữ nguyên, chỉ đổi ngôn ngữ diễn
+#    đạt. Tiếng Việt chỉ còn ở phần config người dùng chọn được (`communication_language`).
+#    Lý do: dự án nhắm người dùng ngoài Việt Nam.
+#
+#    Hệ quả cho thư mục này: `skill-quality` đã tiếng Anh, giữ nguyên. Bốn lens BA đang
+#    tiếng Việt vì chúng soi `docs/VAN-DAO-*.md` tiếng Việt — khi tài liệu đó chuyển ngữ,
+#    lens chuyển theo. Quy tắc không đổi; chỉ có kết quả áp dụng đổi, và điểm đến là cả
+#    năm lens cùng tiếng Anh. Đây là nợ có mốc, không phải trạng thái ổn định.
+#
+# 2. KHÔNG có lens custom nào `applies_to = "code"`, và đó là cố ý. Lens custom chỉ
+#    đáng viết khi có failure mode mà lens shipped không bắt được — `skill-quality`
+#    tồn tại vì viết skill có kiểu hỏng riêng (mốc token, eval giả, lệnh chưa chạy).
+#    Code Python thường thì không: adversarial và edge-case-hunter đã tìm ra finding
+#    thật trên `bin/work-state.py` và `bin/setup-hooks.py`. Viết lens code khi chưa
+#    có bằng chứng thiếu chỉ thêm một thứ phải bảo trì.
 
 [[workflow.lenses]]
 code = "skill-quality"
@@ -33,7 +54,7 @@ instruction = "Load `{project-root}/_bmad/custom/lenses/ba-requirements-quality.
 code = "ba-traceability"
 name = "BA · Truy vết"
 applies_to = "docs"
-when = "Tài liệu có từ hai tầng trở lên trong chuỗi vấn đề → nhu cầu → yêu cầu → giải pháp → kế hoạch. Cần ít nhất hai tầng thì mới có gì để lần."
+when = "Tài liệu có từ hai tầng trở lên trong chuỗi vấn đề → nhu cầu → yêu cầu → giải pháp → kế hoạch — hoặc có một mục ranh giới (ngoài phạm vi, không làm) để đối chiếu, vì phép lần thứ tư chỉ cần chừng đó."
 instruction = "Load `{project-root}/_bmad/custom/lenses/ba-traceability.md` and follow it."
 
 [[workflow.lenses]]

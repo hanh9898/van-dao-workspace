@@ -43,6 +43,8 @@ Mục "ngoài phạm vi" có mâu thuẫn với bất kỳ yêu cầu hay việc
 Canonical fields, thêm:
 
 - `mat_xich` — cặp bị đứt, viết dạng `<nguồn> → <đích>` (ví dụ `TC-2 → (không có yêu cầu nào)`)
-- `huong` — `xuôi` · `ngược` · `ranh giới`
+- `huong` — `xuôi` (nhu cầu→yêu cầu) · `ngược` (yêu cầu→nhu cầu) · `kế hoạch` (phép lần 3, cả hai chiều giữa yêu cầu và kế hoạch) · `ranh giới`
 
-Kết quả rỗng hợp lệ khi cả bốn phép lần đều liền mạch — nhưng phải nói rõ đã lần bao nhiêu mắt xích, để người đọc biết lens đã thật sự chạy.
+Kết quả rỗng hợp lệ khi cả bốn phép lần đều liền mạch — nhưng con số **đã lần bao nhiêu mắt xích** phải xuất hiện, và chỗ của nó là dòng tổng kết của lens trong báo cáo markdown, **không phải** trong mảng finding: mảng rỗng thì không đựng được gì.
+
+Không có con số đó thì "lens chạy và sạch" trông y hệt "lens không chạy".

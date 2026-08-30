@@ -23,8 +23,11 @@ Giới hạn phải biết, không giấu:
 
 Dùng:
     python bin/setup-hooks.py            cài (không ghi đè hook đang có)
-    python bin/setup-hooks.py --force    ghi đè hook đang có
+    python bin/setup-hooks.py --force    ghi đè hook đang có (lưu bản cũ thành .bak)
     python bin/setup-hooks.py --check    chỉ báo trạng thái, không sửa gì
+
+Đưa cả `--check` lẫn `--force` thì `--check` thắng: cờ chỉ-đọc luôn thắng cờ ghi,
+để một lần gõ nhầm không phá thứ đang có.
 
 Mã thoát: 0 đã cài hoặc đã có sẵn · 1 không cài được · 2 (--check) chưa cài.
 """
@@ -43,6 +46,16 @@ GOC = Path(__file__).resolve().parent.parent
 # với một hook khác người dùng tự viết, và để không ghi đè nhầm.
 DAU = "# managed-by: bin/setup-hooks.py"
 
+# Phép dò interpreter, viết một lần dùng hai chỗ: nhúng vào hook, và chạy lúc cài để
+# báo ngay hook sẽ gọi cái nào. Hai bản chép tay sẽ trôi khỏi nhau lúc nào không biết.
+DO_PY = """PY=""
+for c in python3 python py; do
+    if command -v "$c" >/dev/null 2>&1 && "$c" -c "import sys" >/dev/null 2>&1; then
+        PY="$c"
+        break
+    fi
+done"""
+
 HOOK = f"""#!/bin/sh
 {DAU}
 #
@@ -56,13 +69,7 @@ HOOK = f"""#!/bin/sh
 # và một hook gọi tên không tồn tại thì đỏ mọi lần, chặn MỌI commit. Kiểm bằng cách
 # chạy thử chứ không chỉ `command -v` — Windows Store cài sẵn một `python3.exe` giả
 # chỉ mở cửa hàng, `command -v` thấy nó nhưng nó không chạy được gì.
-PY=""
-for c in python3 python py; do
-    if command -v "$c" >/dev/null 2>&1 && "$c" -c "import sys" >/dev/null 2>&1; then
-        PY="$c"
-        break
-    fi
-done
+{DO_PY}
 
 if [ -z "$PY" ]; then
     # Chặn, không cho qua. Không phải vì nghiêm khắc hơn: cho qua kèm cảnh báo tạo ra
@@ -129,6 +136,14 @@ def main():
         print(f"Chưa cài. Chạy: python bin/setup-hooks.py")
         sys.exit(2)
 
+    # Ghi đè hook của người khác thì giữ lại một bản. `--force` là cố ý, nhưng cố ý
+    # ghi đè không đồng nghĩa với cố ý mất — và hook không nằm trong git nên không có
+    # đường nào khác lấy lại.
+    if f.is_file() and DAU not in f.read_text(encoding="utf-8", errors="replace"):
+        luu = f.with_name(f.name + ".bak")
+        luu.write_bytes(f.read_bytes())
+        print(f"Đã lưu hook cũ: {luu}")
+
     d.mkdir(parents=True, exist_ok=True)
     # newline="\n": hook chạy qua sh, CRLF làm shebang hỏng trên Windows.
     f.write_text(HOOK, encoding="utf-8", newline="\n")
@@ -139,6 +154,16 @@ def main():
 
     print(f"Đã cài hook: {f}")
     print("Từ giờ mỗi `git commit` sẽ chạy test trước. Bỏ qua bằng --no-verify.")
+
+    # Chạy chính phép dò của hook, để biết ngay bây giờ chứ không phải lúc commit đầu.
+    r = subprocess.run(["sh", "-c", DO_PY + '; echo "$PY"'],
+                       capture_output=True, text=True, encoding="utf-8")
+    ten = (r.stdout or "").strip()
+    if ten:
+        print(f"Hook sẽ chạy test bằng: {ten}")
+    else:
+        print("CẢNH BÁO: không dò được interpreter Python nào chạy được — hook sẽ "
+              "chặn mọi commit cho tới khi cài Python 3.")
 
 
 if __name__ == "__main__":

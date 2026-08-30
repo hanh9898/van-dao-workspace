@@ -65,6 +65,12 @@ Platform details drift, and memory of them is often wrong in a specific, silent 
 shape, a renamed API). Both real bugs this project shipped were exactly this: assuming a config
 mechanism's shape instead of testing it — caught only by running the skill for real.
 
+**Where 3 and 4 overlap, split them by how the failure surfaces.** An unrun command belongs to check 3
+when typing it is what fails — wrong name, wrong prefix, command does not exist. It belongs to check 4
+when the string is right and the *mechanism behind it* behaves other than assumed — the flag is
+ignored, the field was renamed, the substitution never happens. One defect can be both; report it once
+under the check whose fix is different, and say the other applies.
+
 ### 5. A claimed hard guarantee is tested at the mechanism level, not the compliance level
 
 - Where the skill claims something is **impossible** for the model to do — not just "instructed not
@@ -84,8 +90,11 @@ proof of the mechanism-level claim.
 - Is each piece of evidence a **verbatim transcript from a real run** — not a description of expected
   behavior, not a simulated/imagined transcript, and not a pointer to a path that will not survive
   past the authoring session (a session-local scratch directory)?
-- Was the eval run against the actual packaged skill (installed/loaded the way a real user would
-  reach it), not just read as prose and reasoned about?
+- Was the eval run against the actual packaged skill, not just read as prose and reasoned about?
+  **"Packaged" means whatever the real reach path is for this skill's kind** — a plugin skill: installed
+  from the built plugin; a workspace skill under `.claude/skills/`: invoked by its real name from the
+  workspace root (`claude -p "/name …"`), because that *is* how a user reaches it. What disqualifies an
+  eval either way is the same thing: the skill was never actually loaded, only quoted.
 
 An eval that never ran the real skill, or whose evidence can't outlive the session that wrote it,
 gives false confidence indistinguishable from no eval at all.

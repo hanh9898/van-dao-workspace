@@ -34,14 +34,14 @@ Phạm vi bản đầu bỏ sót ba nhóm, và cả ba đều là **thành phầ
 | Artifact | Trạng thái | Chi tiết |
 |---|---|---|
 | `bin/work-state.py` | `da-review` | 2026-08-31 · cùng vòng với skill `work-state` · 19 unit test khoá lại từng lỗi |
-| `bin/setup-hooks.py` | `da-review` | 2026-08-31 · adversarial, edge-case-hunter · 5 finding, **vá 1** · hook không còn gọi `python` trần: dò `python3` · `python` · `py` và kiểm bằng cách chạy thử `import sys`, vì `command -v` thấy cả stub Windows Store vốn chỉ mở cửa hàng. Không tìm được interpreter thì **chặn** chứ không cho qua kèm cảnh báo — cho qua tạo ra đúng thứ cơ chế này chống: commit trông như đã qua test. Verify thật cả hai nhánh: bình thường exit 0 test xanh; `env PATH=/nonexistent` exit 1 kèm thông báo và lối thoát `--no-verify`. Còn: `--force` ghi đè hook người khác không backup |
+| `bin/setup-hooks.py` | `da-review` | 2026-08-31 · adversarial, edge-case-hunter · 5 finding, **vá 4, rút 1, hết** · hook dò `python3`·`python`·`py` bằng cách chạy thử `import sys` (`command -v` thấy cả stub Windows Store), không tìm được thì **chặn**; phép dò tách thành một nguồn dùng chung cho hook và cho lúc cài, nên `setup-hooks.py` báo ngay interpreter nào sẽ được gọi thay vì để lộ ở commit đầu; `--force` lưu `.bak` trước khi đè hook người khác; docstring ghi `--check` thắng `--force`. **Rút 1:** "tiếng Việt trong hook gây mojibake ở locale C" — sai, `sh` không transcode, verify bằng `LC_ALL=C LANG=C` thì chữ ra đúng; mojibake chỉ phụ thuộc codepage của terminal |
 
 ## Tài liệu
 
 | Artifact | Trạng thái | Chi tiết |
 |---|---|---|
 | `docs/VAN-DAO-harness-viet-skill.md` | `da-review` | 2026-08-31 · ba-problem-validity, ba-requirements-quality, ba-traceability, ba-solution-evaluation · 23 finding, vá hết |
-| `docs/VAN-DAO-chuan-muc-skill.md` | `da-review` | 2026-08-31 · ba-requirements-quality, ba-traceability, skill-quality · 4 finding, **vá 1** · đã vá: góc 1 (Sống sót) giờ ghi mốc 5.000 token và mốc chung 25.000, bảng tóm sửa theo — trước đó bảo "xem mục nào rơi sau mốc" mà không nói mốc nào. Còn: bảng cuối xếp Phần B vào cột phổ quát trong khi góc 7 trỏ vào bảng A.0 và ngưỡng token, hai thứ chính tài liệu xếp vào cột riêng Vấn Đạo; góc 3 gọi tên hai mục bằng tiếng Việt nên không soi được skill đã chuyển tiếng Anh; không góc nào soi quyền ghi vùng dữ liệu |
+| `docs/VAN-DAO-chuan-muc-skill.md` | `da-review` | 2026-08-31 · ba-requirements-quality, ba-traceability, skill-quality · 4 finding, **vá 4, hết** · góc 1 ghi mốc 5.000 token và pool 25.000; góc 3 nêu cả tên mục bản tiếng Anh và thêm phép kiểm vùng ghi (liệt kê tệp skill đọc/ghi rồi đối chiếu vai sở hữu — lấn việc lộ ở đường ghi chứ không ở câu chữ, và đó là cách AD-3 hỏng); bảng cuối tách *câu hỏi chấm* (phổ quát) khỏi *ngưỡng số* (riêng dự án), hết mâu thuẫn với góc 1 và góc 7 |
 | `docs/VAN-DAO-dac-ta-v1.0.md` | `mien-tru` | Đặc tả sản phẩm, có trước quy tắc này, và không phải artifact harness — nó mô tả Vấn Đạo chứ không hướng dẫn cách xây |
 | `docs/VAN-DAO-setup-du-an.md` | `mien-tru` | Có trước quy tắc. Ghi lại cách dựng môi trường, không tạo hành vi mới |
 | `docs/VAN-DAO-trang-thai-du-an.md` | `mien-tru` | Có trước quy tắc. Bản ghi sự kiện, không phải chuẩn |
@@ -50,11 +50,11 @@ Phạm vi bản đầu bỏ sót ba nhóm, và cả ba đều là **thành phầ
 
 | Artifact | Trạng thái | Chi tiết |
 |---|---|---|
-| `_bmad/custom/lenses/skill-quality.md` | `da-review` | 2026-08-31 · đọc thật toàn văn, không dựa hiệu quả đã đo · 4 finding, **vá 1** · đã vá: check 8 giờ nêu thẳng mốc 5.000 token / pool 25.000 và bắt người soi báo mốc rơi vào đâu — trước đó chỉ nói "a fixed token ceiling" nên không kiểm được. Còn: check 3 và 4 chồng lấn; check 6 đòi "actual packaged skill" — không xác định cho skill workspace không phải plugin; viết tiếng Anh trong bộ lens tiếng Việt |
-| `_bmad/custom/lenses/ba-problem-validity.md` | `da-review` | 2026-08-31 · 2 finding riêng: stance nói "năm phép kiểm" nhưng phép 4 chứa hai câu hỏi độc lập (liệt kê bên liên quan · ai xác nhận vấn đề) — thực chất sáu; và `nếu_sai_thì` là khoá đầu ra duy nhất trong cả bộ có dấu tiếng Việt, cạnh `babok_area` tiếng Anh trong chính file này — bốn lens BA emit bốn kiểu đặt tên khoá khác nhau, khớp lẫn nhau không được. **Rút lại một finding cũ**: nghi chồng lấn với `ba-requirements-quality` là sai, đọc thật thì phép 5 soi khẳng định hiện trạng còn lens kia soi yêu cầu |
-| `_bmad/custom/lenses/ba-requirements-quality.md` | `da-review` | 2026-08-31 · 1 finding riêng: `req_id` giả định tài liệu đã đánh ID, mà không đặc tính nào trong chín đặc tính bắt được lỗi "yêu cầu không có ID" — đúng thứ lens này nên bắt nhất |
-| `_bmad/custom/lenses/ba-traceability.md` | `da-review` | 2026-08-31 · 2 finding riêng: đòi "nói rõ đã lần bao nhiêu mắt xích" khi kết quả rỗng, nhưng đầu ra là mảng finding — mảng rỗng không có chỗ đựng con số; và enum `huong` chỉ ba giá trị trong khi có bốn phép lần, "việc mồ côi trong kế hoạch" không ánh xạ rõ vào giá trị nào |
-| `_bmad/custom/lenses/ba-solution-evaluation.md` | `da-review` | 2026-08-31 · 2 finding riêng: phép 3 (người xác nhận khác người làm) luôn fail trong workspace một người — sinh noise nền mỗi lần chạy, không có lối thoát; và là lens duy nhất trong năm không nói nó KHÔNG xét gì, nên chồng lấn không được phân xử |
+| `_bmad/custom/lenses/skill-quality.md` | `da-review` | 2026-08-31 · đọc thật toàn văn · 4 finding, **vá 3, đóng 1, hết** · check 8 nêu mốc 5.000/pool 25.000; check 3 và 4 phân xử theo *cách lỗi lộ ra*; check 6 định nghĩa "packaged" theo đường tiếp cận thật của từng loại skill. **Đóng bằng quyết định:** viết tiếng Anh là cố ý — quy tắc "lens cùng ngôn ngữ với thứ nó soi", ghi ở đầu `bmad-review.toml`. Người dùng chốt 2026-08-31: hệ thống chuyển tiếng Anh toàn bộ, nên file này đã đúng đích; bốn lens BA thành nợ chuyển ngữ theo `docs/` |
+| `_bmad/custom/lenses/ba-problem-validity.md` | `da-review` | 2026-08-31 · 2 finding, **vá 2, hết** · tách phép 4 thành hai (bên liên quan · ai xác nhận), stance sửa "năm" → "sáu"; phép ai-xác-nhận thêm lối thoát cho dự án một tác giả — qua khi tài liệu tự nhận là chưa có người xác nhận độc lập, vẫn là finding khi tài liệu im lặng. Khoá `nếu_sai_thì` → `neu_sai_thi`, hết là khoá JSON duy nhất mang dấu. **Một finding cũ bị rút**: nghi chồng lấn với `ba-requirements-quality` là sai — phép cuối soi khẳng định hiện trạng, lens kia soi yêu cầu |
+| `_bmad/custom/lenses/ba-requirements-quality.md` | `da-review` | 2026-08-31 · 1 finding, **vá 1, hết** · thêm mục soi trước chín đặc tính: yêu cầu có định danh không. `req_id` từng giả định tài liệu đã đánh ID, mà không đặc tính nào bắt được lỗi thiếu ID — thứ chặn luôn `ba-traceability` phía sau |
+| `_bmad/custom/lenses/ba-traceability.md` | `da-review` | 2026-08-31 · 2 finding, **vá 2, hết** · enum `huong` thêm giá trị `kế hoạch` cho phép lần thứ 3 (trước đó ba giá trị cho bốn phép, "việc mồ côi trong kế hoạch" không ánh xạ được); và con số mắt xích đã lần giờ ghi ở dòng tổng kết markdown thay vì đòi mảng finding rỗng đựng nó — không có con số thì "chạy và sạch" trông y hệt "không chạy" |
+| `_bmad/custom/lenses/ba-solution-evaluation.md` | `da-review` | 2026-08-31 · 2 finding, **vá 2, hết** · thêm đoạn nói nó KHÔNG xét gì (lens duy nhất trong năm thiếu, nên chồng lấn không phân xử được); phép 3 thêm lối thoát cho dự án một người — qua khi tài liệu thay người ký bằng oracle không phụ thuộc phán đoán tác giả (test đỏ/xanh, mã thoát, số đo có ngưỡng). Trước đó phép này fail bằng định nghĩa mỗi lượt, che mất finding thật |
 
 ## Test
 
@@ -67,7 +67,7 @@ Phạm vi bản đầu bỏ sót ba nhóm, và cả ba đều là **thành phầ
 
 | Artifact | Trạng thái | Chi tiết |
 |---|---|---|
-| `_bmad/custom/bmad-review.toml` | `da-review` | 2026-08-31 · đến hạn đúng lúc: miễn trừ của nó hứa "review cùng lượt với lens nó đăng ký", và cả năm lens vừa chuyển `da-review` · 3 finding, vá 0 · `when` của `ba-traceability` đòi "ít nhất hai tầng" trong khi phép 4 của lens (đối chiếu ranh giới) chỉ cần một tầng — `when` chặt hơn chính lens nên chặn nhầm; `when` của `ba-solution-evaluation` không loại được tài liệu một tác giả, nơi phép "ai ký" luôn fail; không lens custom nào `applies_to = "code"` nên `bin/*.py` chỉ soi được bằng lens shipped |
+| `_bmad/custom/bmad-review.toml` | `da-review` | 2026-08-31 · đến hạn đúng lúc: miễn trừ của nó hứa "review cùng lượt với lens nó đăng ký" · 3 finding, **vá 1, hết hiệu lực 1, đóng 1, hết** · `when` của `ba-traceability` nới ra vì phép lần thứ 4 chỉ cần một mục ranh giới. Finding về `when` của `ba-solution-evaluation` hết hiệu lực sau khi lens có lối thoát. **Đóng bằng quyết định:** không có lens `applies_to = "code"` là cố ý — lens custom chỉ đáng viết khi có kiểu hỏng lens shipped không bắt, mà adversarial và edge-case-hunter đã tìm ra finding thật trên cả hai script; lý do ghi ở đầu file |
 | `_bmad/custom/bmad-prd.toml` | `mien-tru` | Config cho `bmad-prd`, review cùng lượt khi dùng skill đó |
 | `_bmad/custom/config.toml` | `mien-tru` | Config chung, review cùng lượt với thứ nó cấu hình |
 
@@ -83,6 +83,8 @@ Phạm vi bản đầu bỏ sót ba nhóm, và cả ba đều là **thành phầ
 
 Một quy tắc mới áp lên artifact có sẵn sẽ đỏ hàng loạt, và một phép kiểm đỏ kéo dài thì bị tắt — rủi ro này đã ghi trong `VAN-DAO-harness-viet-skill.md` §9. Nên test kiểm **sự có mặt**, không kiểm trạng thái. Nợ hiện ra trong sổ, không biến mất, nhưng cũng không chặn việc khác.
 
+Tính đến 2026-08-31 sổ không còn mục `no` nào. Đừng đọc điều đó thành "`no` là trạng thái xấu phải tránh": artifact tiếp theo được thêm vào rất có thể vào sổ dưới dạng `no`, và đó là đúng cách dùng. Một cuốn sổ toàn `da-review` mãi mãi nghĩa là không ai thêm gì mới — hoặc có người đang ghi bừa.
+
 ## Cơ chế này đang ở tầng nào
 
 Không phải tầng 2 hoàn toàn. `bin/setup-hooks.py` cài một hook `pre-commit` chạy test tự động, nên nó **không còn phụ thuộc ai nhớ gõ lệnh** — nhưng ba giới hạn phải nói thẳng:
@@ -90,7 +92,10 @@ Không phải tầng 2 hoàn toàn. `bin/setup-hooks.py` cài một hook `pre-co
 - Hook sống trong `.git/hooks/`, **không được version control**. Máy khác clone về là không có, cho tới khi ai đó chạy `python bin/setup-hooks.py`.
 - `git commit --no-verify` bỏ qua được. Đây là guardrail, không phải cổng an ninh.
 - Chỉ chạy lúc commit. Thay đổi chưa commit vẫn nằm ngoài.
+- Cần một interpreter Python chạy được. Hook tự dò `python3` · `python` · `py` và kiểm bằng cách chạy thử; không tìm được thì nó **chặn** chứ không im lặng cho qua — commit trông như đã qua test là đúng thứ cơ chế này chống.
 
 Nên gọi đúng: **tầng 2.5**. Mạnh hơn "ai đó nhớ chạy", yếu hơn CI. Nó lên tầng 2 thật khi repo có remote — mục hoãn số 17.
 
 Điều test **thật sự** bắt: một artifact mới được thêm mà không ai ghi vào sổ. Đó là ca đã xảy ra thật với `orca-help`.
+
+Điều nó **không** bắt, và đã bỏ lọt thật: `_bmad/custom/bmad-review.toml` viện dẫn "review cùng lượt với lens nó đăng ký" mà không nêu đường dẫn trong backtick, nên phép kiểm ở lý do (c) không khớp được, và mục đó tụt lại phía sau năm lens đã `da-review` cho tới khi có người đọc bảng bằng mắt. §9 ở đầu sổ đã cảnh báo trước đúng chuyện này — cảnh báo không phải phép kiểm. Ai viết lý do (c) mà không đặt đường dẫn trong backtick thì đang tự bỏ ràng buộc của chính mình.

@@ -6,7 +6,7 @@ Lens này **không** xét chất lượng từng yêu cầu (việc của `ba-re
 
 ## Stance
 
-Đọc như một người sắp phải bỏ tiền cho việc này và chưa tin nó đáng làm. Kết quả rỗng là hợp lệ, nhưng chỉ khi cả năm phép kiểm dưới đây đều qua.
+Đọc như một người sắp phải bỏ tiền cho việc này và chưa tin nó đáng làm. Kết quả rỗng là hợp lệ, nhưng chỉ khi cả sáu phép kiểm dưới đây đều qua.
 
 ## Các phép kiểm
 
@@ -32,9 +32,13 @@ Thiếu mục này thì mọi kế hoạch đều "đáng làm" một cách mặ
 
 Liệt kê các bên chịu ảnh hưởng. Ba nhóm hay bị quên: **người vận hành** thứ sẽ được xây, **người kế thừa** nó sau khi tác giả rời đi, và **người chịu hậu quả gián tiếp** khi nó hỏng.
 
-Tài liệu có nêu ai xác nhận vấn đề này là đúng không? Nếu tác giả tự phát biểu vấn đề rồi tự xác nhận, đó là một finding.
+### 5. Ai xác nhận vấn đề này là đúng
 
-### 5. Bằng chứng cho phát biểu vấn đề
+Tài liệu có nêu ai xác nhận không? Tác giả tự phát biểu vấn đề rồi tự xác nhận là một finding.
+
+**Trừ khi tài liệu đã tự nhận điều đó.** Ở dự án một tác giả, "người xác nhận khác người viết" không tồn tại, và báo đi báo lại mỗi lượt chỉ tạo tiếng ồn nền. Khi tài liệu **nêu thẳng** rằng chưa có người xác nhận độc lập và ghi mốc sẽ có, phép này qua. Khi tài liệu **im lặng** về chuyện đó — vẫn là finding, vì im lặng đọc như đã có người duyệt.
+
+### 6. Bằng chứng cho phát biểu vấn đề
 
 Mỗi khẳng định về hiện trạng phải truy về: dữ liệu đo được · tài liệu/chính sách viết ra · hoặc lời của người có quyền quyết. Trực giác và "ai cũng biết" không tính.
 
@@ -45,6 +49,6 @@ Chỉ ra cụ thể khẳng định nào đang không có nguồn.
 Canonical fields (`location`, `trigger_condition`, `guard_snippet`, `potential_consequence`), thêm:
 
 - `babok_area` — knowledge area liên quan (ví dụ `Strategy Analysis`)
-- `nếu_sai_thì` — điều gì đổ theo nếu finding này đúng: một yêu cầu, cả nhóm yêu cầu, hay toàn bộ kế hoạch
+- `neu_sai_thi` — điều gì đổ theo nếu finding này đúng: một yêu cầu, cả nhóm yêu cầu, hay toàn bộ kế hoạch
 
 Không xếp hạng, không gán mức nghiêm trọng.

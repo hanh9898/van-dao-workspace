@@ -178,7 +178,8 @@ Thứ tự dưới đây theo *hậu quả khi hỏng*, không theo dễ kiểm.
 
 > Skill có nêu điều kiện kết thúc quan sát được không? Có nói rõ thứ nó **không** làm, kèm chỗ chuyển tiếp không?
 
-**Kiểm:** đọc "Xong khi" và "Khi nào không giúp được". Ranh giới chỉ nằm trong tài liệu thiết kế mà không nằm trong skill thì không tính.
+**Kiểm:** đọc hai mục "Xong khi" và "Khi nào skill này không giúp được" — bản tiếng Anh là "Done when" và "When this skill does not help". Ranh giới chỉ nằm trong tài liệu thiết kế mà không nằm trong skill thì không tính.
+**Kiểm thêm — vùng ghi:** liệt kê mọi tệp/thư mục skill này *đọc* và *ghi*, rồi đối chiếu với vai sở hữu từng vùng. Lấn sang việc vai khác thường không lộ ra ở câu chữ mà lộ ở đường ghi: một skill khai đúng phạm vi vẫn có thể ghi vào vùng của vai khác. Hai vai cùng ghi một vùng thì hỏng theo kiểu khó truy nhất — không ai sai ở lượt của mình.
 **Hỏng thế nào:** skill lấn sang việc của vai khác, hoặc bịa ra thứ chưa dựng.
 
 ### 4 · Kích hoạt — được gọi đúng lúc
@@ -251,10 +252,10 @@ Phép thử: **bỏ hết danh từ riêng của Vấn Đạo đi, câu đó cò
 |---|---|
 | Hai trục phân loại skill (A.0) | Bốn mục bắt buộc (A.5) |
 | Thứ tự sống sót (A.1) | Vai nào ghi vùng dữ liệu nào |
-| Ranh giới lời dặn / cơ chế (A.2) | Ngưỡng token cụ thể của dự án |
+| Ranh giới lời dặn / cơ chế (A.2) | Các *ngưỡng số* trong phép kiểm góc 1 và góc 7 |
 | `description` là điều kiện kích hoạt (A.3) | Thuật ngữ hệ (bí kíp, mạch, chỉ điểm) |
 | Bốn cách xử lý khi skill phình (A.4) | |
-| Tám góc độ đánh giá (Phần B) | |
+| Tám góc độ đánh giá (Phần B) — *câu hỏi chấm* | |
 | Eval đi cùng lúc viết (A.6) | |
 
 Cột trái tách ra dùng lại được ngoài Vấn Đạo. Cột phải thì không, và cũng không nên cố làm cho nó phổ quát.

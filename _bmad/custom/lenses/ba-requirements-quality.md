@@ -28,6 +28,12 @@ Một yêu cầu không kiểm được pass/fail thì không phải yêu cầu,
 2. **Ngưỡng nhất quán khắp tài liệu.** Cùng một ràng buộc xuất hiện ở phần yêu cầu, phần kế hoạch, phần rủi ro — ba chỗ phải cùng một con số.
 3. **Ngưỡng phân biệt được con số *của nền tảng* với con số *do dự án tự đặt*.** Lẫn hai loại này khiến người sau không biết được phép đổi cái nào.
 
+## Trước khi soi từng cái — yêu cầu có định danh không
+
+`req_id` ở phần đầu ra giả định tài liệu đã đánh ID. Phần lớn tài liệu thì không: yêu cầu nằm rải trong văn xuôi, không ID, không đếm được, không ai nói được "yêu cầu số mấy đã xong".
+
+Đó tự nó là finding, và phải báo **trước** khi soi chín đặc tính — vì nó chặn cả `ba-traceability` phía sau: không có ID thì không có mắt xích để lần. Khi rơi vào ca này, `req_id` ghi `(chưa đánh ID)` kèm trích dẫn đủ dài để định vị được câu đang nói tới.
+
 ## Kiểm ngược — tìm cách nó sai
 
 Với mỗi yêu cầu, hỏi: *"tôi có thể thi hành đúng từng chữ mà vẫn không đạt được điều tài liệu muốn không?"* Nếu có, yêu cầu đó chưa ghim đủ.

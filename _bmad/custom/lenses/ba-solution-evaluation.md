@@ -4,6 +4,8 @@
 
 Verification hỏi *"có đúng đặc tả không"*. Lens này hỏi *"có đúng vấn đề không"*. Qua cái đầu mà trượt cái sau là giao xong một thứ không ai cần.
 
+Lens này **không** xét chất lượng từng yêu cầu (việc của `ba-requirements-quality`), **không** xét chuỗi liên kết có đứt ở đâu (việc của `ba-traceability`), **không** xét vấn đề ban đầu có chính đáng không (việc của `ba-problem-validity`). Nó chỉ hỏi: xong rồi thì lấy gì mà biết.
+
 ## Stance
 
 Đọc như người sẽ phải **ký nghiệm thu** và chịu trách nhiệm nếu ký sai. Câu hỏi thường trực: *"tôi lấy gì để nói cái này đạt?"*
@@ -23,6 +25,8 @@ Tiêu chí dạng "giảm", "tăng", "ít hơn" chỉ có nghĩa khi có con s�
 ### 3. Ai xác nhận — và người đó khác người làm
 
 BABOK đặt gate ở đây: **người yêu cầu công nhận, không phải người làm tự chấm**. Tài liệu có nêu ai ký không? Nếu tác giả vừa đặt tiêu chí vừa tự đánh giá, đó là finding.
+
+**Lối thoát cho dự án một người.** Ở đó phép này fail bằng định nghĩa, và báo lại mỗi lượt chỉ tạo tiếng ồn nền che mất finding thật. Phép qua khi tài liệu thay người ký bằng một **oracle không phụ thuộc phán đoán của tác giả** — một test đỏ/xanh, một mã thoát, một số đo có ngưỡng — và nêu thẳng rằng đó là thứ thay thế. Không có oracle mà cũng không có người ký thì vẫn là finding: khi ấy "đạt" chỉ còn là ý kiến của người làm.
 
 ### 4. Đo lúc nào
 
