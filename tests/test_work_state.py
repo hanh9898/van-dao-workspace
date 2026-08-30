@@ -149,5 +149,50 @@ class TestDocSprint(unittest.TestCase):
                          "không được dùng khoá đặc biệt trong dict trạng thái")
 
 
+class TestLocWorktreeTheoRepo(unittest.TestCase):
+    """`orca worktree ps` trả worktree của MỌI repo trên máy, không chỉ repo này.
+
+    Ca đã xảy ra thật: báo 7 worktree trong khi chỉ 1 thuộc repo này, 6 cái kia là
+    dự án khác — người đọc tưởng chúng liên quan tới story đang làm.
+    """
+
+    def _wt(self, path, repo_id, ten="x"):
+        return {"path": path, "repoId": repo_id, "displayName": ten,
+                "branch": "refs/heads/main", "workspaceStatus": "in-progress"}
+
+    def test_chi_giu_worktree_cung_repo(self):
+        goc = str(ws.GOC).replace("\\", "/")
+        ds = {"worktrees": [
+            self._wt(goc, "R1", "main"),
+            self._wt(goc + "/con", "R1", "con"),
+            self._wt("D:/khac/opms", "R2", "opms"),
+            self._wt("D:/khac/test", "R3", "test"),
+        ]}
+        giu, loai, ly_do = ws.loc_worktree_repo_nay(ds)
+        self.assertEqual(len(giu), 2, "worktree con cùng repoId phải được giữ")
+        self.assertEqual(loai, 2)
+        self.assertIsNone(ly_do)
+
+    def test_khong_nhan_ra_repo_thi_bao_chu_khong_im_lang(self):
+        """Không lọc bừa, và cũng không im lặng — phải trả lý do để vào
+        `khong_doi_chieu_duoc`. Đây đúng ranh giới skill tự đặt: một phép so không
+        chạy được khác hẳn một phép so chạy mà không thấy gì."""
+        ds = {"worktrees": [self._wt("D:/khac/opms", "R2")]}
+        giu, loai, ly_do = ws.loc_worktree_repo_nay(ds)
+        self.assertEqual(len(giu), 1, "không nhận ra repo thì giữ nguyên, không vứt")
+        self.assertEqual(loai, 0)
+        self.assertIsNotNone(ly_do)
+
+    def test_khong_co_worktree_nao(self):
+        self.assertEqual(ws.loc_worktree_repo_nay({}), ([], 0, None))
+
+    def test_so_sanh_path_khong_phan_biet_dau_gach_va_hoa_thuong(self):
+        """Orca trả `C:/...`, Path trên Windows cho `C:\...` — so thô là trượt."""
+        goc = str(ws.GOC).replace("/", "\\").upper()
+        ds = {"worktrees": [self._wt(goc, "R1"), self._wt("D:/khac", "R2")]}
+        giu, loai, ly_do = ws.loc_worktree_repo_nay(ds)
+        self.assertEqual((len(giu), loai, ly_do), (1, 1, None))
+
+
 if __name__ == "__main__":
     unittest.main()

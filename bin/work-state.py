@@ -165,6 +165,38 @@ def khop_sprint(ten_story, sprint):
     return ra
 
 
+def loc_worktree_repo_nay(wt):
+    """Chỉ giữ worktree thuộc CHÍNH repo này.
+
+    `orca worktree ps` trả mọi worktree Orca biết, kể cả của dự án khác trên cùng
+    máy. Báo hết ra là sai theo đúng nghĩa mà skill này tồn tại để chống: người đọc
+    thấy "7 worktree" rồi tưởng chúng liên quan tới story đang làm.
+
+    Cách nhận repo: tìm worktree có `path` trỏ đúng gốc repo này, lấy `repoId` của
+    nó, rồi giữ mọi worktree cùng `repoId` (worktree con nằm ở path khác nhưng cùng
+    repoId). Không tìm được thì KHÔNG lọc bừa và cũng không im lặng — trả lý do để
+    nó vào `khong_doi_chieu_duoc`.
+
+    Trả `(danh_sách, số_bị_loại, lý_do_hoặc_None)`.
+    """
+    ds = wt.get("worktrees") or []
+    if not ds:
+        return [], 0, None
+
+    def chuan(x):
+        return str(x or "").replace("\\", "/").rstrip("/").lower()
+
+    goc = chuan(GOC)
+    repo_id = next((w.get("repoId") for w in ds if chuan(w.get("path")) == goc), None)
+    if repo_id is None:
+        return ds, 0, (
+            f"không nhận ra worktree nào trỏ đúng gốc repo này ({GOC}), nên KHÔNG lọc "
+            f"được worktree của repo khác — {len(ds)} worktree dưới đây có thể thuộc dự án khác"
+        )
+    giu = [w for w in ds if w.get("repoId") == repo_id]
+    return giu, len(ds) - len(giu), None
+
+
 def tim_lech(sprint, stories, orca_tasks, co_run, story_thieu_status=()):
     """Đối chiếu các nguồn. Hàm thuần — mọi đầu vào là tham số, không đọc đĩa, không gọi orca.
 
@@ -248,9 +280,12 @@ def main():
     wt_ok, wt = chay_orca("worktree", "ps")
 
     danh_sach_task = tasks.get("tasks", []) if tasks_ok else []
+    wt_repo_nay, so_wt_repo_khac, wt_ly_do = loc_worktree_repo_nay(wt if wt_ok else {})
     lech, chua_so = tim_lech(sprint, stories, danh_sach_task, tasks_ok, thieu_status)
     for f in trung_ten:
         chua_so.append(f"file story `{f}` trùng tên với một story khác — bị bỏ qua")
+    if wt_ok and wt_ly_do:
+        chua_so.append(wt_ly_do)
     if dong_la:
         chua_so.append(
             f"{len(dong_la)} dòng trong `development_status` không đúng hình dạng "
@@ -287,8 +322,9 @@ def main():
             "worktree": [
                 {"ten": w.get("displayName"), "branch": w.get("branch"),
                  "trang_thai": w.get("workspaceStatus")}
-                for w in (wt.get("worktrees", []) if wt_ok else [])
+                for w in wt_repo_nay
             ] if wt_ok else None,
+            "worktree_repo_khac": so_wt_repo_khac,
         },
         "lech": lech,
         "khong_doi_chieu_duoc": chua_so,
@@ -308,6 +344,8 @@ def main():
         so_story = len(b["story_status_khong_done"]) + b["so_story_done"]
         print(f"BMAD  : {so_story} story, đang dở: {b['dang_lam'] or '(không có)'}")
         wt = "?" if o["worktree"] is None else len(o["worktree"])
+        if o.get("worktree_repo_khac"):
+            wt = f"{wt} (+{o['worktree_repo_khac']} của repo khác, đã loại)"
         print(f"Orca  : {'chạy' if o['app_chay'] else 'không chạy'}"
               f" · {len(o['task'])} task · {wt} worktree")
         if ket_qua["lech"]:

@@ -69,7 +69,8 @@ Report through your dispatch (`worker_done`), not by editing shared tracking fil
 | `bmad.sprint_status_dang_hoat_dong` | Sprint rows that are not `backlog`/`optional`; the count of skipped rows is reported separately |
 | `orca.co_run_binding` | `false` means no Run is bound — every BMAD↔Orca check was skipped |
 | `orca.task` | Orchestration tasks, with status and a truncated spec |
-| `orca.worktree` | Worktrees Orca knows about, with branch and workspace status |
+| `orca.worktree` | Worktrees **of this repo only**, with branch and workspace status |
+| `orca.worktree_repo_khac` | How many worktrees belonged to other repos and were filtered out |
 | `lech` | Sources disagree — act on these |
 | `khong_doi_chieu_duoc` | Checks that did not run — say so, do not treat as clean |
 
@@ -78,5 +79,7 @@ Three Orca states read very differently and must not be collapsed:
 - `app_chay: false` — Orca is not running. The BMAD half still works; the Orca half is unknown. Not an error.
 - `co_run_binding: false` — Orca runs but no Run is bound, so **every BMAD↔Orca check was skipped**. This lands in `khong_doi_chieu_duoc`, not in "clean".
 - `co_run_binding: true` with `task: []` — a Run is bound and it genuinely has no tasks. Here the comparison **did** run. If a story is in progress, that is a real divergence, and the script reports it as one.
+
+`orca worktree ps` returns worktrees for **every repo on the machine**, so the script keeps only those sharing a `repoId` with the worktree whose path is this repo root, and reports the number it dropped. Reporting all of them would be the exact failure this skill exists to prevent: a reader sees "7 worktrees" and assumes they relate to the story in progress. If no worktree matches this repo root, the script does **not** filter blind — it keeps the list and says why the filter could not run, which lands in `khong_doi_chieu_duoc`.
 
 `worktree: null` means the worktree query failed; `worktree: []` means Orca returned none. The `--brief` line prints `?` for the first case so the two never look alike.
