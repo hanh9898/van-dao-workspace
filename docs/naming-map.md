@@ -7,8 +7,8 @@ agent. Thế giới quan tiên hiệp giữ nguyên; chỉ ngôn ngữ diễn đ
 chỗ: `communication_language` trong config, tức thứ tiếng hệ *nói chuyện* với người dùng.
 
 Tài liệu này tồn tại vì một lý do hẹp: **cùng một khái niệm phải ra cùng một từ ở mọi nơi.** Dịch
-rải rác qua nhiều lượt thì `bí kíp` sẽ thành `manual` chỗ này, `book` chỗ kia, `scripture` chỗ nữa —
-và không có cách nào sửa lại sau, vì không ai biết ba từ đó từng là một.
+rải rác qua nhiều lượt thì `bí kíp` sẽ thành một từ ở chỗ này, một từ khác ở chỗ kia — và không có
+cách nào sửa lại sau, vì lúc đó không ai còn biết hai từ ấy từng là một.
 
 ---
 
@@ -19,18 +19,18 @@ người đọc có tiếp xúc thể loại nhận ra ngay. Không dùng pinyin
 
 | Tiếng Việt | Hán tự | Tiếng Anh | Ghi chú |
 |---|---|---|---|
-| bí kíp | 秘笈 | **manual** | Cuốn sách được nạp vào hệ. Không dùng `book` — mất màu, và `book` đã bận nghĩa kỹ thuật |
+| bí kíp | 秘笈 | **scripture** | Cuốn sách được nạp vào hệ. Không dùng `book` (bận nghĩa kỹ thuật) cũng không dùng `manual` — `manual` trong phần mềm nghĩa là sách hướng dẫn dùng sản phẩm, nên `manuals/` sẽ bị đọc thành docs của plugin |
 | mạch | 脈 | **meridian** | Nhánh tri thức chạy xuyên nhiều bí kíp |
-| chỉ điểm | 指點 | **pointer** | Lời chỉ của Trưởng môn cho đệ tử. Số nhiều `pointers` |
+| chỉ điểm | 指點 | **counsel** | Lời chỉ của Trưởng môn cho đệ tử. Không dùng `pointer` — trong một dự án Python, `pointers.jsonl` đọc như con trỏ. `counsel` là danh từ không đếm được, dùng nguyên dạng cho cả số nhiều |
 | Trưởng môn | 掌門 | **Sect Master** | Vai điều phối |
 | trưởng lão | 長老 | **Elder** | Vai chấm bài |
 | đệ tử | 弟子 | **disciple** | Người học |
 | nhập môn | 入門 | **initiation** | Nghi thức gia nhập |
-| tàng kinh (các) | 藏經閣 | **Scripture Hall** | Nơi cất bí kíp |
+| tàng kinh (các) | 藏經閣 | **Scripture Hall** | Nơi cất bí kíp. Cùng gốc từ với `scripture` là cố ý, không phải trùng lặp — tàng kinh các đúng nghĩa là nơi chứa kinh thư |
 | cảnh giới | 境界 | **realm** | Bậc tu vi |
 | tâm pháp | 心法 | **heart method** | Nguyên lý cốt lõi của một chương |
 | công pháp | 功法 | **technique** | Cách vận dụng |
-| khảo thí | 考試 | **trial** | Bài kiểm tra. Không dùng `exam` — mất màu |
+| khảo thí | 考試 | **ordeal** | Bài kiểm tra. Không dùng `exam` (mất màu) cũng không dùng `trial` — "start a trial" trong phần mềm đọc như bản dùng thử |
 | nghiệm công | 驗功 | **proving** | Chứng minh đã lĩnh hội |
 | Phúc Khảo Sứ | 覆考使 | **Re-examiner** | Vai chấm lại độc lập |
 | hạ sơn | 下山 | **descend the mountain** | Rời môn phái, hoàn thành |
@@ -40,6 +40,8 @@ người đọc có tiếp xúc thể loại nhận ra ngay. Không dùng pinyin
 
 | Tiếng Việt | Tiếng Anh |
 |---|---|
+| khối sư phạm | pedagogy block |
+| khuôn câu hỏi | question template |
 | hồ sơ | profile |
 | thư | letter |
 | bàn giao | handover |
@@ -53,7 +55,7 @@ người đọc có tiếp xúc thể loại nhận ra ngay. Không dùng pinyin
 | tiêu chí đạt | pass criteria |
 | sai lầm phổ biến | common mistakes |
 | mục tiêu | objective |
-| phụ thuộc | depends on |
+| phụ thuộc | depends_on |
 | nhận định | assessment |
 | suy đoán | inference |
 | giả định nền | baseline assumption |
@@ -63,11 +65,11 @@ người đọc có tiếp xúc thể loại nhận ra ngay. Không dùng pinyin
 
 ## 3 · Quy tắc đặt tên định danh
 
-- **Thư mục và tệp:** `kebab-case`, tiếng Anh. `thu-bi-kip/` → `manual-intake/`
+- **Thư mục và tệp:** `kebab-case`, tiếng Anh. `thu-bi-kip/` → `scripture-intake/`
 - **Hàm và biến Python:** `snake_case`, tiếng Anh. `kiem_manifest` → `check_manifest`
 - **Khoá JSON/TOML:** `snake_case`, tiếng Anh. `tieu_chi_dat` → `pass_criteria`
 - **Vai (agent/skill):** danh từ chỉ vai, `kebab-case`. `truong-mon/` → `sect-master/`
-- **Không viết tắt** trừ khi từ đầy đủ dài hơn ba từ.
+- **Không viết tắt.** Không có ngoại lệ nào đủ rẻ để đáng có: một định danh dài đọc chậm hơn vài giây, một định danh viết tắt sai nghĩa thì sai mãi. Bản trước của dòng này ghi "trừ khi dài hơn ba từ" mà không nói viết tắt *thành gì* — tức là một quy tắc không thi hành được.
 
 Một khái niệm ra một từ. Nếu bảng này chưa có từ cho thứ đang cần, **thêm vào bảng trước**, rồi mới
 dùng — chứ không dùng trước rồi ghi sau.
@@ -78,16 +80,19 @@ dùng — chứ không dùng trước rồi ghi sau.
 triển. Quyết định này chỉ đúng khi thực hiện *trước* lần phát hành đầu; sau đó thì vĩnh viễn phải
 migrate.
 
+Nguồn cho "chưa phát hành", verify 2026-08-31: repo `van-dao` không có tag nào, không có remote nào,
+và `CHANGELOG.md` ghi `## [0.1.0] — chưa phát hành`. Ba dấu hiệu độc lập cùng chỉ một hướng.
+
 | Cũ | Mới |
 |---|---|
 | `.vandao/` | `.wayfarer/` |
-| `.vandao/bi-kip/` | `.wayfarer/manuals/` |
-| `.vandao/truong-mon/chi-diem.jsonl` | `.wayfarer/sect-master/pointers.jsonl` |
+| `.vandao/bi-kip/` | `.wayfarer/scriptures/` |
+| `.vandao/truong-mon/chi-diem.jsonl` | `.wayfarer/sect-master/counsel.jsonl` |
 | `.vandao/truong-mon/ho-so.json` | `.wayfarer/sect-master/profile.json` |
 | `.vandao/nhap-mon-ky.md` | `.wayfarer/initiation-record.md` |
 | `.vandao/tang-kinh/nhap-dang-do/` | `.wayfarer/scripture-hall/drafts/` |
 | `.vandao/ban-giao/thu/` | `.wayfarer/handover/letters/` |
-| `.vandao/custom/thu-bi-kip.toml` | `.wayfarer/custom/manual-intake.toml` |
+| `.vandao/custom/thu-bi-kip.toml` | `.wayfarer/custom/scripture-intake.toml` |
 | `.vandao/custom/truong-mon.toml` | `.wayfarer/custom/sect-master.toml` |
 
 ## 5 · Tên sản phẩm — **Wayfarer**
@@ -117,7 +122,23 @@ cùng lúc với lần đặt remote đầu tiên.
 của Tàng kinh trưởng lão. Nên là `drafts/`, không phải `pending/`: "pending" nói thứ đang chờ ai đó
 xử lý, còn đây là việc của chính người viết chưa làm xong.*
 
-## 6 · Không đổi
+## 6 · Bảng này phủ đến đâu — và chỗ nó chưa cưỡng chế được
+
+**Phủ:** thuật ngữ hệ (§1), danh từ kỹ thuật hay gặp (§2), đường dẫn dữ liệu người dùng (§4), tên sản
+phẩm (§5). Đó là phần **quyết định** — chọn sai thì sai lan ra mọi chỗ.
+
+**Chưa phủ:** hàng trăm khoá `snake_case` trong đặc tả (`dang_treo`, `lop_nhiem_vu`, `canh_gioi_ra`,
+`khao_thi_quyen`, `ghi_luc`…). Chúng suy ra được từ §1 và §2 nên không cần liệt kê sẵn — nhưng **suy
+ra rồi thì phải ghi vào §2**, để lần sau người khác gặp cùng khoá không suy ra một từ khác. Quy tắc:
+gặp khoá chưa có từ → thêm dòng vào bảng → rồi mới đổi tên. Không làm ngược.
+
+**Chỗ bảng này chưa cưỡng chế được gì.** Nguyên tắc "một khái niệm ra một từ" hiện chỉ là lời dặn —
+đúng thứ dự án này liên tục chứng minh là không đủ. Phép kiểm rẻ nhất, dựng **sau khi refactor xong**:
+một test quét mọi định danh trong mã và tên tệp, đỏ nếu còn ký tự có dấu tiếng Việt. Nó không bắt được
+"dịch một khái niệm thành hai từ", nhưng bắt được "quên dịch", và đó là kiểu sót nhiều nhất. Mốc: cùng
+lượt với lần refactor cuối.
+
+## 7 · Không đổi
 
 - `communication_language` và các khoá config chuẩn của BMad — thuộc nền tảng, không phải của ta.
 - Nội dung do người dùng viết ra: bài nộp, ghi chép, thư của họ.
