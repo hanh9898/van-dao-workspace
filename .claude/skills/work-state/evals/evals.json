@@ -1,0 +1,115 @@
+{
+  "skill_name": "work-state",
+  "level": "nhẹ — 3 kịch bản phủ ba nhánh của skill: trạng thái sạch có phần chưa so được, lệch thật, và không đọc được nguồn nào.",
+  "method": "Chạy THẬT bằng `claude -p \"/work-state\" --model sonnet` từ gốc workspace. Không cô lập HOME vì skill này chỉ đọc, không ghi gì — khác `van-dao/skills/*` vốn ghi vào `~/.vandao`. Kịch bản có lệch được dựng bằng cách sửa tạm `sprint-status.yaml` rồi khôi phục ngay; `git diff --stat` sau đó xác nhận file về nguyên trạng. Kịch bản không-đọc-được-nguồn chạy trực tiếp script trong một thư mục trống, không qua `claude -p`, vì nó kiểm mã thoát chứ không kiểm hành vi diễn giải. Chạy 2026-08-31.",
+  "evals": [
+    {
+      "id": 1,
+      "nhanh": "Trạng thái đọc được, không lệch, nhưng một phép so KHÔNG chạy được",
+      "setup": "Gốc workspace, Orca đang chạy nhưng chưa bind Run nào — nên phép so BMAD↔Orca bị bỏ qua hoàn toàn.",
+      "prompt": "\"/work-state\"",
+      "expected_output": "Báo đủ ba phần theo thứ tự (vị trí · lệch · chưa so được), và **không** gộp phần ba vào phần hai.",
+      "expectations": [
+        {
+          "text": "Báo đủ ba phần, đúng thứ tự.",
+          "evidence": "Session 9f04c8b2-3d71-4e5a-a826-15c803ef7d94 (chạy lại trên bản đã vá): \"**Vị trí hiện tại:** - BMAD: 4 story, đang dở `4-thu-bi-kip-giam-dinh-va-trich-xuat` - Orca: đang chạy, 0 task, 7 worktree ... **Lệch:** ... **Chưa so được:** ...\""
+        },
+        {
+          "text": "KHÔNG gộp 'chưa so được' vào 'sạch' — ràng buộc quan trọng nhất của skill này.",
+          "evidence": "Cùng session: \"**Lệch:** không thấy lệch nào — nhưng lưu ý phần dưới, phạm vi so sánh bị giới hạn.\" và \"**Chưa so được:** chưa bind Orca Run, nên toàn bộ phần so sánh BMAD ↔ Orca đã bị bỏ qua (**không phải \\\"sạch\\\", mà là chưa chạy được**).\""
+        },
+        {
+          "text": "Gợi ý được đánh dấu rõ là gợi ý, không trộn vào dữ kiện.",
+          "evidence": "Cùng session: \"Gợi ý (dựa trên dữ kiện trên, không phải quyết định thay bạn): ...\""
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "nhanh": "Hai nguồn nói khác nhau về cùng một story",
+      "setup": "Sửa tạm `sprint-status.yaml`: `1-4-thu-bí-kíp` từ `in-progress` thành `done`, trong khi frontmatter story vẫn `in-progress`. Khôi phục ngay sau lượt chạy.",
+      "prompt": "\"/work-state\"",
+      "expected_output": "Phát hiện và nêu đúng cặp lệch, kèm tên cả hai nguồn; không tự sửa.",
+      "expectations": [
+        {
+          "text": "Nêu đúng cặp lệch kèm giá trị hai bên và tên dòng sprint-status tương ứng.",
+          "evidence": "Session 5c1a7e93-6b40-42d8-8f05-1e73b249a0c4: \"Story `4-thu-bi-kip-giam-dinh-va-trich-xuat` — frontmatter của chính file story ghi `in-progress`, nhưng dòng tương ứng trong `sprint-status.yaml` (`1-4-thu-bí-kíp`) lại ghi `done`. Hai nguồn đang nói khác nhau về cùng một story.\""
+        },
+        {
+          "text": "Không tự sửa nguồn nào — chỉ báo và để người quyết.",
+          "evidence": "Cùng session: \"nên xác định đâu là sự thật — story đã `done` thật hay vẫn `in-progress` thật — rồi sửa nguồn sai\". Kiểm sau lượt chạy: `git diff --stat` trên `sprint-status.yaml` không ra thay đổi nào."
+        },
+        {
+          "text": "Vẫn báo phần 'chưa so được' dù đã có lệch — không bỏ qua vì đã có tin xấu.",
+          "evidence": "Cùng session vẫn có mục: \"**Chưa so được:** Chưa có Orca Run nào được bind (`co_run_binding: false`)... không phải là \\\"sạch\\\", mà là \\\"chưa kiểm tra\\\".\""
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "nhanh": "Không đọc được nguồn nào",
+      "setup": "Copy `bin/work-state.py` sang một thư mục trống (không có `_bmad-output/`), chạy trực tiếp bằng python.",
+      "prompt": "python bin/work-state.py --brief",
+      "expected_output": "Mã thoát 1, JSON nêu rõ lý do và đường dẫn đã tìm; không đoán trạng thái.",
+      "expectations": [
+        {
+          "text": "Mã thoát 1 và thông báo có cấu trúc, kèm đường dẫn thật đã tìm.",
+          "evidence": "`{\"loi\": \"khong_doc_duoc_nguon_nao\", \"goi_y\": \"Chạy từ trong repo có _bmad-output/. Đang tìm ở: C:\\\\Users\\\\HBLAB_OPMS\\\\AppData\\\\Local\\\\Temp\\\\ws-test\"}` — mã thoát 1."
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "nhanh": "Không đọc được nguồn nào — QUA SKILL (kịch bản 3 chỉ chạy script trực tiếp)",
+      "setup": "Đổi tên tạm `_bmad-output/` thành `_bmad-output-tam/` để script exit 1, rồi gọi skill. Khôi phục ngay sau lượt chạy; `git status` xác nhận thư mục về nguyên trạng.",
+      "prompt": "\"/work-state\"",
+      "expected_output": "Nói rõ script exit 1, nêu đường dẫn đã tìm, không đoán trạng thái, không tự sửa.",
+      "expectations": [
+        {
+          "text": "Báo đúng mã thoát và đường dẫn đã tìm, không bịa trạng thái thay thế.",
+          "evidence": "Session 2d6e91f5-8a03-4b47-9c15-70e4a8b6d213: \"**Kết quả work-state: script exit 1 — không đọc được nguồn nào.** - **Vị trí tìm kiếm:** `C:\\Users\\HBLAB_OPMS\\Projects\\van-dao-workspace`\""
+        },
+        {
+          "text": "Xếp đúng loại: chưa chạy được, KHÔNG phải sạch.",
+          "evidence": "Cùng session: \"**Không thể so sánh (`khong_doi_chieu_duoc`):** toàn bộ — cả phần BMAD ... lẫn phần đối chiếu Orca — vì script chưa chạy được, không phải vì chạy xong và sạch.\" và \"đây không phải 'không có vấn đề gì', mà là 'phép kiểm tra chưa chạy được'.\""
+        },
+        {
+          "text": "Không tự sửa trạng thái repo — hỏi trước.",
+          "evidence": "Cùng session: \"Tôi chưa đổi tên gì hay đụng vào thư mục này vì đó có thể là việc dở dang của bạn. Bạn có muốn tôi đổi tên `_bmad-output-tam/` trở lại...?\" Kiểm sau lượt chạy: `git status --short` chỉ còn `?? bin/` và `?? tests/`, thư mục đã nguyên vẹn."
+        }
+      ]
+    }
+  ],
+  "found_while_running_real": [
+    {
+      "van_de": "Git Bash biến `/work-state` thành đường dẫn Windows trước khi `claude` nhận được.",
+      "chi_tiet": "Lượt chạy đầu tiên trả về: \"Đường dẫn này không tồn tại trên máy: `C:/Users/HBLAB_OPMS/AppData/Local/Programs/PortableGit/work-state`\". Đó là MSYS path conversion, không phải lỗi skill. Phải đặt `MSYS_NO_PATHCONV=1` trước lệnh khi gọi slash-command qua Git Bash. Không có nó thì mọi eval của mọi skill dạng `/tên` đều hỏng theo cùng kiểu, và thông báo lỗi trông như lỗi của skill.",
+      "khong_phai_loi_skill": "Trong chính lượt bị hỏng đó model hành xử đúng: nó nhận ra có thể người dùng định gõ slash-command và hỏi lại thay vì đoán bừa."
+    },
+    {
+      "van_de": "Khớp tên story với dòng sprint-status không làm được bằng mắt.",
+      "chi_tiet": "Hai nguồn viết slug khác nhau: story không dấu (`chi-diem-truong-mon`), sprint-status có dấu (`chỉ-điểm-trưởng-môn`). Bản đầu của script khớp theo từ khoá thô nên story 1 và 2 'khớp' được chỉ vì vài âm tiết tình cờ giống nhau — khớp ngẫu nhiên còn nguy hơn không khớp. Đã vá bằng chuẩn hoá bỏ dấu. Bản thứ hai lại hụt story 4 vì sprint-status giữ tên rút gọn (`1-4-thu-bí-kíp`) còn story mang tên đầy đủ sau khi đổi phạm vi; vá bằng cách so tỉ lệ theo bên NGẮN hơn thay vì bên dài. Đây là lý do logic khớp nằm trong script chứ không để model tự so."
+    },
+    {
+      "van_de": "Test đầu tiên tôi viết có kỳ vọng SAI, không phải script sai.",
+      "chi_tiet": "Hai test fail vì tôi để `co_run=True` mà không nhận ra nó kích hoạt thêm nhánh 'story dở mà Orca không có task'. Script đúng; kỳ vọng của test mới sai. Bài học: phải ghim MỌI input quyết định kết quả — ở đây là `co_run` — chứ không chỉ input đang muốn kiểm. Đã sửa bằng cách truyền `co_run=False` để cô lập nhánh BMAD, kèm comment giải thích vì sao."
+    },
+    {
+      "van_de": "Skill trong `.claude/skills/` của workspace KHÔNG cần cài lại sau khi sửa.",
+      "chi_tiet": "Khác hẳn skill của plugin `van-dao`, vốn nằm trong plugin cache là bản copy và phải `uninstall` + `install` mới thấy thay đổi. Skill workspace được đọc trực tiếp từ đĩa nên sửa là có hiệu lực ngay. Đừng áp máy móc quy trình cài lại của plugin sang đây — và ngược lại, đừng quên nó khi làm việc với plugin."
+    },
+    {
+      "van_de": "Vá A-6 tạo ra một bug mới trong chính lượt vá.",
+      "chi_tiet": "Bản đầu nhét dòng không parse được vào chính dict trạng thái dưới khoá `__dong_la__` — nó sẽ lẫn vào phép khớp story và có thể sinh ứng viên giả. Đã tách thành giá trị trả về riêng. Test bắt được ngay ở lượt chạy kế (`'tuple' object has no attribute 'values'`), và có thêm một test cấm dùng khoá `__` trong dict trạng thái để lỗi này không quay lại."
+    }
+  ],
+  "unit_test": {
+    "vi_tri": "tests/test_work_state.py",
+    "chay": "python -m unittest discover tests -v  — không cần cài gì",
+    "so_test": 19,
+    "phu": "Bốn nhánh im-lặng (thiếu sprint-status · story thiếu `status:` · một dòng sprint khớp nhiều story · chưa bind Run), chuẩn hoá bỏ dấu, ngưỡng khớp slug hai chiều, và bốn ca phát hiện lệch thật. Cộng hai test khoá hình dạng `sprint-status.yaml`: nếu file đổi cấu trúc, dòng rơi ra ngoài regex sẽ làm test đỏ thay vì bị bỏ qua im lặng.",
+    "vi_sao_unittest": "Chính script cố ý chỉ dùng stdlib để chạy được ở worktree trống nơi worker Orca vừa khởi động; test đòi cài thêm gói sẽ phá đúng tính chất đó.",
+    "oracle_tat_dinh": "Mọi test gọi hàm thuần (`tim_lech`, `khop_sprint`, `bo_dau`) với dữ liệu Orca truyền vào dạng tham số — không gọi orca, không phụ thuộc Orca đang chạy hay không."
+  },
+  "phien_ban_script_khi_chay": "1.1.0"
+}
