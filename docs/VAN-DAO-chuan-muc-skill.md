@@ -119,6 +119,28 @@ Ba điều eval phải làm mà đọc lại mã không làm được:
 - **Chạy trên bản đã cài, không phải bản trong repo.** Plugin cache là bản copy; sửa xong mà không cài lại là đang kiểm bản cũ.
 - **Kiểm cả thứ không được xảy ra** — không có thư thừa, không có bản ghi thừa.
 
+## A.7 · Review độc lập, và dấu vết của nó
+
+Tự chấm theo tám góc ở Phần B **không thay thế được** một vòng `bmad-review`. Bằng chứng trong chính dự án này: cả `work-state` lẫn `orca-help` đều tự chấm 8/8 pass trước khi review; lens sau đó tìm ra 16 và 18 finding. Với `work-state`, ba lỗi nặng nhất — script im lặng khi không kết luận được — tự chấm bỏ sót hoàn toàn.
+
+Lý do không phải người tự chấm cẩu thả. Tự chấm hỏi *"có làm đúng những gì tôi định làm không"*; lens hỏi *"nó hỏng bằng cách nào"*. Hai câu khác nhau, và câu thứ hai khó tự hỏi mình.
+
+**Khi nào bắt buộc review.** Output trong luồng BMAD đã có cổng sẵn (`bmad-build` step-04). Output **ngoài luồng** thì không có cổng nào — nó phụ thuộc ai đó nhớ, và điều đó đã hỏng thật: `work-state` được review vì có người bảo, `orca-help` thì không cho tới khi có người để ý.
+
+Ranh giới cái gì cần: **output mà người hoặc agent khác sẽ dùng làm chuẩn, hoặc sẽ chạy.** Skill, script, lens, tài liệu quy tắc thì có. Bản ghi sự kiện (sprint-status, deferred-work, Spec Change Log) thì không — chúng ghi lại quyết định đã có, không tạo hành vi mới.
+
+**Không cưỡng chế được hành động, nhưng cưỡng chế được bằng chứng.** Không có cách nào bắt ai chạy review — nó cần phán đoán, không đếm được. Đây đúng là bài toán AD-10 đã giải cho eval: không ép được ai chạy eval, nhưng ép được *"phải có `evals.json`"*.
+
+Áp cùng hình dạng: mọi artifact harness được version control phải **có mặt** trong `_bmad-output/implementation-artifacts/review-log.md`, với một trong ba trạng thái — `da-review`, `no` (kèm mốc quay lại), `mien-tru` (kèm lý do). `tests/test_review_log.py` kiểm sự có mặt đó.
+
+Ba điều về thiết kế này, nói thẳng vì chúng là giới hạn chứ không phải chi tiết:
+
+- **Test kiểm sự có mặt, không kiểm chất lượng.** Một dòng ghi bừa vẫn qua. Nhưng nó nâng chi phí nói dối từ *im lặng* lên *phải chủ động viết một câu sai* — cùng ranh giới AD-10 đã chấp nhận.
+- **`no` không làm test đỏ.** Quy tắc mới áp lên artifact có sẵn sẽ đỏ hàng loạt, và phép kiểm đỏ kéo dài thì bị tắt. Nợ hiện ra trong sổ, không biến mất, nhưng không chặn việc khác.
+- **Thứ test thật sự bắt** là một artifact mới xuất hiện mà không ai ghi nhận. Đó chính là ca đã xảy ra với `orca-help`.
+
+Phạm vi tính theo `git ls-files`, nên thứ bị gitignore — 49 skill BMAD cài từ ngoài chẳng hạn — tự động nằm ngoài, không cần danh sách loại trừ tự bịa.
+
 ---
 
 # Phần B — Tám góc độ đánh giá một skill
