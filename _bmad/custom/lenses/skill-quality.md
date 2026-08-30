@@ -104,11 +104,18 @@ weak guarantee — this is exactly why some skills in this project are commands,
 
 ### 8. Context budget is respected
 
-- Is the skill's main file dramatically larger than its core path needs, with rarely-needed detail
-  written inline rather than pushed to a referenced sub-file loaded only when needed?
+- Measure the skill's tokens and locate the **5,000-token mark**. Is anything past it load-bearing —
+  a data schema, a write rule, a safety constraint, a required confirmation step?
+- Is the main file dramatically larger than its core path needs, with rarely-needed detail written
+  inline rather than pushed to a referenced sub-file loaded only when needed?
 
-Skills are budgeted per-load (a fixed token ceiling per skill, and a shared ceiling across every skill
-active in a session). A bloated main file taxes every invocation for the sake of the rare path.
+The numbers are the check, not a style preference. After auto-compaction a skill is re-attached at
+only its **first 5,000 tokens**; every re-attached skill draws on a shared **25,000-token** pool; and
+a skill invoked early enough in the session is dropped outright once that pool is spent. Content past
+the 5,000-token mark is therefore not merely expensive — in a compacted session it is *gone*, while
+the skill still runs and still sounds certain. Report where that mark lands and what falls after it,
+not just that the file is long. A real case in this project: a 7,334-token skill lost its entire data
+schema section this way.
 
 ## Output
 

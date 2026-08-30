@@ -163,7 +163,8 @@ Thứ tự dưới đây theo *hậu quả khi hỏng*, không theo dễ kiểm.
 
 > Nếu chỉ phần đầu của file này sống sót, skill còn làm đúng không?
 
-**Kiểm:** đo token tích luỹ; xem mục nào rơi sau mốc. Lược đồ dữ liệu, luật ghi, ràng buộc an toàn nằm sau mốc là hỏng.
+**Kiểm:** đo token tích luỹ; xem mục nào rơi sau **mốc 5.000 token** — sau khi ngữ cảnh bị nén, mỗi skill chỉ được gắn lại đúng chừng ấy token đầu file. Lược đồ dữ liệu, luật ghi, ràng buộc an toàn nằm sau mốc là hỏng.
+**Mốc thứ hai:** mọi skill được gắn lại chia chung **25.000 token**. Skill gọi sớm trong phiên bị bỏ *hẳn* khi ngân sách đó cạn — không phải cắt bớt phần đuôi, mà mất cả file.
 **Hỏng thế nào:** âm thầm nhất trong tám góc. Skill vẫn chạy, vẫn tự tin, chỉ thiếu một nửa chỉ dẫn.
 
 ### 2 · Cưỡng chế — ràng buộc quan trọng là cơ chế, không phải chữ
@@ -219,7 +220,7 @@ Thứ tự dưới đây theo *hậu quả khi hỏng*, không theo dễ kiểm.
 
 | # | Góc độ | Một câu để hỏi |
 |---|---|---|
-| 1 | Sống sót | Chỉ phần đầu sống sót thì còn đúng không? |
+| 1 | Sống sót | Chỉ 5.000 token đầu sống sót thì còn đúng không? |
 | 2 | Cưỡng chế | Vi phạm thì có gì bắt được? |
 | 3 | Đúng việc | Xong khi nào, và không làm gì? |
 | 4 | Kích hoạt | `description` tả tình huống hay chức năng? |

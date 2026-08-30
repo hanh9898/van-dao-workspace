@@ -18,6 +18,8 @@ Giới hạn phải biết, không giấu:
   là không có. Đó là lý do script này tồn tại: nó được commit, hook thì không.
 - `git commit --no-verify` bỏ qua hook. Đây là guardrail, không phải cổng an ninh.
 - Nó không thay CI. Khi repo có remote, CI mới là thứ không lách được.
+- Hook tự dò `python3` · `python` · `py` và kiểm bằng cách chạy thử. Máy không có
+  interpreter nào chạy được thì xem nhánh tương ứng trong `HOOK` bên dưới.
 
 Dùng:
     python bin/setup-hooks.py            cài (không ghi đè hook đang có)
@@ -50,8 +52,34 @@ HOOK = f"""#!/bin/sh
 # mặt trong review-log.md. Chạy ở đây nghĩa là artifact mới bị bắt ngay lúc commit,
 # thay vì lọt qua rồi phải có người để ý sau.
 
-echo "pre-commit: chạy test..."
-if ! python -m unittest discover tests -q; then
+# Dò interpreter thay vì gọi `python` trần: trên phần lớn Linux chỉ có `python3`,
+# và một hook gọi tên không tồn tại thì đỏ mọi lần, chặn MỌI commit. Kiểm bằng cách
+# chạy thử chứ không chỉ `command -v` — Windows Store cài sẵn một `python3.exe` giả
+# chỉ mở cửa hàng, `command -v` thấy nó nhưng nó không chạy được gì.
+PY=""
+for c in python3 python py; do
+    if command -v "$c" >/dev/null 2>&1 && "$c" -c "import sys" >/dev/null 2>&1; then
+        PY="$c"
+        break
+    fi
+done
+
+if [ -z "$PY" ]; then
+    # Chặn, không cho qua. Không phải vì nghiêm khắc hơn: cho qua kèm cảnh báo tạo ra
+    # đúng thứ cả cơ chế này được dựng để chống — một commit trông như đã qua test.
+    # Ai không đọc dòng cảnh báo sẽ tin nhầm là xanh. Chặn thì lối thoát vẫn còn và
+    # rẻ (--no-verify), chỉ khác ở chỗ nó trở thành một quyết định có ý thức.
+    echo ""
+    echo "pre-commit: không tìm thấy Python chạy được (đã thử python3, python, py)."
+    echo "Repo này là Python — test không chạy được thì commit chưa được kiểm gì cả."
+    echo ""
+    echo "  Cài Python 3, hoặc:"
+    echo "  git commit --no-verify   nếu bạn cố ý commit mà không chạy test"
+    exit 1
+fi
+
+echo "pre-commit: chạy test bằng $PY..."
+if ! "$PY" -m unittest discover tests -q; then
     echo ""
     echo "pre-commit: TEST ĐỎ — commit bị chặn."
     echo "Sửa rồi commit lại, hoặc dùng 'git commit --no-verify' nếu cố ý bỏ qua."
