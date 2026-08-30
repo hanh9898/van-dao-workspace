@@ -63,6 +63,68 @@ người đọc có tiếp xúc thể loại nhận ra ngay. Không dùng pinyin
 | dư thừa | redundant |
 | độ phức tạp | complexity |
 
+## 2.1 · Khoá data contract — `bi-kip.schema.md`
+
+Đây là phần **rủi ro nhất** của cả đợt refactor: khoá ở đây xuất hiện trong file bí kíp mà người dùng
+tạo ra, nên đổi khoá là đổi định dạng dữ liệu, không phải đổi tên biến. Khoá glossary ở đây trước khi
+sửa dòng đầu tiên (§7.4).
+
+**Cấp quyển — `manifest.yaml`**
+
+| Cũ | Mới | | Cũ | Mới |
+|---|---|---|---|---|
+| `loai` | `kind` | | `tieu_de` | `title` |
+| `cau_truc` | `structure` | | `tac_gia` | `author` |
+| `mach` | `meridian` | | `nam` | `year` |
+| `chuong` | `chapter` | | `nguon_file` | `source_file` |
+| `xuong_song` | `spine` | | `van_tay` | `fingerprint` |
+| `chi_nhanh` | `branch` | | `duong_dan` | `path` |
+| `khao_thi_quyen` | `volume_ordeal` | | `ha_son_sau` | `descend_after` |
+
+**Cấp chương — `chuong/NN.yaml`**
+
+| Cũ | Mới | | Cũ | Mới |
+|---|---|---|---|---|
+| `muc_tieu` | `objective` | | `tieu_chi_dat` | `pass_criteria` |
+| `gia_dinh_nen` | `baseline_assumption` | | `khuon_cau_hoi` | `question_template` |
+| `phu_thuoc` | `depends_on` | | `khuon` | `template` |
+| `worked_example` | *(giữ)* | | `do_tieu_chi` | `covers_criteria` |
+| `tro_toi` | `points_to` | | `bai_luyen_lap` | `drill` |
+| `sai_lam_pho_bien` | `common_mistakes` | | `gian_giao` | `scaffold` |
+| `dau_hieu` | `signal` | | `do_phuc_tap` | `complexity` |
+| `quan_niem_sai` | `misconception` | | `lop_nhiem_vu` | `task_class` |
+| `cach_chua` | `remedy` | | `du_thua` | `redundant` |
+| `nguon` | `source` | | `bo_tham_so` | `parameter_set` |
+| `mo_ta` | `description` | | `canh_gioi_vao` / `canh_gioi_ra` | `realm_in` / `realm_out` |
+
+`do_tieu_chi` → `covers_criteria` chứ không dịch sát chữ: nó là danh sách id tiêu chí mà câu hỏi phủ,
+và tên tiếng Anh phải nói ra quan hệ đó — nếu không thì `do_tieu_chi: []` ở câu khởi động trông như
+một trường bỏ trống chứ không phải một tuyên bố "câu này cố ý không làm bằng chứng".
+
+**Enum — giá trị, không phải khoá**
+
+| Trường | Cũ | Mới |
+|---|---|---|
+| `kind` | `bi-kip` · `tan-quyen` | `scripture` · `fragment` |
+| `structure` | `chuoi` · `mang` | `chain` · `web` |
+| `realm_in` / `realm_out` | `luyen-khi` · `truc-co` · `ket-dan` · `nguyen-anh` · `hoa-than` | `qi-refining` · `foundation` · `core-formation` · `nascent-soul` · `soul-transformation` |
+| `complexity` | `thap` · `trung` · `cao` | `low` · `medium` · `high` |
+| `scaffold` | `day` · `vua` · `mong` | `heavy` · `medium` · `light` |
+| `loai` câu hỏi | `tai_hien` · `van_dung` · `phan_tich` | `recall` · `apply` · `analyze` |
+| `bloom` | `nho` · `hieu` · `ap_dung` · `phan_tich` · `danh_gia` · `sang_tao` | `remember` · `understand` · `apply` · `analyze` · `evaluate` · `create` |
+| `source` | `nguoi` · `sach` · `suy_doan` | `person` · `book` · `inference` |
+
+Hai chỗ đáng nói:
+
+- **Ngũ cảnh giới** dùng đúng bản dịch đã phổ biến trong cultivation fiction tiếng Anh (Luyện Khí ·
+  Trúc Cơ · Kết Đan · Nguyên Anh · Hoá Thần). Đây là chỗ quyết định "cultivation fiction, không phải
+  pinyin" ở §1 trả cổ tức: người đọc thể loại nhận ra thang bậc ngay mà không cần chú giải.
+- **`bloom`** vốn là thang Bloom, gốc tiếng Anh. Sáu bậc trả về đúng tên gốc — đây là dịch *ngược lại*
+  về nguyên bản, không phải đặt từ mới.
+
+`source: book` là chỗ duy nhất `book` được dùng, và nó đúng: ở đây `sach` nghĩa là **cuốn sách vật lý
+gốc**, không phải bí kíp trong hệ. Bí kíp vẫn là `scripture` (§1).
+
 ## 3 · Quy tắc đặt tên định danh
 
 - **Thư mục và tệp:** `kebab-case`, tiếng Anh. `thu-bi-kip/` → `scripture-intake/`
