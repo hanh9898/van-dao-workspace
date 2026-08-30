@@ -181,6 +181,37 @@ Khoá đầu ra là **contract giữa script và skill**, không phải biến n
 Đổi ở đây thì mọi chỗ trong SKILL.md nhắc tới chúng phải đổi cùng lô — nếu không, skill đọc một khoá
 không còn tồn tại và im lặng nhận `None`.
 
+## 2.3 · Khoá `chi-diem.jsonl` — contract vùng Trưởng môn
+
+Contract thứ ba, và là cái dễ bỏ sót nhất: nó **không có file schema riêng**. Định nghĩa nằm trong mục
+"Định dạng file" của `truong-mon/SKILL.md`, nên quét schema không thấy nó. Áp cho cả
+`chi-diem.jsonl` lẫn `chi-diem-hong.jsonl`.
+
+| Cũ | Mới | | Cũ | Mới |
+|---|---|---|---|---|
+| `ten` | `title` | | `muc_chac_chan` | `confidence` |
+| `tac_gia` | `author` | | `trang_thai` | `status` |
+| `nam_an_ban` | `published_year` | | `ghi_luc` | `logged_at` |
+| `loai` | `kind` | | `id` | *(giữ)* |
+| `vi_sao` | `rationale` | | | |
+
+**Enum**
+
+| Trường | Cũ | Mới |
+|---|---|---|
+| `kind` | `cong_phap` · `tam_phap` | `technique` · `heart-method` |
+| `status` | `dang_treo` · `khong_thay` · `het_hieu_luc` | `pending` · `not_found` · `expired` |
+| `confidence` | `suy_doan` | `inference` |
+
+**`trang_thai` xuất hiện ở hai contract khác nhau** — khoá đầu ra JSON của script giám định (§2.2) và
+khoá của `chi-diem.jsonl` ở đây. Cả hai đều thành `status`, nên không va nhau; nhưng chúng là hai
+contract độc lập và **đổi cái này không tự động đúng cho cái kia**. Ghi ra vì bản thân việc tưởng
+chúng là một đã suýt làm lô 2b chạy sai.
+
+`loai` giờ là từ thứ ba mang nghĩa khác nhau (loại quyển · loại câu hỏi · loại chỉ điểm), cả ba đều
+thành `kind`. Vẫn không va nhau vì ba object khác nhau — nhưng đây là dấu hiệu `loai` là từ quá chung
+trong bản gốc, chứ không phải bản dịch có vấn đề.
+
 ## 3 · Quy tắc đặt tên định danh
 
 - **Thư mục và tệp:** `kebab-case`, tiếng Anh. `thu-bi-kip/` → `scripture-intake/`
