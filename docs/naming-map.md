@@ -35,6 +35,7 @@ người đọc có tiếp xúc thể loại nhận ra ngay. Không dùng pinyin
 | Phúc Khảo Sứ | 覆考使 | **Re-examiner** | Vai chấm lại độc lập |
 | hạ sơn | 下山 | **descend the mountain** | Rời môn phái, hoàn thành |
 | giám định | 鑑定 | **appraisal** | Thẩm định bản sách trước khi nhận |
+| bế quan | 閉關 | **seclusion** | Vào kín học một bí kíp. Skill chưa dựng — đặt tên trước để lệnh `/wayfarer:seclusion` không phải đổi sau |
 
 ## 2 · Danh từ kỹ thuật — không mang màu
 
@@ -233,6 +234,34 @@ chúng là một đã suýt làm lô 2b chạy sai.
 thành `kind`. Vẫn không va nhau vì ba object khác nhau — nhưng đây là dấu hiệu `loai` là từ quá chung
 trong bản gốc, chứ không phải bản dịch có vấn đề.
 
+## 2.4 · Tên file và thư mục trong `van-dao/`
+
+| Cũ | Mới |
+|---|---|
+| `skills/nhap-mon/` | `skills/initiation/` |
+| `skills/nhap-mon-ky/` | `skills/initiation-record/` |
+| `skills/thu-bi-kip/` | `skills/scripture-intake/` |
+| `skills/truong-mon/` | `skills/sect-master/` |
+| `skills/*/references/dinh-dang.md` | `skills/*/references/format.md` |
+| `bin/giam-dinh.py` | `bin/appraise.py` |
+| `bin/kiem-bi-kip.py` | `bin/validate-scripture.py` |
+| `tham-chieu/` | `reference/` |
+| `tham-chieu/bi-kip.schema.md` | `reference/scripture.schema.md` |
+| `tests/test_giam_dinh.py` | `tests/test_appraise.py` |
+| `tests/test_kiem_bi_kip.py` | `tests/test_validate_scripture.py` |
+| `tests/fixtures/kiem-thu-dac-ta/` | `tests/fixtures/spec-based-testing/` |
+| `tests/fixtures/sach-loi/` | `tests/fixtures/broken-scripture/` |
+| `tests/fixtures/tan-quyen-mau/` | `tests/fixtures/fragment-sample/` |
+| `tests/fixtures/sach-thu/` | `tests/fixtures/sample-books/` |
+| `tests/fixtures/sach-gia.txt` | `tests/fixtures/fake-book.txt` |
+
+Tên thư mục skill **là thứ người dùng gõ**: `/van-dao:thu-bi-kip` thành `/wayfarer:scripture-intake`.
+Đây là chỗ đợt refactor chạm vào giao diện, không chỉ nội bộ — mọi eval nhắc lệnh cũ sẽ sai và phải
+chạy lại, không sửa tay.
+
+`kiem-thu-dac-ta` là tên một bí kíp **mẫu** ("kiểm thử dựa trên đặc tả"), không phải thuật ngữ hệ —
+nên dịch theo nghĩa của nó, `spec-based-testing`.
+
 ## 3 · Quy tắc đặt tên định danh
 
 - **Thư mục và tệp:** `kebab-case`, tiếng Anh. `thu-bi-kip/` → `scripture-intake/`
@@ -258,6 +287,7 @@ và `CHANGELOG.md` ghi `## [0.1.0] — chưa phát hành`. Ba dấu hiệu độ
 | `.vandao/` | `.wayfarer/` |
 | `.vandao/bi-kip/` | `.wayfarer/scriptures/` |
 | `.vandao/truong-mon/chi-diem.jsonl` | `.wayfarer/sect-master/counsel.jsonl` |
+| `.vandao/truong-mon/chi-diem-hong.jsonl` | `.wayfarer/sect-master/counsel-broken.jsonl` |
 | `.vandao/truong-mon/ho-so.json` | `.wayfarer/sect-master/profile.json` |
 | `.vandao/nhap-mon-ky.md` | `.wayfarer/initiation-record.md` |
 | `.vandao/tang-kinh/nhap-dang-do/` | `.wayfarer/scripture-hall/drafts/` |
