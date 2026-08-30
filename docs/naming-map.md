@@ -75,18 +75,19 @@ sửa dòng đầu tiên (§7.4).
 |---|---|---|---|---|
 | `loai` | `kind` | | `tieu_de` | `title` |
 | `cau_truc` | `structure` | | `tac_gia` | `author` |
-| `mach` | `meridian` | | `nam` | `year` |
-| `chuong` | `chapter` | | `nguon_file` | `source_file` |
-| `xuong_song` | `spine` | | `van_tay` | `fingerprint` |
-| `chi_nhanh` | `branch` | | `duong_dan` | `path` |
-| `khao_thi_quyen` | `volume_ordeal` | | `ha_son_sau` | `descend_after` |
+| `mach` | `meridians` *(list)* | | `nam` | `year` |
+| `vai` | `roles` *(list)* | | `nguon_file` | `source_file` |
+| `xuong_song` | `spine` *(list)* | | `van_tay` | `fingerprint` |
+| `chi_nhanh` | `branches` *(list)* | | `duong_dan` | `path` |
+| `khao_thi_quyen` | `volume_ordeal` | | `ha_son_sau` | `descend_after` *(list số chương)* |
+| `nguon` *(cấp quyển)* | `source` | | `chuong` | `chapter` *(số)* · `chapters` *(list)* |
 
 **Cấp chương — `chuong/NN.yaml`**
 
 | Cũ | Mới | | Cũ | Mới |
 |---|---|---|---|---|
 | `muc_tieu` | `objective` | | `tieu_chi_dat` | `pass_criteria` |
-| `gia_dinh_nen` | `baseline_assumption` | | `khuon_cau_hoi` | `question_template` |
+| `gia_dinh_nen` | `baseline_assumption` | | `khuon_cau_hoi` | `question_templates` *(list)* |
 | `phu_thuoc` | `depends_on` | | `khuon` | `template` |
 | `worked_example` | *(giữ)* | | `do_tieu_chi` | `covers_criteria` |
 | `tro_toi` | `points_to` | | `bai_luyen_lap` | `drill` |
@@ -94,8 +95,8 @@ sửa dòng đầu tiên (§7.4).
 | `dau_hieu` | `signal` | | `do_phuc_tap` | `complexity` |
 | `quan_niem_sai` | `misconception` | | `lop_nhiem_vu` | `task_class` |
 | `cach_chua` | `remedy` | | `du_thua` | `redundant` |
-| `nguon` | `source` | | `bo_tham_so` | `parameter_set` |
-| `mo_ta` | `description` | | `canh_gioi_vao` / `canh_gioi_ra` | `realm_in` / `realm_out` |
+| `nguon` *(trong `common_mistakes`)* | `origin` | | `bo_tham_so` | `parameter_set` |
+| `mo_ta` | `description` | | `canh_gioi_vao` / `canh_gioi_ra` | `realm_required` / `realm_granted` |
 
 `do_tieu_chi` → `covers_criteria` chứ không dịch sát chữ: nó là danh sách id tiêu chí mà câu hỏi phủ,
 và tên tiếng Anh phải nói ra quan hệ đó — nếu không thì `do_tieu_chi: []` ở câu khởi động trông như
@@ -107,12 +108,24 @@ một trường bỏ trống chứ không phải một tuyên bố "câu này c�
 |---|---|---|
 | `kind` | `bi-kip` · `tan-quyen` | `scripture` · `fragment` |
 | `structure` | `chuoi` · `mang` | `chain` · `web` |
-| `realm_in` / `realm_out` | `luyen-khi` · `truc-co` · `ket-dan` · `nguyen-anh` · `hoa-than` | `qi-refining` · `foundation` · `core-formation` · `nascent-soul` · `soul-transformation` |
+| `realm_required` / `realm_granted` | `luyen-khi` · `truc-co` · `ket-dan` · `nguyen-anh` · `hoa-than` | `qi-refining` · `foundation` · `core-formation` · `nascent-soul` · `soul-transformation` |
 | `complexity` | `thap` · `trung` · `cao` | `low` · `medium` · `high` |
 | `scaffold` | `day` · `vua` · `mong` | `heavy` · `medium` · `light` |
 | `loai` câu hỏi | `tai_hien` · `van_dung` · `phan_tich` | `recall` · `apply` · `analyze` |
 | `bloom` | `nho` · `hieu` · `ap_dung` · `phan_tich` · `danh_gia` · `sang_tao` | `remember` · `understand` · `apply` · `analyze` · `evaluate` · `create` |
-| `source` | `nguoi` · `sach` · `suy_doan` | `person` · `book` · `inference` |
+| `origin` | `nguoi` · `sach` · `suy_doan` | `person` · `book` · `inference` |
+
+**Bốn khoá giữ nguyên, không dịch:** `id`, `schema`, `worked_example`, `bloom`. Nói ra vì im lặng ở
+đây đọc như "chưa xét tới".
+
+**Hai từ Việt mang hai nghĩa khác nhau — chỗ dễ dịch hỏng nhất, và bản đầu của bảng này đã mắc.**
+
+- `nguon` cấp quyển là **object** metadata sách gốc (`title`/`author`/`year`) → `source`. `nguon` trong
+  `common_mistakes` là **enum xuất xứ** của một sai lầm — ai nói ra điều đó → `origin`. Gộp cả hai
+  thành `source` là đúng thứ bảng này tồn tại để chống.
+- `loai` cấp quyển (`scripture`/`fragment`) và `loai` câu hỏi (`recall`/`apply`/`analyze`) đều thành
+  `kind`. Dùng chung một từ được, vì chúng lồng trong hai object khác nhau nên không bao giờ va nhau —
+  nhưng phải nói ra, chứ không để người dịch lô sau tự quyết.
 
 Hai chỗ đáng nói:
 
