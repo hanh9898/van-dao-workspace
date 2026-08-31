@@ -35,6 +35,9 @@ PHAM_VI = (
     # Chính cuốn sổ. Nó không chỉ ghi lại — nó định nghĩa phạm vi và ba trạng thái,
     # tức là một chuẩn. Cơ chế tự loại mình ra khỏi tầm kiểm là chỗ nó mù nhất.
     "_bmad-output/implementation-artifacts/review-log.md",
+    # Cấu hình hook: nó quyết định lượt của agent bị chặn hay không. Sai ở đây thì
+    # mọi phép kiểm khác im lặng mất tác dụng mà không file nào khác lộ ra.
+    ".claude/settings.json",
 )
 
 TRANG_THAI_HOP_LE = {"da-review", "no", "mien-tru"}
