@@ -4,14 +4,23 @@ Every entry here is **a class of mistake that actually happened in this project*
 the concrete incident. Nothing here is general theory: a class that has not bitten yet does not get an
 entry.
 
-The column that matters is **Caught by**. It has three levels, and the level drives behaviour — not
-the prose describing the mistake:
+The column that matters is **Caught by**, and there is exactly one question behind it:
 
-| Level | Meaning |
-|---|---|
-| **mechanism** | A test or hook blocks it. Violate it and something goes red; you cannot continue |
-| **declaration** | Cannot be blocked, but forces a sentence to be written. Lying becomes a deliberate act |
-| **none** | Currently relies on a human noticing. Written down so the gap is visible |
+> **Is the oracle the system's own truth, or something the agent typed?**
+
+That question, not how well an entry describes the mistake, decides whether anything is actually
+prevented. A precise description prevents nothing. Three levels follow from it:
+
+| Level | Oracle | What it does |
+|---|---|---|
+| **mechanism** | system truth — `git`, exit codes, a test result | Blocks. The agent cannot continue and cannot talk its way past it |
+| **declaration** | something the agent typed | Does not block. Raises the cost of getting it wrong from silence to a deliberate keystroke — nothing more |
+| **none** | — | Relies on a human noticing. Written down so the gap stays visible |
+
+**This ledger was first written with the levels wrong.** Entries whose oracle is a checkbox the agent
+ticks were labelled `mechanism`; one of them let a false tick through on its first use. The labels
+below are the corrected ones. Getting this wrong is worse than having no label: a thing believed to be
+enforced stops being watched.
 
 The operating principle, taken from harness-engineering practice: *every time the agent makes a
 mistake, spend the effort to build something so it cannot make that mistake again.* An entry at level
@@ -19,9 +28,31 @@ mistake, spend the effort to build something so it cannot make that mistake agai
 
 ---
 
+## 0 · The control group — mistakes that did **not** recur
+
+Before the ten entries, the three failures this project *does* prevent. They are the reason the levels
+above are not arbitrary.
+
+| Failure | Oracle | Times it caught me |
+|---|---|---|
+| New artifact added without a row in the review ledger | `git ls-files` vs the ledger file | **3** |
+| Committing while tests are red | test exit code | **1** |
+| A `no` row with no return milestone | regex over the ledger | **1** |
+
+Five catches, and **none of these three ever recurred after being caught** — the second attempt was
+stopped by the same check as the first. Compare with the ten entries below: every one of them recurred,
+several within the same turn they were written down in.
+
+The difference is not that these three are easier mistakes. It is that each has an oracle **outside the
+agent**: `git ls-files` reports what is tracked whether or not I agree, and a test exits non-zero whether
+or not I think the code is fine. The ten below have no such oracle, so what stands between them and the
+repository is a human reading carefully.
+
+That is the whole finding. Everything else in this file is bookkeeping.
+
 ## 1 · Checking that something *exists* instead of that it *works*
 
-**Caught by:** mechanism (partly) — `bin/check-turn.py` blocks the turn when tests are red.
+**Caught by:** none. (`check-turn.py` blocking on red tests is real, but it catches *red tests* — it does not catch *checking existence instead of behaviour*. Those are different failures, and labelling this one `mechanism` was wrong.)
 
 Three real incidents, 2026-08-31:
 
@@ -38,8 +69,7 @@ If your check is a `grep`, the next question is: what happens when you run it?
 
 ## 2 · Misreading a truncated result
 
-**Caught by:** mechanism — `check-turn.py` warns when a turn used `grep` piped into `head` to conclude
-"clean".
+**Caught by:** declaration. `check-turn.py` *warns*; it does not block, and it cannot tell a `head` used for looking from one used for concluding. It puts the question in front of the agent — that is all.
 
 Two real incidents:
 
@@ -95,8 +125,9 @@ worked on the first try.
 
 ## 6 · Stopping at the easy part and reporting it as finished
 
-**Caught by:** mechanism — `.done-criteria.md` lists countable criteria and `check-turn.py` blocks
-while any `- [ ]` remains.
+**Caught by:** declaration. `.done-criteria.md` lists countable criteria and `check-turn.py` blocks
+while any `- [ ]` remains — but the oracle is **a box the agent ticks**, not system truth. It failed on
+its first use (third incident below).
 
 Three real incidents:
 
@@ -109,7 +140,7 @@ Three real incidents:
 happens in the gap between *the task as given* and *the task as silently redefined*; that gap only
 closes by writing it down.
 
-**Known limit of the mechanism:** the hook reads the tick, not the truth. The third incident above
+**Why this is a declaration and not a mechanism:** the hook reads the tick, not the truth. The third incident above
 slipped through because I ticked an item I had not finished. A declaration raises the cost of lying
 from silence to a deliberate keystroke — it does not remove it.
 
