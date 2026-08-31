@@ -18,9 +18,14 @@ prevented. A precise description prevents nothing. Three levels follow from it:
 | **none** | — | Relies on a human noticing. Written down so the gap stays visible |
 
 **This ledger was first written with the levels wrong.** Entries whose oracle is a checkbox the agent
-ticks were labelled `mechanism`; one of them let a false tick through on its first use. The labels
-below are the corrected ones. Getting this wrong is worse than having no label: a thing believed to be
-enforced stops being watched.
+ticks were labelled `mechanism`; one of them let a false tick through on its first use. Getting this
+wrong is worse than having no label: a thing believed to be enforced stops being watched.
+
+**2026-08-31, second revision.** After the research run on enforcing soft constraints, three entries
+moved *up* to `mechanism` — #2 (refused before the command runs), #6 (a ticked item whose `cmd:` fails
+still blocks) and #10 (a new script without tests blocks). This was not relabelling: each one gained an
+oracle outside the agent. The research's own test decided which entries could move at all — **is
+verification cheaper than execution?**
 
 The operating principle, taken from harness-engineering practice: *every time the agent makes a
 mistake, spend the effort to build something so it cannot make that mistake again.* An entry at level
@@ -69,7 +74,7 @@ If your check is a `grep`, the next question is: what happens when you run it?
 
 ## 2 · Misreading a truncated result
 
-**Caught by:** declaration. `check-turn.py` *warns*; it does not block, and it cannot tell a `head` used for looking from one used for concluding. It puts the question in front of the agent — that is all.
+**Caught by:** mechanism. `bin/check-tool.py` is a `PreToolUse` hook that **refuses** a Bash command shaped like `grep ... | head` unless it also counts — exit 2, before the command runs, so a truncated output never reaches a conclusion. `check-turn.py` keeps a softer warning for cases the predicate misses. The refusal is narrow on purpose (not when counting, not `head` on a file) and the way out is one keystroke: pipe to `wc -l`. A block with an expensive escape route gets disabled.
 
 Two real incidents:
 
@@ -97,7 +102,13 @@ written** before applying it to anyone else. Not automated yet.
 
 ## 4 · Creating new debt while clearing debt
 
-**Caught by:** none.
+**Caught by:** mechanism. `check-turn.py` blocks the turn when a file **created this turn**, in an
+area we author, carries Vietnamese diacritics. It reads the transcript for the paths actually written
+rather than `git status`, because the second incident below happened in a turn that created *and
+committed* the files — the tree was clean by the time any hook ran.
+
+*This label itself was stale for one turn: the mechanism was built and the ledger still said `none`.
+Which is the failure this very entry describes, applied to the entry.*
 
 Two real incidents:
 
@@ -125,9 +136,10 @@ worked on the first try.
 
 ## 6 · Stopping at the easy part and reporting it as finished
 
-**Caught by:** declaration. `.done-criteria.md` lists countable criteria and `check-turn.py` blocks
-while any `- [ ]` remains — but the oracle is **a box the agent ticks**, not system truth. It failed on
-its first use (third incident below).
+**Caught by:** mechanism. `.done-criteria.md` items may carry a `cmd:` line; `check-turn.py` **runs it
+and blocks on a non-zero exit even when the item is ticked**. The tick is what the agent types; the
+command is what the system runs, and the command wins. Items marked `- [~]` are excluded — a documented
+drop is a decision, and its command is not a promise.
 
 Three real incidents:
 
@@ -140,9 +152,11 @@ Three real incidents:
 happens in the gap between *the task as given* and *the task as silently redefined*; that gap only
 closes by writing it down.
 
-**Why this is a declaration and not a mechanism:** the hook reads the tick, not the truth. The third incident above
-slipped through because I ticked an item I had not finished. A declaration raises the cost of lying
-from silence to a deliberate keystroke — it does not remove it.
+**How this was promoted from declaration to mechanism.** The third incident above slipped through
+because the hook read the tick rather than the truth: I ticked an item I had not finished. Adding
+`cmd:` closes exactly that hole — a ticked item whose command fails still blocks the turn. What remains
+uncovered is an item with **no** command attached, so the honest statement is: a mechanism wherever the
+criterion is executable, a declaration where it is not.
 
 ## 7 · False precision
 
@@ -160,7 +174,9 @@ you have just said a measurement mixes two kinds, that number gets withdrawn, no
 
 ## 8 · Missing part of the scope when handing work to a worker
 
-**Caught by:** none.
+**Caught by:** none — and this was looked for, not skipped. Any check would compare the scope I declared
+against the scope I decided: the same source twice. The TACL condition for self-checking fails here,
+because working out the true scope *is* the task.
 
 Real incident: the batch-3b task spec gave four workers `SKILL.md` and forgot `references/format.md`.
 That file held an entire data contract nobody translated; it surfaced two batches later.
@@ -180,7 +196,10 @@ in that scope.
 
 ## 10 · Your own measuring script being wrong before the thing measured is
 
-**Caught by:** none.
+**Caught by:** mechanism (partial). `check-turn.py` blocks when a new script appears under `bin/`
+without a matching `tests/test_*.py`. This does not make the script correct — it makes the script
+*tested*, the cheapest available proxy and the one whose verification is trivially cheaper than its
+execution: the file exists or it does not.
 
 Four real incidents:
 

@@ -227,5 +227,117 @@ class TestNewFilesMustBeEnglish(Base):
         self.assertEqual(code, 2)
 
 
+class TestProofCommands(Base):
+    """Pitfall #6, promoted from declaration to mechanism.
+
+    The point of this check is that a tick is not evidence. These cases pin the two halves
+    of that: a ticked item whose command fails must still block, and a deliberately
+    dropped item's command must not be treated as a promise.
+    """
+
+    def _run(self):
+        buffer = io.StringIO()
+        try:
+            with redirect_stderr(buffer):
+                ct.check_proofs()
+        except SystemExit as exc:
+            return exc.code, buffer.getvalue()
+        return None, buffer.getvalue()
+
+    def test_ticked_item_with_failing_command_still_blocks(self):
+        """The case that matters: I ticked it, the command disagrees, the command wins."""
+        self.write_criteria("- [x] all done\n      cmd: exit 1\n")
+        code, message = self._run()
+        self.assertEqual(code, 2)
+        self.assertIn("The tick is not the oracle", message)
+
+    def test_passing_command_does_not_block(self):
+        self.write_criteria("- [x] all done\n      cmd: exit 0\n")
+        self.assertIsNone(self._run()[0])
+
+    def test_dropped_item_command_is_not_a_promise(self):
+        """`- [~]` means decided against; its command must not hold the turn hostage."""
+        self.write_criteria("- [~] dropped: no cheap oracle exists\n      cmd: exit 1\n")
+        self.assertIsNone(self._run()[0])
+
+    def test_no_criteria_file_is_silent(self):
+        self.assertIsNone(self._run()[0])
+
+    def test_item_without_command_is_ignored(self):
+        self.write_criteria("- [x] plain item, no proof\n")
+        self.assertIsNone(self._run()[0])
+
+    def test_backticks_are_stripped_from_the_command(self):
+        self.write_criteria("- [x] done\n      cmd: `exit 0`\n")
+        self.assertIsNone(self._run()[0])
+
+    def test_command_is_attributed_to_the_item_above_it(self):
+        self.write_criteria("- [x] first item\n      cmd: exit 0\n"
+                            "- [x] second item\n      cmd: exit 1\n")
+        code, message = self._run()
+        self.assertEqual(code, 2)
+        self.assertIn("second item", message)
+        self.assertNotIn("first item", message)
+
+
+class TestNewScriptsNeedTests(Base):
+    """Pitfall #10 — a measuring script that is itself wrong, three times in one session."""
+
+    def setUp(self):
+        super().setUp()
+        subprocess.run(["git", "init", "-q"], cwd=ct.ROOT, capture_output=True)
+        self._saved_transcript = dict(ct.LAST_TRANSCRIPT)
+
+    def tearDown(self):
+        ct.LAST_TRANSCRIPT.clear()
+        ct.LAST_TRANSCRIPT.update(self._saved_transcript)
+        super().tearDown()
+
+    def _turn_wrote(self, *rels):
+        records = [{"type": "user", "message": {"role": "user",
+                                                "content": [{"type": "text", "text": "go"}]}}]
+        for rel in rels:
+            target = ct.ROOT / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text("# x\n", encoding="utf-8")
+            records.append({"type": "assistant", "message": {"role": "assistant", "content": [
+                {"type": "tool_use", "name": "Write", "input": {"file_path": str(target)}}]}})
+        path = ct.ROOT / "t.jsonl"
+        path.write_text("\n".join(json.dumps(r) for r in records) + "\n", encoding="utf-8")
+        ct.LAST_TRANSCRIPT["path"] = str(path)
+
+    def _run(self):
+        buffer = io.StringIO()
+        try:
+            with redirect_stderr(buffer):
+                ct.check_new_scripts_have_tests()
+        except SystemExit as exc:
+            return exc.code, buffer.getvalue()
+        return None, buffer.getvalue()
+
+    def test_new_script_without_test_blocks(self):
+        self._turn_wrote("bin/measure.py")
+        code, message = self._run()
+        self.assertEqual(code, 2)
+        self.assertIn("tests/test_measure.py", message)
+
+    def test_new_script_with_test_does_not_block(self):
+        self._turn_wrote("bin/measure.py", "tests/test_measure.py")
+        self.assertIsNone(self._run()[0])
+
+    def test_hyphenated_script_maps_to_underscored_test(self):
+        """`bin/check-thing.py` pairs with `tests/test_check_thing.py`."""
+        self._turn_wrote("bin/check-thing.py", "tests/test_check_thing.py")
+        self.assertIsNone(self._run()[0])
+
+    def test_non_python_file_in_bin_is_ignored(self):
+        self._turn_wrote("bin/notes.md")
+        self.assertIsNone(self._run()[0])
+
+    def test_file_outside_bin_is_ignored(self):
+        self._turn_wrote("docs/thing.py")
+        self.assertIsNone(self._run()[0])
+
+
 if __name__ == "__main__":
     unittest.main()

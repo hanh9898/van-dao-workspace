@@ -53,6 +53,10 @@ CRITERIA = ROOT / ".done-criteria.md"
 STATE = ROOT / ".git" / "agent-turn-state.json"
 MAX_BLOCKS = 2
 
+# Set once in main() so later checks can reach the transcript without threading it
+# through every signature. A dict rather than a bare name so tests can set it directly.
+LAST_TRANSCRIPT = {"path": None}
+
 # Areas we author ourselves and have committed to English. `_bmad-output/` is excluded
 # on purpose: BMAD generates it under `document_output_language`, so Vietnamese there is
 # the configured behaviour, not debt.
@@ -113,6 +117,82 @@ def check_criteria():
           + "\n\nFinish them, or if one is being dropped on purpose change `- [ ]` to "
             "`- [~]` and give the reason — a documented drop is a decision, a silent "
             "one is forgetting.")
+
+
+def proof_commands():
+    """Every `cmd: <shell>` line in the criteria file, paired with the item above it.
+
+    A tick is something I type; a command is something the system runs. Pairing them is
+    what moves this check from a declaration to a mechanism — see the research finding
+    that self-reported completion is exactly what fails.
+    """
+    if not CRITERIA.is_file():
+        return []
+    pairs, item = [], "(unnamed item)"
+    for line in CRITERIA.read_text(encoding="utf-8", errors="replace").splitlines():
+        stripped = line.strip()
+        if stripped.startswith(("- [x]", "- [X]", "- [ ]", "- [~]")):
+            item = stripped
+        elif stripped.lower().startswith("cmd:"):
+            command = stripped[4:].strip().strip("`")
+            if command:
+                pairs.append((item, command))
+    return pairs
+
+
+def check_proofs():
+    """Check 5: every claimed-done item that carries a proof command must actually pass.
+
+    This is the mechanism the ledger's pitfall #6 needed. Ticking `[x]` is no longer
+    enough — if an item names a command, the command decides.
+    """
+    failures = []
+    for item, command in proof_commands():
+        if item.startswith("- [~]"):
+            continue          # deliberately dropped; its command is not a promise
+        result = subprocess.run(command, cwd=ROOT, shell=True, capture_output=True,
+                                text=True, encoding="utf-8", errors="replace")
+        if result.returncode != 0:
+            tail = ((result.stderr or result.stdout) or "").strip()[-400:]
+            failures.append(f"{item}\n      cmd: {command}\n      -> exit "
+                            f"{result.returncode}\n      {tail}")
+    if not failures:
+        return
+    block("proof-failed",
+          "[check-turn] item(s) in `.done-criteria.md` name a proof command that FAILS:\n  "
+          + "\n  ".join(failures)
+          + "\n\nThe tick is not the oracle — the command is. Either make the command pass, "
+            "or untick the item and say what is actually left.")
+
+
+def check_new_scripts_have_tests():
+    """Check 6: a new script under bin/ must come with tests.
+
+    Pitfall #10 in the ledger — a measuring script that is itself wrong, three times in
+    one session. Verification here is cheap: the test file either exists or it does not.
+    """
+    missing = []
+    for raw_path in files_written_this_turn(LAST_TRANSCRIPT.get("path")):
+        try:
+            rel = Path(raw_path).resolve().relative_to(ROOT.resolve()).as_posix()
+        except (ValueError, OSError):
+            continue
+        if not rel.startswith("bin/") or not rel.endswith(".py"):
+            continue
+        if git("ls-files", "--error-unmatch", rel).returncode == 0:
+            continue          # already tracked: not a new script
+        stem = Path(rel).stem.replace("-", "_")
+        expected = ROOT / "tests" / f"test_{stem}.py"
+        if not expected.is_file():
+            missing.append(f"{rel} -> expected tests/test_{stem}.py")
+    if not missing:
+        return
+    block("new-script-untested",
+          "[check-turn] new script(s) under bin/ with no matching test file:\n  "
+          + "\n  ".join(missing)
+          + "\n\nPitfall #10: a measuring script that is itself wrong, three times in one "
+            "session. This is the cheapest class to verify — the test file exists or it "
+            "does not.")
 
 
 def check_tests():
@@ -262,9 +342,13 @@ def main():
     if payload.get("stop_hook_active"):
         sys.exit(0)
 
+    LAST_TRANSCRIPT["path"] = payload.get("transcript_path")
+
     check_criteria()
+    check_proofs()
     check_tests()
     check_new_files_are_english(payload.get("transcript_path"))
+    check_new_scripts_have_tests()
     check_truncated_grep(payload.get("transcript_path"))
 
     write_state({})   # turn ended clean — clear the counter
