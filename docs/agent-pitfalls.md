@@ -158,6 +158,16 @@ because the hook read the tick rather than the truth: I ticked an item I had not
 uncovered is an item with **no** command attached, so the honest statement is: a mechanism wherever the
 criterion is executable, a declaration where it is not.
 
+**First real catch, 2026-08-31 — on the turn the mechanism was built.** I ticked the item for pitfall
+#2 and attached the proof `python bin/check-tool.py < fixture ; test $? -eq 2`. The hook ran it, the
+command failed, and the turn was blocked. The cause was mine and not the checker's: `shell=True` on
+Windows runs `cmd.exe`, where `;` and `$?` are not shell syntax, so the `test` half never executed.
+
+Two things follow. The mechanism works — it caught a false tick within minutes of existing, which is
+the thing the previous version could not do. And a proof command must be **platform-independent**:
+prefer a test run (`python -m unittest ...`) over a shell one-liner, because a proof that only works
+on one shell is a proof that quietly stops proving.
+
 ## 7 · False precision
 
 **Caught by:** none.
