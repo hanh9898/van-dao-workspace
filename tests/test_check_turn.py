@@ -4,13 +4,15 @@
 
 Why these matter more than they look: this hook BLOCKS. A blocking hook that gets it
 wrong either traps the agent in a loop or gets switched off by the user — and a hook
-that is off protects nothing. The two most dangerous cases pinned here are
-**infinite-loop protection** and **`- [~]` not counting as unfinished**.
+that is off protects nothing. The most dangerous cases pinned here are
+**infinite-loop protection**, **`- [~]` not counting as unfinished**, and the two
+false-positive cases in the pitfall-#4 check.
 """
 
 import importlib.util
 import io
 import json
+import subprocess
 import unittest
 from contextlib import redirect_stderr
 from pathlib import Path
@@ -124,6 +126,105 @@ class TestTruncatedGrepWarning(Base):
 
     def test_missing_transcript_is_silent(self):
         self.assertIsNone(ct.check_truncated_grep(str(Path(self._tmp.name) / "nope")))
+
+
+class TestNewFilesMustBeEnglish(Base):
+    """Pitfall #4 — the first mechanised one.
+
+    Two cases decide whether this check is usable at all: a pre-existing Vietnamese file
+    must not trigger it, and a BMAD-generated artifact must not either. A check that
+    fires on those fires on almost every turn, and a check that fires constantly is a
+    check that gets switched off.
+    """
+
+    def setUp(self):
+        super().setUp()
+        subprocess.run(["git", "init", "-q"], cwd=ct.ROOT, capture_output=True)
+
+    def _transcript(self, *written_paths):
+        """A minimal transcript: one human message, then Write tool_use blocks."""
+        records = [{"type": "user", "message": {"role": "user",
+                                                "content": [{"type": "text", "text": "go"}]}}]
+        for target in written_paths:
+            records.append({"type": "assistant", "message": {"role": "assistant", "content": [
+                {"type": "tool_use", "name": "Write", "input": {"file_path": target}}]}})
+        return self._write_records("transcript.jsonl", records)
+
+    def _write_records(self, name, records):
+        path = ct.ROOT / name
+        path.write_text("\n".join(json.dumps(r) for r in records) + "\n", encoding="utf-8")
+        return str(path)
+
+    def _make(self, rel, text, tracked=False):
+        target = ct.ROOT / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(text, encoding="utf-8")
+        if tracked:
+            subprocess.run(["git", "add", rel], cwd=ct.ROOT, capture_output=True)
+            subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t",
+                            "commit", "-qm", "x"], cwd=ct.ROOT, capture_output=True)
+        return str(target)
+
+    def _run(self, transcript):
+        buffer = io.StringIO()
+        try:
+            with redirect_stderr(buffer):
+                ct.check_new_files_are_english(transcript)
+        except SystemExit as exc:
+            return exc.code, buffer.getvalue()
+        return None, buffer.getvalue()
+
+    def test_new_vietnamese_file_blocks(self):
+        target = self._make("bin/tool.py", "# bi kip va chi diem\n# bí kíp và chỉ điểm\n")
+        code, message = self._run(self._transcript(target))
+        self.assertEqual(code, 2)
+        self.assertIn("agent-pitfalls", message)
+
+    def test_new_english_file_does_not_block(self):
+        target = self._make("bin/tool.py", "# scripture intake, counsel, ordeal\n")
+        self.assertIsNone(self._run(self._transcript(target))[0])
+
+    def test_pre_existing_vietnamese_file_does_not_block(self):
+        """A tracked file is someone else's migration batch, not new debt. Blocking on it
+        would fire on every untranslated file still in the repo."""
+        target = self._make("docs/old.md", "# tài liệu cũ chưa chuyển ngữ\n", tracked=True)
+        self.assertIsNone(self._run(self._transcript(target))[0])
+
+    def test_bmad_generated_artifact_does_not_block(self):
+        """`_bmad-output/` is produced under document_output_language — Vietnamese there
+        is configured behaviour, not debt."""
+        target = self._make("_bmad-output/story.md", "# câu chuyện người dùng\n")
+        self.assertIsNone(self._run(self._transcript(target))[0])
+
+    def test_only_this_turn_counts(self):
+        """A Write that happened before the last human message belongs to an earlier turn."""
+        target = self._make("bin/old-turn.py", "# bí kíp\n")
+        records = [
+            {"type": "assistant", "message": {"role": "assistant", "content": [
+                {"type": "tool_use", "name": "Write", "input": {"file_path": target}}]}},
+            {"type": "user", "message": {"role": "user",
+                                         "content": [{"type": "text", "text": "next"}]}},
+        ]
+        self.assertIsNone(self._run(self._write_records("t2.jsonl", records))[0])
+
+    def test_file_outside_authored_areas_is_ignored(self):
+        target = self._make("scratch/notes.md", "# ghi chú tạm\n")
+        self.assertIsNone(self._run(self._transcript(target))[0])
+
+    def test_missing_transcript_is_silent(self):
+        self.assertIsNone(self._run(str(ct.ROOT / "nope.jsonl"))[0])
+
+    def test_edit_counts_not_only_write(self):
+        """Edit creates debt just as well as Write."""
+        target = self._make("docs/new.md", "# chỉ điểm mới\n")
+        records = [
+            {"type": "user", "message": {"role": "user",
+                                         "content": [{"type": "text", "text": "go"}]}},
+            {"type": "assistant", "message": {"role": "assistant", "content": [
+                {"type": "tool_use", "name": "Edit", "input": {"file_path": target}}]}},
+        ]
+        code, _ = self._run(self._write_records("t3.jsonl", records))
+        self.assertEqual(code, 2)
 
 
 if __name__ == "__main__":

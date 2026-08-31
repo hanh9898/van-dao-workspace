@@ -11,6 +11,18 @@
           }
         ]
       }
+    ],
+    "TaskCompleted": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/bin/check-turn.py\"",
+            "timeout": 120
+          }
+        ]
+      }
     ]
   }
 }

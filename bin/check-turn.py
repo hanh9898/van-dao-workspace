@@ -22,6 +22,14 @@ Three checks, ordered by how hard they bite:
    Pitfall #2 in the ledger; it has bitten twice. Not a block, because it is easy to
    flag wrongly — `head` while *looking* is fine, only `head` while *concluding* is not.
 
+4. A file CREATED this turn, in an area we author, carries Vietnamese diacritics
+   while the project is mid-migration to English  ->  BLOCK (exit 2)
+   Pitfall #4, committed twice, caught by the user both times and by no scan. This is
+   the first mechanised pitfall and it is deliberately narrow: it reads the transcript
+   for the paths actually written, because the failure it targets happened in a turn
+   that created *and committed* the files — `git status` would have been clean by the
+   time any hook ran.
+
 Infinite-loop protection: after blocking `MAX_BLOCKS` times in a row for the same
 reason, stop blocking and say so plainly. A hook that blocks forever gets switched off,
 and a hook that is off protects nothing.
@@ -31,6 +39,7 @@ keep working.
 """
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -43,6 +52,15 @@ ROOT = Path(__file__).resolve().parent.parent
 CRITERIA = ROOT / ".done-criteria.md"
 STATE = ROOT / ".git" / "agent-turn-state.json"
 MAX_BLOCKS = 2
+
+# Areas we author ourselves and have committed to English. `_bmad-output/` is excluded
+# on purpose: BMAD generates it under `document_output_language`, so Vietnamese there is
+# the configured behaviour, not debt.
+AUTHORED_AREAS = ("bin/", "tests/", "docs/", ".claude/skills/", "_bmad/custom/")
+
+VIETNAMESE = re.compile(
+    "[à-ãè-êìíò-õùúý"
+    "ăđĩũơưạ-ỹ]", re.IGNORECASE)
 
 
 def read_state():
@@ -74,8 +92,10 @@ def block(reason, message):
     sys.exit(2)
 
 
-def git(*args, cwd=ROOT):
-    return subprocess.run(["git", *args], cwd=cwd, capture_output=True,
+def git(*args, cwd=None):
+    # `cwd=ROOT` as a default would bind ROOT at definition time, so the helper would keep
+    # pointing at the real repo even after ROOT is reassigned. Resolve it per call instead.
+    return subprocess.run(["git", *args], cwd=cwd or ROOT, capture_output=True,
                           text=True, encoding="utf-8", errors="replace")
 
 
@@ -136,6 +156,102 @@ def check_truncated_grep(transcript_path):
               "bitten twice.)", file=sys.stderr)
 
 
+def files_written_this_turn(transcript_path, tail_bytes=3_000_000):
+    """Paths passed to Write/Edit since the last human message.
+
+    Reads the tail of the transcript rather than `git status`, because the failure this
+    targets happened in a turn that created *and committed* the files — by the time any
+    hook ran, the tree was clean.
+    """
+    if not transcript_path:
+        return []
+    path = Path(transcript_path)
+    if not path.is_file():
+        return []
+    try:
+        with open(path, "rb") as fh:
+            fh.seek(max(0, path.stat().st_size - tail_bytes))
+            raw = fh.read().decode("utf-8", errors="replace")
+    except OSError:
+        return []
+
+    lines = raw.splitlines()[1:]          # first line is probably cut mid-record
+    records = []
+    for line in lines:
+        try:
+            records.append(json.loads(line))
+        except Exception:
+            continue
+
+    # Only this turn: everything after the last real human message.
+    start = 0
+    for i, rec in enumerate(records):
+        msg = rec.get("message") or {}
+        if rec.get("type") != "user" or msg.get("role") != "user":
+            continue
+        content = msg.get("content")
+        if isinstance(content, str) or (
+            isinstance(content, list)
+            and any(b.get("type") == "text" for b in content if isinstance(b, dict))
+        ):
+            start = i
+
+    written = []
+    for rec in records[start:]:
+        for block in (rec.get("message") or {}).get("content") or []:
+            if not isinstance(block, dict) or block.get("type") != "tool_use":
+                continue
+            if block.get("name") not in ("Write", "Edit", "NotebookEdit"):
+                continue
+            target = (block.get("input") or {}).get("file_path")
+            if target:
+                written.append(target)
+    return written
+
+
+def check_new_files_are_english(transcript_path):
+    """Check 4: a file created this turn, in an area we author, must be English."""
+    offenders = []
+    seen = set()
+    # Resolve BOTH sides: on Windows the repo root can be a short name (HBLAB_~1) while a
+    # path from the transcript resolves to the long one, and `relative_to` then misses.
+    try:
+        root = ROOT.resolve()
+    except OSError:
+        root = ROOT
+    for raw_path in files_written_this_turn(transcript_path):
+        try:
+            rel = Path(raw_path).resolve().relative_to(root).as_posix()
+        except (ValueError, OSError):
+            continue
+        if rel in seen:
+            continue
+        seen.add(rel)
+        if not rel.startswith(AUTHORED_AREAS):
+            continue
+        # Pre-existing files are someone else's migration batch, not new debt.
+        if git("ls-files", "--error-unmatch", rel).returncode == 0:
+            continue
+        try:
+            text = (ROOT / rel).read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        hits = sum(1 for line in text.splitlines() if VIETNAMESE.search(line))
+        if hits:
+            offenders.append((rel, hits))
+
+    if not offenders:
+        return
+    listing = "\n  ".join(f"{rel} — {n} line(s)" for rel, n in offenders)
+    block("new-file-not-english",
+          "[check-turn] file(s) created this turn carry Vietnamese diacritics, while the "
+          "project is mid-migration to English:\n  " + listing
+          + "\n\nThis is pitfall #4 in docs/agent-pitfalls.md — creating new debt while "
+            "clearing debt. It has happened twice and a human caught it both times.\n"
+            "Rewrite them in English now: a scan afterwards only clears what you remember "
+            "to scan for, and what you just wrote is never on that list.")
+
+
 def main():
     try:
         payload = json.load(sys.stdin)
@@ -148,6 +264,7 @@ def main():
 
     check_criteria()
     check_tests()
+    check_new_files_are_english(payload.get("transcript_path"))
     check_truncated_grep(payload.get("transcript_path"))
 
     write_state({})   # turn ended clean — clear the counter
