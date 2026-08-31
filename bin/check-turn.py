@@ -1,29 +1,33 @@
 #!/usr/bin/env python3
-"""check-turn.py — hook `Stop`: chặn lượt kết thúc khi còn việc đo được là chưa xong.
+"""check-turn.py — a `Stop` hook: block the turn while measurable work is unfinished.
 
-Vì sao cần: `docs/agent-pitfalls.md` liệt kê 10 lớp lỗi đã xảy ra thật. Ba lớp nặng
-nhất — dừng ở phần dễ, tự đổi sang cách dễ hơn, báo cáo xong khi chưa verify — đều
-xảy ra ở khoảng trống giữa **việc được giao** và **việc agent tự định nghĩa lại trong
-đầu**. Khoảng đó không đóng được bằng lời nhắc; nó chỉ đóng được khi có một bản khai
-báo viết ra từ đầu để đối chiếu.
+Why this exists: `docs/agent-pitfalls.md` lists ten classes of mistake that actually
+happened in this project. The three worst — stopping at the easy part, quietly swapping
+in an easier method, reporting done before verifying — all occur in the gap between
+**the task as given** and **the task as the agent silently redefined it**. No reminder
+closes that gap; only a declaration written up front, which something else can compare
+against.
 
-Ba phép kiểm, xếp theo mức cưỡng chế:
+Three checks, ordered by how hard they bite:
 
-1. `.done-criteria.md` còn mục `- [ ]`  ->  CHẶN (exit 2)
-   Bản khai báo đầu việc. Mục cố ý bỏ ghi `- [~]` kèm lý do, không tính là chưa xong.
+1. `.done-criteria.md` still has a `- [ ]` item  ->  BLOCK (exit 2)
+   The up-front declaration. An item dropped on purpose is written `- [~]` with a
+   reason and does not count as unfinished.
 
-2. File `.py` thay đổi mà test đỏ      ->  CHẶN (exit 2)
-   Cùng luật với git pre-commit, nhưng bắn sớm hơn: lúc agent định dừng, chưa tới
-   lúc commit.
+2. A `.py` file changed and the tests are red  ->  BLOCK (exit 2)
+   Same rule as the git pre-commit hook, but it fires earlier: when the agent means to
+   stop, well before commit time.
 
-3. Lượt dùng `grep ... | head` để kết luận "đã sạch"  ->  CẢNH BÁO (exit 0)
-   Lỗi số 2 trong sổ, đã cắn hai lần. Không chặn vì dễ báo nhầm — `head` khi đang
-   *xem* là hợp lệ, chỉ sai khi đang *kết luận*.
+3. The turn used `grep` piped into `head` to conclude "nothing left"  ->  WARN (exit 0)
+   Pitfall #2 in the ledger; it has bitten twice. Not a block, because it is easy to
+   flag wrongly — `head` while *looking* is fine, only `head` while *concluding* is not.
 
-Chống lặp vô hạn: cùng một lý do chặn quá `TOI_DA` lần liên tiếp thì thôi chặn và nói
-rõ. Một hook chặn mãi sẽ bị tắt, và lúc đó nó không bảo vệ được gì nữa.
+Infinite-loop protection: after blocking `MAX_BLOCKS` times in a row for the same
+reason, stop blocking and say so plainly. A hook that blocks forever gets switched off,
+and a hook that is off protects nothing.
 
-Mã thoát: 0 cho đi tiếp (có thể kèm cảnh báo ở stderr) · 2 chặn, agent phải làm tiếp.
+Exit codes: 0 carry on (possibly with a warning on stderr) · 2 blocked, the agent must
+keep working.
 """
 
 import json
@@ -31,122 +35,122 @@ import subprocess
 import sys
 from pathlib import Path
 
-for _l in (sys.stdout, sys.stderr):
-    if hasattr(_l, "reconfigure"):
-        _l.reconfigure(encoding="utf-8")
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8")
 
-GOC = Path(__file__).resolve().parent.parent
-TIEU_CHI = GOC / ".done-criteria.md"
-TRANG_THAI = GOC / ".git" / "agent-turn-state.json"
-TOI_DA = 2
+ROOT = Path(__file__).resolve().parent.parent
+CRITERIA = ROOT / ".done-criteria.md"
+STATE = ROOT / ".git" / "agent-turn-state.json"
+MAX_BLOCKS = 2
 
 
-def doc_trang_thai():
+def read_state():
     try:
-        return json.loads(TRANG_THAI.read_text(encoding="utf-8"))
+        return json.loads(STATE.read_text(encoding="utf-8"))
     except Exception:
         return {}
 
 
-def ghi_trang_thai(d):
+def write_state(data):
     try:
-        TRANG_THAI.write_text(json.dumps(d), encoding="utf-8")
+        STATE.write_text(json.dumps(data), encoding="utf-8")
     except OSError:
         pass
 
 
-def chan(ly_do, thong_diep):
-    """Chặn lượt — trừ khi đã chặn cùng lý do quá nhiều lần."""
-    st = doc_trang_thai()
-    n = st.get(ly_do, 0) + 1
-    if n > TOI_DA:
-        ghi_trang_thai({})
-        print(f"[check-turn] đã chặn {TOI_DA} lần vì `{ly_do}` mà chưa xong — thôi chặn.\n"
-              f"{thong_diep}\n"
-              f"Nói thẳng với người dùng là việc này còn dở và vì sao.", file=sys.stderr)
+def block(reason, message):
+    """Block the turn — unless the same reason has already blocked it too many times."""
+    state = read_state()
+    count = state.get(reason, 0) + 1
+    if count > MAX_BLOCKS:
+        write_state({})
+        print(f"[check-turn] blocked {MAX_BLOCKS} times for `{reason}` and it is still "
+              f"not done — giving up on blocking.\n{message}\n"
+              f"Tell the user plainly that this is unfinished, and why.", file=sys.stderr)
         sys.exit(0)
-    ghi_trang_thai({ly_do: n})
-    print(thong_diep, file=sys.stderr)
+    write_state({reason: count})
+    print(message, file=sys.stderr)
     sys.exit(2)
 
 
-def git(*a, cwd=GOC):
-    return subprocess.run(["git", *a], cwd=cwd, capture_output=True,
+def git(*args, cwd=ROOT):
+    return subprocess.run(["git", *args], cwd=cwd, capture_output=True,
                           text=True, encoding="utf-8", errors="replace")
 
 
-def kiem_tieu_chi():
-    """Phép kiểm 1: bản khai báo đầu việc còn mục chưa xong."""
-    if not TIEU_CHI.is_file():
+def check_criteria():
+    """Check 1: the up-front declaration still has unfinished items."""
+    if not CRITERIA.is_file():
         return
-    dong = TIEU_CHI.read_text(encoding="utf-8", errors="replace").splitlines()
-    chua = [d.strip() for d in dong if d.strip().startswith("- [ ]")]
-    if not chua:
+    lines = CRITERIA.read_text(encoding="utf-8", errors="replace").splitlines()
+    pending = [line.strip() for line in lines if line.strip().startswith("- [ ]")]
+    if not pending:
         return
-    chan("tieu-chi-chua-xong",
-         "[check-turn] `.done-criteria.md` còn mục chưa xong:\n  "
-         + "\n  ".join(chua[:8])
-         + "\n\nLàm nốt, hoặc nếu cố ý bỏ thì đổi `- [ ]` thành `- [~]` kèm lý do "
-           "— bỏ có ghi lý do là quyết định, bỏ im lặng là quên.")
+    block("criteria-unfinished",
+          "[check-turn] `.done-criteria.md` still has unfinished items:\n  "
+          + "\n  ".join(pending[:8])
+          + "\n\nFinish them, or if one is being dropped on purpose change `- [ ]` to "
+            "`- [~]` and give the reason — a documented drop is a decision, a silent "
+            "one is forgetting.")
 
 
-def kiem_test():
-    """Phép kiểm 2: có sửa .py mà test đỏ."""
-    r = git("status", "--porcelain")
-    if r.returncode != 0:
+def check_tests():
+    """Check 2: a .py file changed and the tests are red."""
+    status = git("status", "--porcelain")
+    if status.returncode != 0:
         return
-    py = [d for d in r.stdout.splitlines() if d.strip().endswith(".py")]
-    if not py:
+    if not [line for line in status.stdout.splitlines() if line.strip().endswith(".py")]:
         return
-    t = subprocess.run([sys.executable, "-m", "unittest", "discover", "tests", "-q"],
-                       cwd=GOC, capture_output=True, text=True,
-                       encoding="utf-8", errors="replace")
-    if t.returncode == 0:
+    result = subprocess.run([sys.executable, "-m", "unittest", "discover", "tests", "-q"],
+                            cwd=ROOT, capture_output=True, text=True,
+                            encoding="utf-8", errors="replace")
+    if result.returncode == 0:
         return
-    chan("test-do",
-         "[check-turn] có thay đổi trong file .py và test ĐANG ĐỎ:\n"
-         + (t.stderr or t.stdout)[-1200:]
-         + "\n\nSửa cho xanh trước khi kết thúc lượt.")
+    block("tests-red",
+          "[check-turn] .py files changed and the tests are RED:\n"
+          + (result.stderr or result.stdout)[-1200:]
+          + "\n\nGet them green before ending the turn.")
 
 
-def kiem_grep_bi_cat(transcript):
-    """Phép kiểm 3: dùng `grep | head` để kết luận đã sạch. Chỉ cảnh báo."""
-    if not transcript:
+def check_truncated_grep(transcript_path):
+    """Check 3: `grep` piped into `head` used to conclude "clean". Warn only."""
+    if not transcript_path:
         return
-    p = Path(transcript)
-    if not p.is_file():
+    path = Path(transcript_path)
+    if not path.is_file():
         return
     try:
-        dong = p.read_text(encoding="utf-8", errors="replace").splitlines()[-400:]
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()[-400:]
     except OSError:
         return
-    nghi = 0
-    for d in dong:
-        if "grep" in d and "| head" in d and "wc -l" not in d and "grep -c" not in d:
-            nghi += 1
-    if nghi:
-        print(f"[check-turn] lượt này có {nghi} lệnh dạng `grep ... | head`. "
-              "Nếu bất kỳ lệnh nào trong số đó được dùng để KẾT LUẬN 'đã sạch / không "
-              "còn sót', kết luận đó không đứng được — `head` cắt mất phần sau. "
-              "Đếm bằng `grep -c` hoặc `wc -l` rồi kết luận lại. "
-              "(Lỗi số 2 trong docs/agent-pitfalls.md, đã cắn hai lần.)", file=sys.stderr)
+    suspects = sum(
+        1 for line in lines
+        if "grep" in line and "| head" in line and "wc -l" not in line and "grep -c" not in line
+    )
+    if suspects:
+        print(f"[check-turn] this turn ran {suspects} command(s) shaped like `grep ... | head`. "
+              "If any of them backed a conclusion such as 'clean / nothing left', that "
+              "conclusion does not hold — `head` cut off the rest. Count with `grep -c` or "
+              "`wc -l` and conclude again. (Pitfall #2 in docs/agent-pitfalls.md; it has "
+              "bitten twice.)", file=sys.stderr)
 
 
 def main():
     try:
-        vao = json.load(sys.stdin)
+        payload = json.load(sys.stdin)
     except Exception:
-        vao = {}
+        payload = {}
 
-    # Hook Stop có thể bắn lại sau khi chính nó chặn; không chặn chồng.
-    if vao.get("stop_hook_active"):
+    # A Stop hook can fire again after it blocked; do not stack blocks.
+    if payload.get("stop_hook_active"):
         sys.exit(0)
 
-    kiem_tieu_chi()
-    kiem_test()
-    kiem_grep_bi_cat(vao.get("transcript_path"))
+    check_criteria()
+    check_tests()
+    check_truncated_grep(payload.get("transcript_path"))
 
-    ghi_trang_thai({})   # lượt kết thúc sạch — xoá bộ đếm
+    write_state({})   # turn ended clean — clear the counter
     sys.exit(0)
 
 

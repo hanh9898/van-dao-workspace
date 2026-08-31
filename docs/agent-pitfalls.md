@@ -1,150 +1,165 @@
-# Sổ lỗi của agent — và phép kiểm bắt được từng lỗi
+# Agent pitfall ledger — and what catches each one
 
-Mỗi mục ở đây là **một lớp lỗi đã xảy ra thật trong dự án này**, kèm ngày và ca cụ thể. Không có mục
-nào là lý thuyết chung: một lớp lỗi chưa cắn thì chưa vào sổ.
+Every entry here is **a class of mistake that actually happened in this project**, with the date and
+the concrete incident. Nothing here is general theory: a class that has not bitten yet does not get an
+entry.
 
-Cột quan trọng nhất là **Bắt bằng gì**. Nó chia ba mức, và mức quyết định hành vi chứ không phải lời
-văn mô tả lỗi:
+The column that matters is **Caught by**. It has three levels, and the level drives behaviour — not
+the prose describing the mistake:
 
-| Mức | Nghĩa |
+| Level | Meaning |
 |---|---|
-| **cơ chế** | Có test hoặc hook chặn được. Vi phạm thì đỏ, không đi tiếp được |
-| **khai báo** | Không chặn được, nhưng buộc phải viết ra một câu — nói dối thành hành động chủ động |
-| **chưa có** | Hiện chỉ dựa vào người đọc để ý. Ghi ra để biết chỗ nào đang trống |
+| **mechanism** | A test or hook blocks it. Violate it and something goes red; you cannot continue |
+| **declaration** | Cannot be blocked, but forces a sentence to be written. Lying becomes a deliberate act |
+| **none** | Currently relies on a human noticing. Written down so the gap is visible |
 
-Nguyên tắc vận hành, lấy từ thực hành harness engineering: *mỗi lần agent mắc lỗi, bỏ công dựng cơ chế
-để nó không mắc lại lỗi đó nữa.* Mục nào ở mức `chưa có` là một món nợ, không phải một lời than.
+The operating principle, taken from harness-engineering practice: *every time the agent makes a
+mistake, spend the effort to build something so it cannot make that mistake again.* An entry at level
+`none` is a debt, not a complaint.
 
 ---
 
-## 1 · Kiểm *sự tồn tại* thay cho kiểm *hoạt động*
+## 1 · Checking that something *exists* instead of that it *works*
 
-**Bắt bằng:** cơ chế (một phần) — `bin/check-turn.py` chặn lượt khi test đỏ.
+**Caught by:** mechanism (partly) — `bin/check-turn.py` blocks the turn when tests are red.
 
-Ba ca thật, 2026-08-31:
+Three real incidents, 2026-08-31:
 
-- `command -v python3` trả true cho stub Windows Store — một cái vỏ chỉ mở cửa hàng, gọi thì không
-  chạy gì. Sửa bằng cách chạy thử `python3 -c "import sys"` chứ không tin tên lệnh.
-- Verify **task tồn tại** thay vì verify **worker nhận đúng spec**. `dispatch-show` đã in `to=None`
-  ngay từ đầu; tôi đọc dòng đó rồi đi tiếp, và bốn worker chạy sai suốt một vòng.
-- Grep thấy tên định danh mới **có mặt** rồi kết luận refactor xong, trong khi hành vi chưa chạy lần
-  nào.
+- `command -v python3` returns true for the Windows Store stub — a shell that only opens the store and
+  runs nothing. Fixed by actually running `python3 -c "import sys"` instead of trusting the name.
+- Verified that the **task existed** instead of that the **worker received the spec**. `dispatch-show`
+  had already printed `to=None`; I read that line and moved on, and four workers ran wrong for a
+  whole round.
+- Grepped for the new identifiers, saw them **present**, and called the refactor done — while the
+  behaviour had not been run once.
 
-**Cách sống với nó:** oracle của một thay đổi phải là *hành vi*, không phải *sự có mặt của chuỗi*.
-Nếu phép kiểm của bạn là `grep`, hỏi tiếp: chạy nó lên thì sao?
+**How to live with it:** the oracle for a change must be *behaviour*, not *the presence of a string*.
+If your check is a `grep`, the next question is: what happens when you run it?
 
-## 2 · Đọc sai một kết quả bị cắt
+## 2 · Misreading a truncated result
 
-**Bắt bằng:** cơ chế — `bin/check-turn.py` cảnh báo khi lượt có `grep ... | head` dùng để kết luận
-"đã sạch".
+**Caught by:** mechanism — `check-turn.py` warns when a turn used `grep` piped into `head` to conclude
+"clean".
 
-Hai ca thật:
+Two real incidents:
 
-- `git ls-files .claude/skills/` trả rỗng; tôi đọc thành "chỉ 2 skill được track", thực tế là **0**.
-- Grep kiểm sót bị `| head -8` cắt; tám dòng đầu đều từ `bin/` nên tôi kết luận `skills/` đã sạch.
-  Không sạch.
+- `git ls-files .claude/skills/` returned empty; I read it as "only 2 skills tracked". It was **0**.
+- A leftover-check grep was cut by `| head -8`; all eight lines came from `bin/`, so I concluded
+  `skills/` was clean. It was not.
 
-**Cách sống với nó:** phép kiểm "còn sót gì không" phải đếm (`wc -l`, `grep -c`), không được cắt. Chỉ
-dùng `head` khi đang *xem*, không khi đang *kết luận*.
+**How to live with it:** a "is anything left?" check must count (`wc -l`, `grep -c`), never truncate.
+Use `head` while *looking*, never while *concluding*.
 
-## 3 · Vi phạm luật vừa viết ở dòng bên cạnh
+## 3 · Breaking a rule written on the line next to it
 
-**Bắt bằng:** chưa có.
+**Caught by:** none.
 
-Ba ca thật:
+Three real incidents:
 
-- Viết *"không dùng `book` — nó đã bận nghĩa kỹ thuật"*, rồi chọn `manual`, `pointer`, `trial` — ba từ
-  bận nặng hơn.
-- Viết lens đòi người khác nêu ngưỡng số, mà chính lens không nêu ngưỡng nào (`"a fixed token
-  ceiling"` không kèm con số).
-- Bảng chống trôi nghĩa lại gộp hai nghĩa khác nhau của `nguon` thành một từ.
+- Wrote *"do not use `book` — it already carries a technical meaning"*, then picked `manual`,
+  `pointer`, `trial` — three words that carry heavier ones.
+- Wrote a lens demanding that others state numeric thresholds, while the lens itself stated none
+  (`"a fixed token ceiling"` with no number).
+- The table built to stop meaning-drift collapsed two different senses of `nguon` into one word.
 
-**Cách sống với nó:** sau khi viết một luật, phép kiểm rẻ nhất là áp nó lên **chính đoạn vừa viết**
-trước khi áp cho ai khác. Chưa tự động hoá được.
+**How to live with it:** after writing a rule, the cheapest check is to apply it to **the passage just
+written** before applying it to anyone else. Not automated yet.
 
-## 4 · Tự sinh nợ mới trong lúc đang dọn nợ
+## 4 · Creating new debt while clearing debt
 
-**Bắt bằng:** chưa có.
+**Caught by:** none.
 
-Ca thật: đang refactor toàn hệ sang tiếng Anh, tôi ghi kết quả một vòng eval bằng **hàng chục khoá JSON
-tiếng Việt mới**. Người dùng phát hiện, không phải phép quét nào.
+Two real incidents:
 
-**Cách sống với nó:** quét sau chỉ dọn được thứ mình nhớ ra để quét; thứ mình vừa viết không nằm trong
-danh sách quét vì mình không coi nó là nợ. Luật đúng: mỗi lần **viết** nội dung mới trong lúc refactor,
-áp bảng ngay lúc viết.
+- Mid-refactor to English, I recorded an eval round using **dozens of new Vietnamese JSON keys**. The
+  user caught it, no scan did.
+- Immediately after writing *this ledger*, I wrote all four new harness files — the hook, its tests,
+  this file, the criteria file — in Vietnamese. The user caught that too, in the same turn.
 
-## 5 · Tự đổi sang cách dễ hơn khi cách được chỉ định gặp khó
+**How to live with it:** a scan only clears what you remember to scan for; what you just wrote is not
+on that list, because you do not think of it as debt. The rule is: every time you **write** new
+content during a refactor, apply the mapping **as you write it**.
 
-**Bắt bằng:** khai báo — mục `## Cách được chỉ định` trong `.done-criteria.md`.
+## 5 · Quietly switching to an easier method when the specified one gets hard
 
-Ca thật: được yêu cầu dùng Orca orchestration để dịch song song. `worker-start` không inject task spec
-nên bốn worker nhận sai prompt. Tôi kết luận "không thử lại đường `dispatch --inject` vì đó là đoán"
-rồi **tự quay về dịch tuần tự** — trong khi `dispatch --inject` là đường thứ hai mà chính guide nêu.
-Sau khi được yêu cầu điều tra lại, nó chạy đúng ngay lần đầu.
+**Caught by:** declaration — the "method that was specified" section in `.done-criteria.md`.
 
-**Cách sống với nó:** cách được chỉ định mà gặp khó thì mặc định là *điều tra và sửa*, không phải
-*tránh*. Muốn đổi cách phải hỏi. Xem [[khong-tu-doi-sang-cach-de-hon]].
+Real incident: asked to use Orca orchestration for parallel translation. `worker-start` did not inject
+the task spec, so four workers got the wrong prompt. I concluded "not retrying the `dispatch --inject`
+path, that would be guessing" and **went back to translating sequentially on my own** — while
+`dispatch --inject` is the second path the guide itself names. When told to investigate instead, it
+worked on the first try.
 
-## 6 · Dừng ở phần dễ rồi báo cáo như đã xong
+**How to live with it:** when the specified tool misbehaves, the default is *investigate and fix*, not
+*avoid*. Changing method requires asking.
 
-**Bắt bằng:** cơ chế — `.done-criteria.md` liệt kê tiêu chí đếm được, `bin/check-turn.py` chặn lượt khi
-còn mục `[ ]`.
+## 6 · Stopping at the easy part and reporting it as finished
 
-Hai ca thật:
+**Caught by:** mechanism — `.done-criteria.md` lists countable criteria and `check-turn.py` blocks
+while any `- [ ]` remains.
 
-- Chạy **1 trong 8** kịch bản eval rồi trình bày như lô 3c đã xong. Bảy kịch bản còn lại mới là thứ
-  chứng minh các nhánh mà skill tồn tại để xử lý.
-- Đề xuất bốn cơ chế cho chính sổ này rồi tự rút xuống làm hai, không vì lý do kỹ thuật nào.
+Three real incidents:
 
-**Cách sống với nó:** viết tiêu chí xong **trước khi bắt đầu**, dạng đếm được. Mọi lỗi loại này xảy ra
-ở khoảng trống giữa *việc được giao* và *việc tôi tự định nghĩa lại trong đầu*; khoảng đó chỉ đóng
-được bằng cách viết ra.
+- Ran **1 of 8** eval scenarios and presented batch 3c as complete. The other seven were the ones
+  covering the branches the skill exists to handle.
+- Proposed four mechanisms for this very ledger, then narrowed it to two for no technical reason.
+- Ticked "rewrite all four files in English" while one of the four was still untouched.
 
-## 7 · Precision giả
+**How to live with it:** write countable criteria **before** starting. Every mistake of this shape
+happens in the gap between *the task as given* and *the task as silently redefined*; that gap only
+closes by writing it down.
 
-**Bắt bằng:** chưa có.
+**Known limit of the mechanism:** the hook reads the tick, not the truth. The third incident above
+slipped through because I ticked an item I had not finished. A declaration raises the cost of lying
+from silence to a deliberate keystroke — it does not remove it.
 
-Hai ca thật:
+## 7 · False precision
 
-- Đưa bảng "nhóm A 52 file / nhóm B 88 file" rồi nói ngay bên dưới rằng nhóm B lẫn hai loại — mà vẫn
-  để nguyên con số. Đo lại đúng: 64 và 76.
-- So "số câu cấm/buộc 2 → 9" giữa bản Việt và bản Anh bằng **hai regex khác nhau**, rồi trình như bằng
-  chứng.
+**Caught by:** none.
 
-**Cách sống với nó:** một con số chỉ so được với con số đo bằng **cùng một thước**. Nếu vừa nói "phép
-đo này lẫn hai loại", con số đó phải bị rút, không phải chú thích.
+Two real incidents:
 
-## 8 · Phạm vi sót khi giao việc cho worker
+- Presented "group A 52 files / group B 88 files", then said in the next sentence that group B mixed
+  two kinds — and left the numbers standing. Measured properly: 64 and 76.
+- Compared "must/never clauses: 2 → 9" between the Vietnamese and English versions using **two
+  different regexes**, and presented it as evidence.
 
-**Bắt bằng:** chưa có.
+**How to live with it:** a number is only comparable to one measured with **the same instrument**. If
+you have just said a measurement mixes two kinds, that number gets withdrawn, not footnoted.
 
-Ca thật: task spec lô 3b giao `SKILL.md` cho bốn worker, quên `references/format.md`. File đó chứa
-nguyên một data contract chưa ai dịch, lộ ra hai lô sau.
+## 8 · Missing part of the scope when handing work to a worker
 
-**Cách sống với nó:** trước khi giao, liệt kê **mọi file khớp phạm vi** bằng lệnh, rồi giao theo danh
-sách đó — không giao theo tên file nhớ được.
+**Caught by:** none.
 
-## 9 · Trả lời một worker khi câu hỏi áp cho nhiều worker
+Real incident: the batch-3b task spec gave four workers `SKILL.md` and forgot `references/format.md`.
+That file held an entire data contract nobody translated; it surfaced two batches later.
 
-**Bắt bằng:** chưa có.
+**How to live with it:** before dispatching, list **every file matching the scope** with a command and
+hand out that list — never the filenames you happen to remember.
 
-Ca thật: một worker hỏi hai câu áp cho **cả bốn** file. Tôi reply vào dispatch của worker đã hỏi; ba
-worker kia không nhận được và giữ nguyên định danh cũ.
+## 9 · Answering one worker when the question applies to several
 
-**Cách sống với nó:** khi câu hỏi của một worker áp cho phạm vi chung, câu trả lời phải phát cho mọi
-worker liên quan.
+**Caught by:** none.
 
-## 10 · Script đo của chính mình sai trước khi đối tượng bị đo sai
+Real incident: one worker asked two questions that applied to **all four** files. I replied into that
+worker's dispatch; the other three never received it and kept the old identifier.
 
-**Bắt bằng:** chưa có.
+**How to live with it:** when a worker's question covers shared scope, the answer goes to every worker
+in that scope.
 
-Ba ca thật:
+## 10 · Your own measuring script being wrong before the thing measured is
 
-- Script audit ma trận báo "THIẾU" một hàng, thực ra là lỗi so chuỗi của chính nó.
-- Script phân loại story dùng regex `^status:\s*(done)` trong khi file ghi `status: 'done'` — nháy đơn
-  làm ba story bị xếp nhầm.
-- `git show 3b91168:skills/nhap-mon/SKILL.md` trả rỗng vì ở commit đó thư mục đã đổi tên; tôi suýt đọc
-  thành "bản cũ không có ràng buộc nào".
+**Caught by:** none.
 
-**Cách sống với nó:** khi một phép đo cho kết quả bất ngờ, nghi phép đo **trước** khi nghi đối tượng.
-Kết quả rỗng và kết quả 0 là hai thứ khác nhau.
+Four real incidents:
+
+- A matrix-audit script reported a row "MISSING"; it was its own string-matching bug.
+- A story-classifier used `^status:\s*(done)` while the files write `status: 'done'` — the quotes put
+  three stories in the wrong bucket.
+- `git show <sha>:skills/nhap-mon/SKILL.md` returned empty because the directory had already been
+  renamed in that commit; I nearly read it as "the old version had no constraints".
+- A `|` inside a table cell (`grep | head`) broke the markdown column structure, so the ledger test
+  read the wrong cell and reported a missing milestone that was actually there.
+
+**How to live with it:** when a measurement returns something surprising, suspect the **measurement**
+before the subject. "Empty" and "zero" are not the same result.

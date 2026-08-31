@@ -1,11 +1,11 @@
-"""Kiểm `bin/check-turn.py` — hook Stop chặn lượt khi còn việc đo được là chưa xong.
+"""Tests for `bin/check-turn.py` — the Stop hook that blocks a turn with work left.
 
     python -m unittest discover tests -v
 
-Vì sao test này quan trọng hơn vẻ ngoài của nó: đây là một hook CHẶN. Hook chặn sai
-thì hoặc nó khoá agent trong vòng lặp, hoặc người dùng tắt nó đi — và một hook bị tắt
-không bảo vệ được gì. Hai ca nguy hiểm nhất được khoá ở đây là **chống lặp vô hạn** và
-**`- [~]` không bị tính là chưa xong**.
+Why these matter more than they look: this hook BLOCKS. A blocking hook that gets it
+wrong either traps the agent in a loop or gets switched off by the user — and a hook
+that is off protects nothing. The two most dangerous cases pinned here are
+**infinite-loop protection** and **`- [~]` not counting as unfinished**.
 """
 
 import importlib.util
@@ -16,114 +16,114 @@ from contextlib import redirect_stderr
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-GOC = Path(__file__).resolve().parent.parent
-_spec = importlib.util.spec_from_file_location("check_turn", GOC / "bin" / "check-turn.py")
+ROOT = Path(__file__).resolve().parent.parent
+_spec = importlib.util.spec_from_file_location("check_turn", ROOT / "bin" / "check-turn.py")
 ct = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(ct)
 
 
-class Nen(unittest.TestCase):
-    """Mỗi ca chạy trên thư mục tạm — không đụng file thật của repo."""
+class Base(unittest.TestCase):
+    """Every case runs against a temp directory — never the repo's real files."""
 
     def setUp(self):
         self._tmp = TemporaryDirectory()
-        d = Path(self._tmp.name)
-        (d / ".git").mkdir()
-        self._goc, self._tc, self._tt = ct.GOC, ct.TIEU_CHI, ct.TRANG_THAI
-        ct.GOC = d
-        ct.TIEU_CHI = d / ".done-criteria.md"
-        ct.TRANG_THAI = d / ".git" / "agent-turn-state.json"
+        tmp = Path(self._tmp.name)
+        (tmp / ".git").mkdir()
+        self._saved = (ct.ROOT, ct.CRITERIA, ct.STATE)
+        ct.ROOT = tmp
+        ct.CRITERIA = tmp / ".done-criteria.md"
+        ct.STATE = tmp / ".git" / "agent-turn-state.json"
 
     def tearDown(self):
-        ct.GOC, ct.TIEU_CHI, ct.TRANG_THAI = self._goc, self._tc, self._tt
+        ct.ROOT, ct.CRITERIA, ct.STATE = self._saved
         self._tmp.cleanup()
 
-    def viet(self, noi):
-        ct.TIEU_CHI.write_text(noi, encoding="utf-8")
+    def write_criteria(self, text):
+        ct.CRITERIA.write_text(text, encoding="utf-8")
 
-    def chay_kiem_tieu_chi(self):
-        """Trả mã thoát; None nghĩa là không chặn."""
+    def run_check(self):
+        """Return the exit code; None means the turn was not blocked."""
         try:
             with redirect_stderr(io.StringIO()):
-                ct.kiem_tieu_chi()
-        except SystemExit as e:
-            return e.code
+                ct.check_criteria()
+        except SystemExit as exc:
+            return exc.code
         return None
 
 
-class TestTieuChi(Nen):
-    def test_khong_co_file_thi_khong_chan(self):
-        """Việc nhỏ không cần khai báo — hook phải im lặng, nếu không nó thành thuế."""
-        self.assertIsNone(self.chay_kiem_tieu_chi())
+class TestCriteria(Base):
+    def test_no_file_does_not_block(self):
+        """Small tasks need no declaration — the hook must stay silent, or it becomes a tax."""
+        self.assertIsNone(self.run_check())
 
-    def test_con_muc_chua_xong_thi_chan(self):
-        self.viet("- [x] xong rồi\n- [ ] chưa làm\n")
-        self.assertEqual(self.chay_kiem_tieu_chi(), 2)
+    def test_unfinished_item_blocks(self):
+        self.write_criteria("- [x] done\n- [ ] not done\n")
+        self.assertEqual(self.run_check(), 2)
 
-    def test_tat_ca_da_xong_thi_khong_chan(self):
-        self.viet("- [x] a\n- [x] b\n")
-        self.assertIsNone(self.chay_kiem_tieu_chi())
+    def test_all_done_does_not_block(self):
+        self.write_criteria("- [x] a\n- [x] b\n")
+        self.assertIsNone(self.run_check())
 
-    def test_muc_co_y_bo_khong_tinh_la_chua_xong(self):
-        """`- [~]` là bỏ CÓ LÝ DO. Không có lối thoát này thì hook chặn mãi một việc
-        đã quyết định không làm, và người dùng sẽ tắt hook."""
-        self.viet("- [x] a\n- [~] bỏ vì cần remote, xem mục hoãn 17\n")
-        self.assertIsNone(self.chay_kiem_tieu_chi())
+    def test_deliberately_dropped_item_is_not_unfinished(self):
+        """`- [~]` is a documented drop. Without this escape the hook blocks forever on
+        something already decided against, and the user switches it off."""
+        self.write_criteria("- [x] a\n- [~] dropped: needs a remote, see deferred item 17\n")
+        self.assertIsNone(self.run_check())
 
-    def test_dem_thut_dong_van_tinh(self):
-        """Mục lồng trong danh sách vẫn là mục chưa xong."""
-        self.viet("- [x] a\n  - [ ] con chưa làm\n")
-        self.assertEqual(self.chay_kiem_tieu_chi(), 2)
-
-
-class TestChongLapVoHan(Nen):
-    """Ca nguy hiểm nhất: hook chặn mãi thì agent kẹt và người dùng tắt hook."""
-
-    def test_chan_toi_da_roi_thoi(self):
-        self.viet("- [ ] việc không làm nổi\n")
-        ma = [self.chay_kiem_tieu_chi() for _ in range(ct.TOI_DA + 1)]
-        self.assertEqual(ma[:ct.TOI_DA], [2] * ct.TOI_DA,
-                         "phải chặn đủ số lần trước khi bỏ cuộc")
-        self.assertEqual(ma[ct.TOI_DA], 0,
-                         "quá ngưỡng thì cho đi tiếp, không khoá agent lại")
-
-    def test_bo_dem_xoa_sau_khi_thoi_chan(self):
-        self.viet("- [ ] x\n")
-        for _ in range(ct.TOI_DA + 1):
-            self.chay_kiem_tieu_chi()
-        self.assertEqual(json.loads(ct.TRANG_THAI.read_text(encoding="utf-8")), {},
-                         "bộ đếm phải sạch, nếu không lần chặn sau bị tính dồn")
-
-    def test_bo_dem_rieng_theo_ly_do(self):
-        """Hai lý do khác nhau không được cộng dồn vào nhau."""
-        ct.TRANG_THAI.write_text(json.dumps({"test-do": ct.TOI_DA}), encoding="utf-8")
-        self.viet("- [ ] x\n")
-        self.assertEqual(self.chay_kiem_tieu_chi(), 2,
-                         "bộ đếm của `test-do` không được làm câm `tieu-chi-chua-xong`")
+    def test_indented_item_still_counts(self):
+        """A nested list item is still an unfinished item."""
+        self.write_criteria("- [x] a\n  - [ ] nested and not done\n")
+        self.assertEqual(self.run_check(), 2)
 
 
-class TestCanhBaoGrepBiCat(Nen):
-    """Cảnh báo, KHÔNG chặn — `head` khi đang xem là hợp lệ, chỉ sai khi kết luận."""
+class TestInfiniteLoopProtection(Base):
+    """The most dangerous case: block forever and the user switches the hook off."""
 
-    def _chay(self, noi):
-        p = Path(self._tmp.name) / "t.jsonl"
-        p.write_text(noi, encoding="utf-8")
-        buf = io.StringIO()
-        with redirect_stderr(buf):
-            ct.kiem_grep_bi_cat(str(p))
-        return buf.getvalue()
+    def test_gives_up_after_max_blocks(self):
+        self.write_criteria("- [ ] something impossible\n")
+        codes = [self.run_check() for _ in range(ct.MAX_BLOCKS + 1)]
+        self.assertEqual(codes[:ct.MAX_BLOCKS], [2] * ct.MAX_BLOCKS,
+                         "must block the full number of times before giving up")
+        self.assertEqual(codes[ct.MAX_BLOCKS], 0,
+                         "past the threshold, let the turn end — do not trap the agent")
 
-    def test_bao_khi_co_grep_head(self):
-        self.assertIn("agent-pitfalls", self._chay('{"c":"grep -rn abc . | head -8"}\n'))
+    def test_counter_cleared_after_giving_up(self):
+        self.write_criteria("- [ ] x\n")
+        for _ in range(ct.MAX_BLOCKS + 1):
+            self.run_check()
+        self.assertEqual(json.loads(ct.STATE.read_text(encoding="utf-8")), {},
+                         "counter must be clean, else the next block starts pre-charged")
 
-    def test_khong_bao_khi_da_dem(self):
-        self.assertEqual(self._chay('{"c":"grep -rc abc . | wc -l"}\n'), "")
+    def test_counters_are_per_reason(self):
+        """Two different reasons must not add up into each other."""
+        ct.STATE.write_text(json.dumps({"tests-red": ct.MAX_BLOCKS}), encoding="utf-8")
+        self.write_criteria("- [ ] x\n")
+        self.assertEqual(self.run_check(), 2,
+                         "the `tests-red` counter must not silence `criteria-unfinished`")
 
-    def test_khong_bao_khi_dung_grep_c(self):
-        self.assertEqual(self._chay('{"c":"grep -c abc x | head -1"}\n'), "")
 
-    def test_transcript_khong_ton_tai_thi_im(self):
-        self.assertEqual(ct.kiem_grep_bi_cat(str(Path(self._tmp.name) / "khong-co")), None)
+class TestTruncatedGrepWarning(Base):
+    """Warns, does NOT block — `head` while looking is fine, only while concluding is not."""
+
+    def _warn(self, content):
+        path = Path(self._tmp.name) / "transcript.jsonl"
+        path.write_text(content, encoding="utf-8")
+        buffer = io.StringIO()
+        with redirect_stderr(buffer):
+            ct.check_truncated_grep(str(path))
+        return buffer.getvalue()
+
+    def test_warns_on_grep_head(self):
+        self.assertIn("agent-pitfalls", self._warn('{"c":"grep -rn abc . | head -8"}\n'))
+
+    def test_silent_when_counted(self):
+        self.assertEqual(self._warn('{"c":"grep -rc abc . | wc -l"}\n'), "")
+
+    def test_silent_when_grep_c_used(self):
+        self.assertEqual(self._warn('{"c":"grep -c abc x | head -1"}\n'), "")
+
+    def test_missing_transcript_is_silent(self):
+        self.assertIsNone(ct.check_truncated_grep(str(Path(self._tmp.name) / "nope")))
 
 
 if __name__ == "__main__":
