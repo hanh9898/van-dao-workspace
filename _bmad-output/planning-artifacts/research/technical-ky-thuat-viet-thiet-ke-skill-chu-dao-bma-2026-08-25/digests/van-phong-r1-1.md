@@ -1,6 +1,6 @@
 # Digest — Dimension 5: Văn phong hướng dẫn model (BMAD SKILL.md)
 
-Nguồn đọc trực tiếp: bmad-architecture/SKILL.md, bmad-prd/SKILL.md, bmad-deep-recon/SKILL.md, bmad-prfaq/SKILL.md, bmad-review/SKILL.md (đường dẫn gốc `.claude\skills\<tên>\SKILL.md` dưới `C:\Users\HBLAB_OPMS\Projects\van-dao-workspace\`).
+Nguồn đọc trực tiếp: bmad-architecture/SKILL.md, bmad-prd/SKILL.md, bmad-deep-recon/SKILL.md, bmad-prfaq/SKILL.md, bmad-review/SKILL.md (đường dẫn gốc `.claude\skills\<tên>\SKILL.md` dưới `C:\Users\<user>\Projects\van-dao-workspace\`).
 
 ## Câu 1 — Ngôi, giọng điệu, persona
 

@@ -87,7 +87,7 @@ van-dao/
   "name": "van-dao",
   "description": "Biến sách bạn đã có thành lộ trình học có người kèm. Thu bí kíp từ PDF/EPUB, dẫn học từng chương, khảo thí để đột phá cảnh giới.",
   "version": "0.1.0",
-  "author": { "name": "hanhnt2", "email": "hanhnt2@hblab.vn" },
+  "author": { "name": "hanhnt2", "email": "56497031+hanh9898@users.noreply.github.com" },
   "repository": "<URL repo>",
   "license": "MIT"
 }

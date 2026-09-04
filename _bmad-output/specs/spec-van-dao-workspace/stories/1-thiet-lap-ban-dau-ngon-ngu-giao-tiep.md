@@ -301,7 +301,7 @@ Log 2026-08-27 và "Tổng kết đóng story" bên dưới)
   cập nhật theo — hai nguồn (contract chữ và code thật) hiện nói khác nhau.
 - Phân loại: **intent_gap** — root cause nằm trong `<intent-contract>` (câu Always mô tả một cơ chế
   đã chứng minh bất khả thi). Theo đúng nhánh intent_gap: không tự sửa `<intent-contract>`, đã lưu
-  patch tham chiếu tại `C:\Users\HBLAB_OPMS\Projects\van-dao-workspace\_bmad-output\implementation-artifacts\bmad-build-auto-patch-story-1-buoc0-mechanism.md`.
+  patch tham chiếu tại `C:\Users\<user>\Projects\van-dao-workspace\_bmad-output\implementation-artifacts\bmad-build-auto-patch-story-1-buoc0-mechanism.md`.
 - **Deviation có báo lại (theo đúng tiền lệ Lần chạy 1 của chính story này):** nhánh intent_gap gọi ý
   revert code. Đã **không revert** — bản sửa Bước 0 đã verify bằng 3 lần chạy thật là đúng, cách đọc
   gốc trong contract đã chứng minh sai/bất khả thi; revert sẽ đưa lại đúng bug đã tìm ra, không bảo

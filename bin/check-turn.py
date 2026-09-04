@@ -293,7 +293,7 @@ def check_new_files_are_english(transcript_path):
     """Check 4: a file created this turn, in an area we author, must be English."""
     offenders = []
     seen = set()
-    # Resolve BOTH sides: on Windows the repo root can be a short name (HBLAB_~1) while a
+    # Resolve BOTH sides: on Windows the repo root can be a short name (<user>) while a
     # path from the transcript resolves to the long one, and `relative_to` then misses.
     try:
         root = ROOT.resolve()

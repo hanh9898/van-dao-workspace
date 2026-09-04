@@ -54,7 +54,7 @@
       "expectations": [
         {
           "text": "Mã thoát 1 và thông báo có cấu trúc, kèm đường dẫn thật đã tìm.",
-          "evidence": "`{\"loi\": \"khong_doc_duoc_nguon_nao\", \"goi_y\": \"Chạy từ trong repo có _bmad-output/. Đang tìm ở: C:\\\\Users\\\\HBLAB_OPMS\\\\AppData\\\\Local\\\\Temp\\\\ws-test\"}` — mã thoát 1."
+          "evidence": "`{\"loi\": \"khong_doc_duoc_nguon_nao\", \"goi_y\": \"Chạy từ trong repo có _bmad-output/. Đang tìm ở: C:\\\\Users\\\\<user>\\\\AppData\\\\Local\\\\Temp\\\\ws-test\"}` — mã thoát 1."
         }
       ]
     },
@@ -67,7 +67,7 @@
       "expectations": [
         {
           "text": "Báo đúng mã thoát và đường dẫn đã tìm, không bịa trạng thái thay thế.",
-          "evidence": "Session 2d6e91f5-8a03-4b47-9c15-70e4a8b6d213: \"**Kết quả work-state: script exit 1 — không đọc được nguồn nào.** - **Vị trí tìm kiếm:** `C:\\Users\\HBLAB_OPMS\\Projects\\van-dao-workspace`\""
+          "evidence": "Session 2d6e91f5-8a03-4b47-9c15-70e4a8b6d213: \"**Kết quả work-state: script exit 1 — không đọc được nguồn nào.** - **Vị trí tìm kiếm:** `C:\\Users\\<user>\\Projects\\van-dao-workspace`\""
         },
         {
           "text": "Xếp đúng loại: chưa chạy được, KHÔNG phải sạch.",
@@ -83,7 +83,7 @@
   "found_while_running_real": [
     {
       "van_de": "Git Bash biến `/work-state` thành đường dẫn Windows trước khi `claude` nhận được.",
-      "chi_tiet": "Lượt chạy đầu tiên trả về: \"Đường dẫn này không tồn tại trên máy: `C:/Users/HBLAB_OPMS/AppData/Local/Programs/PortableGit/work-state`\". Đó là MSYS path conversion, không phải lỗi skill. Phải đặt `MSYS_NO_PATHCONV=1` trước lệnh khi gọi slash-command qua Git Bash. Không có nó thì mọi eval của mọi skill dạng `/tên` đều hỏng theo cùng kiểu, và thông báo lỗi trông như lỗi của skill.",
+      "chi_tiet": "Lượt chạy đầu tiên trả về: \"Đường dẫn này không tồn tại trên máy: `C:/Users/<user>/AppData/Local/Programs/PortableGit/work-state`\". Đó là MSYS path conversion, không phải lỗi skill. Phải đặt `MSYS_NO_PATHCONV=1` trước lệnh khi gọi slash-command qua Git Bash. Không có nó thì mọi eval của mọi skill dạng `/tên` đều hỏng theo cùng kiểu, và thông báo lỗi trông như lỗi của skill.",
       "khong_phai_loi_skill": "Trong chính lượt bị hỏng đó model hành xử đúng: nó nhận ra có thể người dùng định gõ slash-command và hỏi lại thay vì đoán bừa."
     },
     {

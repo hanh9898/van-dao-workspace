@@ -1,6 +1,6 @@
 # Vấn Đạo — Trạng thái dự án và kế hoạch triển khai
 
-**Ngày:** 2026-08-21, cập nhật 2026-08-24 · **Tác giả:** hanhnt2 (hanhnt2@hblab.vn)
+**Ngày:** 2026-08-21, cập nhật 2026-08-24 · **Tác giả:** hanhnt2 (56497031+hanh9898@users.noreply.github.com)
 **Đi kèm:** `VAN-DAO-dac-ta-v1.0.md` (đặc tả) · `bi-kip.schema.md` (data contract) · `VAN-DAO-setup-du-an.md` (dựng môi trường)
 
 Tài liệu này nói **đang ở đâu** và **làm gì tiếp**. Không nhắc lại thiết kế.

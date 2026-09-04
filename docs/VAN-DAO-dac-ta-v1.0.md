@@ -1,6 +1,6 @@
 # VẤN ĐẠO — Đặc tả v1.0
 
-**Tác giả:** hanhnt2 (hanhnt2@hblab.vn)
+**Tác giả:** hanhnt2 (56497031+hanh9898@users.noreply.github.com)
 **Plugin:** `van-dao` · **Lệnh:** `/van-dao:*` · **Giấy phép:** MIT
 
 Đây là bản đặc tả chính thức đầu tiên. Bản này tự đủ — không cần đọc kèm bản nào khác.
